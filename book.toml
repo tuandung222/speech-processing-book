@@ -19,7 +19,7 @@ edit-url-template = "https://github.com/tuandung222/S-AI/edit/main/{path}"
 mathjax-support = false
 no-section-label = false
 additional-css = ["theme/custom.css"]
-additional-js = ["theme/custom.js"]
+additional-js = ["theme/custom.js", "mermaid.min.js", "mermaid-init.js"]
 
 [output.html.fold]
 enable = true
@@ -52,3 +52,6 @@ no-css = false
 include-src = false
 block-delimiter = { left = "$$", right = "$$" }
 inline-delimiter = { left = "$", right = "$" }
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"

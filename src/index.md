@@ -112,19 +112,34 @@ Reference material để tra cứu khi cần, không cần đọc tuần tự.
 
 ### Dependencies giữa các phần (đọc theo thứ tự ưu tiên)
 
-```
-Phần 0 ←─── (optional foundation for non-DSP background)
-   │
-Phần I ───→ Phần II ───→ Phần III ───→ Phần IV
-   │           │              │            │
-   │           ↓              ↓            ↓
-   └────→ Phần V ─────────────────────────┘
-                     │
-                     ↓
-              Phần VI (Vietnamese specifics)
-                     │
-                     ↓
-              Phần VII (Production deployment)
+```mermaid
+flowchart TD
+    P0["Phần 0: Nền tảng cổ điển<br>(Ngôn ngữ học, Âm học, DSP, ML cổ điển)"]
+    P1["Phần I: Cầu nối khái niệm & Nền tảng tín hiệu<br>(Chương 1-3)"]
+    P2["Phần II: Nhận dạng giọng nói - ASR<br>(Chương 4-7)"]
+    P3["Phần III: Tổng hợp giọng nói & Codecs - TTS<br>(Chương 8-10)"]
+    P4["Phần IV: Speech LLMs & Multimodal<br>(Chương 11-13)"]
+    P5["Phần V: Understanding, Translation, Wake-word<br>(Chương 14-15, 21)"]
+    P6["Phần VI: Tiếng Việt - Dialects & Industry<br>(Chương 16-17)"]
+    P7["Phần VII: Tools, Inference, Production<br>(Chương 18-20)"]
+
+    P0 -.->|"Khuyên đọc trước nếu thiếu nền DSP"| P1
+    P1 === P2
+    P1 === P3
+    P1 === P4
+    P2 === P4
+    P3 === P4
+    P1 ---> P5
+    P2 ---> P5
+    P3 ---> P5
+    P4 ---> P5
+    P5 === P6
+    P6 === P7
+
+    style P0 fill:#f9f9f9,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5
+    style P1 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style P4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style P7 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
 ```
 
 Phần I là **prerequisite cho tất cả** (trừ Phần 0). Phần II-IV có thể đọc song song (mỗi phần độc lập về mặt mô hình). Phần V-VI-VII đều dựa trên Phần I-IV.
