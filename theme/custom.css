@@ -19,6 +19,16 @@ html {
   font-size: 17px;
 }
 
+/* Wider content for tables and code (nemotron-inspired) */
+:root {
+  --content-max-width: 920px;
+}
+
+/* Tighter math display margins (nemotron-inspired) */
+.katex-display {
+  margin: 0.75em 0 !important;
+}
+
 body, .content, .chapter {
   font-family: var(--font-serif);
   line-height: 1.75;

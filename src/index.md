@@ -33,53 +33,101 @@ Cuốn sách được thiết kế cho:
 
 ## Cấu trúc Cuốn sách
 
-Cuốn sách gồm **20 chương** chia thành **7 phần** và **6 phụ lục**:
+Cuốn sách được thiết kế **không phải để đọc tuyến tính từ đầu đến cuối** cho mọi người. Mỗi phần phục vụ một mục đích sư phạm khác nhau, và bạn nên đọc theo lộ trình phù hợp với background của bạn (xem mục **Hướng dẫn Đọc** ngay sau đây).
+
+Cuốn sách có **8 phần** (bao gồm Phần 0 nền tảng mới thêm) và **6 phụ lục**, với khoảng **22 chương** và đang được mở rộng dần.
+
+### Phần 0 — Nền tảng cổ điển (mới)
+
+Dành cho audience NLP/LLM thiếu kiến thức ngôn ngữ học, âm học, hoặc DSP. Đây là chương review nhằm bù lấp gap kiến thức cơ bản trước khi vào deep learning hiện đại. Bạn có thể skip nếu đã quen với phonetics, Fourier, HMM, GMM.
+
+- **Chương 0**: Linguistics, Acoustics, DSP, và Traditional ML (HMM-GMM, DTW, i-vectors)
+
+### Phần I — Cầu nối khái niệm và nền tảng tín hiệu (Chương 1-3)
+
+Phần quan trọng nhất để định hướng tư duy. Phần I xây dựng cây cầu giữa NLP/LLM bạn đã biết và Speech AI bạn sắp học. Sau Phần I, mọi thuật ngữ chuyên ngành sẽ không còn xa lạ.
+
+- **Chương 1**: Từ NLP đến Speech — Cầu nối khái niệm
+- **Chương 2**: Audio Signal Fundamentals (DFT, STFT, Mel filterbank, MFCC, SpecAugment)
+- **Chương 3**: Speech Representations (SSL backbones, contrastive learning, codec tokens)
+
+### Phần II — Nhận dạng giọng nói (ASR) (Chương 4-7)
+
+Bài toán Speech-to-Text — bài toán Speech AI lâu đời nhất, có nhiều thành tựu nhất, và là cửa ngõ thực tiễn vào ngành.
+
+- **Chương 4**: ASR Foundations — CTC, Sequence-to-Sequence with Attention, RNN-Transducer
+- **Chương 5**: Modern ASR Architectures — Conformer, Zipformer, E-Branchformer
+- **Chương 6**: Whisper & Canary — large-scale weakly-supervised ASR case studies
+- **Chương 7**: Streaming ASR — kiến trúc và chiến lược cho real-time
+
+### Phần III — Tổng hợp giọng nói (TTS) và codec (Chương 8-10)
+
+Bài toán Text-to-Speech và các neural audio codec, là nền tảng cho voice cloning, voice agent, và Speech LLMs.
+
+- **Chương 8**: TTS Foundations — Tacotron 2, FastSpeech 2, vocoders (HiFi-GAN, BigVGAN)
+- **Chương 9**: End-to-End TTS — VITS, NaturalSpeech 3, F5-TTS, voice cloning với VALL-E
+- **Chương 10**: Audio Codecs — EnCodec, DAC, Mimi, SpeechTokenizer, residual vector quantization
+
+### Phần IV — Speech LLMs và Multimodal (Chương 11-13)
+
+Phần "frontier" nhất, là điểm gặp gỡ giữa Speech AI và LLM revolution. Nếu bạn từ NLP/LLM, đây là phần bạn sẽ thấy quen thuộc và thú vị nhất.
+
+- **Chương 11**: Speech Language Models — AudioLM, VALL-E, Moshi, Qwen2-Audio, Qwen3-Omni
+- **Chương 12**: Multimodal Omni Models — Qwen3.5-Omni, Gemini 3, GPT-Realtime, native multimodal
+- **Chương 13**: Full-Duplex Dialogue — Moshi architecture, conversational dynamics
+
+### Phần V — Speech Understanding, Translation, và Wake-word (Chương 14-15, 21)
+
+Các bài toán speech analysis (classification, translation, wake-word detection) là application layer của các kỹ thuật ở Phần I-IV.
+
+- **Chương 14**: Speech Classification — Speaker ID, emotion recognition, language ID, audio events
+- **Chương 15**: Speech Translation — S2TT, S2ST, simultaneous, SeamlessM4T deep dive
+- **Chương 21**: Wake-Word Detection (Keyword Spotting) — "Hey Siri" và các giải pháp công nghiệp
+
+### Phần VI — Tiếng Việt (Chương 16-17)
+
+Phần dành riêng cho thị trường và đặc thù tiếng Việt. Bao gồm phân tích các công ty Việt Nam (VinAI, ZaloAI, FPT.AI, VinFast, Trusting Social) và đánh giá khả năng của mô hình hiện tại.
+
+- **Chương 16**: Vietnamese Speech Processing — tonal features, code-switching, industry landscape
+- **Chương 17**: Vietnamese Datasets & Benchmarks — VLSP, VIVOS, CMV-Vi, PhoWhisper
+
+### Phần VII — Tools, Inference, Production (Chương 18-20)
+
+Phần dành cho engineer triển khai thực tế. Khác Phần I-IV (focus lý thuyết và mô hình), Phần VII focus vào **làm sao deploy được vào production reliably**.
+
+- **Chương 18**: Training Frameworks — WeNet, ESPnet, NeMo, SpeechBrain, K2/Icefall
+- **Chương 19**: Inference Engines + Tooling — TensorRT-LLM, vLLM, Triton, ONNX Runtime, audio preprocessing libraries, augmentation, WeNet deep guide
+- **Chương 20**: Production Speech Systems — voice agent architectures, latency budget, cost engineering, observability, deployment patterns
+
+### Phụ lục (Appendices A-F)
+
+Reference material — tra cứu khi cần, không cần đọc tuần tự.
+
+- **A**: Notation Reference — quy ước ký hiệu toán học
+- **B**: Mathematical Proofs — chứng minh chi tiết cho CTC forward-backward, mel filterbank, etc.
+- **C**: NLP-Speech Concept Mapping — bảng tra cứu khái niệm (mở rộng từ Bảng 3.1 của Chương 1)
+- **D**: Code Listings — full implementations dài
+- **E**: Vietnamese Speech Resources — collection links, datasets, công cụ
+- **F**: Tool Comparison Matrices — bảng so sánh framework, model, library
+
+### Dependencies giữa các phần (đọc theo thứ tự ưu tiên)
 
 ```
-Speech AI: From Signal Processing to Full-Duplex Dialogue
-│
-├── Phần I: Nền tảng (Ch 1-3)
-│   ├── Ch 1: From NLP to Speech - The Conceptual Bridge
-│   ├── Ch 2: Audio Signal Fundamentals (DFT, STFT, Mel, MFCC)
-│   └── Ch 3: Speech Representations (SSL, Contrastive, Codecs)
-│
-├── Phần II: Nhận dạng Giọng nói - ASR (Ch 4-7)
-│   ├── Ch 4: ASR Foundations (CTC, Seq2Seq, RNN-T)
-│   ├── Ch 5: Modern ASR Architectures (Conformer, Zipformer, E-Branchformer)
-│   ├── Ch 6: Whisper & Canary
-│   └── Ch 7: Streaming ASR
-│
-├── Phần III: Tổng hợp Giọng nói - TTS & Audio Codecs (Ch 8-10)
-│   ├── Ch 8: TTS Foundations & Vocoders
-│   ├── Ch 9: End-to-End TTS & Zero-Shot Voice Cloning
-│   └── Ch 10: Audio Codecs & Neural Tokenization
-│
-├── Phần IV: Speech LLMs & Multimodal (Ch 11-13)
-│   ├── Ch 11: Speech Language Models (AudioLM, Qwen2-Audio, Moshi)
-│   ├── Ch 12: Multimodal Omni Models (Qwen2.5-Omni, Gemini, GPT-4o)
-│   └── Ch 13: Full-Duplex Dialogue
-│
-├── Phần V: Speech Understanding & Translation (Ch 14-15)
-│   ├── Ch 14: Speech Classification (SER, SID, LID, AED)
-│   └── Ch 15: Speech Translation (S2ST, S2TT, SeamlessM4T)
-│
-├── Phần VI: Tiếng Việt (Ch 16-17)
-│   ├── Ch 16: Vietnamese Speech Processing
-│   └── Ch 17: Vietnamese Datasets & Benchmarks
-│
-├── Phần VII: Tools & Production (Ch 18-20)
-│   ├── Ch 18: Training Frameworks (WeNet, ESPnet, NeMo, SpeechBrain)
-│   ├── Ch 19: Inference Engines (TensorRT, Triton, ONNX, CTranslate2)
-│   └── Ch 20: Production Speech Systems
-│
-└── Phụ lục A-F
-    ├── A: Notation Reference
-    ├── B: Mathematical Proofs
-    ├── C: NLP-Speech Mapping
-    ├── D: Code Listings
-    ├── E: Vietnamese Speech Resources
-    └── F: Tool Comparison Matrices
+Phần 0 ←─── (optional foundation for non-DSP background)
+   │
+Phần I ───→ Phần II ───→ Phần III ───→ Phần IV
+   │           │              │            │
+   │           ↓              ↓            ↓
+   └────→ Phần V ─────────────────────────┘
+                     │
+                     ↓
+              Phần VI (Vietnamese specifics)
+                     │
+                     ↓
+              Phần VII (Production deployment)
 ```
+
+Phần I là **prerequisite cho tất cả** (trừ Phần 0). Phần II-IV có thể đọc song song (mỗi phần độc lập về mặt mô hình). Phần V-VI-VII đều dựa trên Phần I-IV.
 
 ## Hướng dẫn Đọc
 
