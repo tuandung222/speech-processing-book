@@ -469,15 +469,643 @@ $$
 
 : Inference Engine Recommendations <a id="tbl-engine-recommendations"></a>
 
+## Phần Mở rộng: Speech Processing Libraries Ecosystem
+
+Inference engine chỉ là một mảnh của puzzle. Production speech pipeline cần nhiều libraries để xử lý data preprocessing, augmentation, model loading, và optimization. Phần này khảo sát ecosystem rộng hơn theo từng category.
+
+### A. Audio data preprocessing libraries
+
+Trước khi feed vào model, audio cần được loaded, resampled, normalized. Đây là các thư viện chính:
+
+#### A.1 `torchaudio`
+
+PyTorch native audio library. Strengths: GPU-accelerated transforms, tight integration với PyTorch models.
+
+```python
+import torchaudio
+import torchaudio.transforms as T
+
+# Load (returns waveform, sample_rate)
+waveform, sr = torchaudio.load("audio.wav")  # [channels, samples]
+
+# Resample to 16kHz (chuẩn cho speech)
+resampler = T.Resample(orig_freq=sr, new_freq=16000)
+waveform_16k = resampler(waveform)
+
+# Mel spectrogram on GPU
+mel_transform = T.MelSpectrogram(
+    sample_rate=16000,
+    n_fft=400,
+    hop_length=160,
+    n_mels=80,
+).cuda()
+mel_spec = mel_transform(waveform_16k.cuda())  # [channels, n_mels, frames]
+```
+
+#### A.2 `librosa`
+
+Pure Python (CPU only), academic standard cho audio analysis. Slower than torchaudio but more analysis features.
+
+```python
+import librosa
+
+# Load
+y, sr = librosa.load("audio.wav", sr=16000)  # 1D numpy array
+
+# Many analysis functions
+mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=80)
+chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+pitch, magnitudes = librosa.piptrack(y=y, sr=sr)
+```
+
+**Khi nào dùng**: research, exploratory data analysis, không có GPU available. Tránh cho production training (slow).
+
+#### A.3 `soundfile`
+
+Fast audio I/O. Read/write nhiều formats (WAV, FLAC, OGG).
+
+```python
+import soundfile as sf
+
+# Read
+data, sr = sf.read("audio.wav")
+
+# Write
+sf.write("output.wav", data, sr, subtype='PCM_16')
+```
+
+#### A.4 `pydub`
+
+Higher-level audio manipulation (cắt, ghép, fade in/out). Wrapper trên ffmpeg.
+
+```python
+from pydub import AudioSegment
+
+audio = AudioSegment.from_wav("input.wav")
+clip = audio[1000:5000]  # 1-5 seconds
+faded = clip.fade_in(500).fade_out(500)
+faded.export("clip.wav", format="wav")
+```
+
+### B. Data augmentation libraries
+
+Augmentation là essential cho ASR training. Boost accuracy 5-10% trên test set.
+
+#### B.1 `audiomentations`
+
+Most popular Python library cho audio augmentation.
+
+```python
+from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift
+
+augment = Compose([
+    AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.015, p=0.5),
+    TimeStretch(min_rate=0.8, max_rate=1.25, p=0.5),
+    PitchShift(min_semitones=-4, max_semitones=4, p=0.5),
+    Shift(min_fraction=-0.5, max_fraction=0.5, p=0.5),
+])
+
+augmented = augment(samples=audio_array, sample_rate=16000)
+```
+
+#### B.2 `torch-audiomentations`
+
+GPU version of audiomentations. Differentiable, batched.
+
+```python
+from torch_audiomentations import Compose, Gain, PolarityInversion
+
+apply_augmentation = Compose(
+    transforms=[
+        Gain(min_gain_in_db=-15.0, max_gain_in_db=5.0, p=0.5),
+        PolarityInversion(p=0.5)
+    ]
+)
+# Works on batched GPU tensors [batch, channels, samples]
+augmented_batch = apply_augmentation(audio_batch, sample_rate=16000)
+```
+
+#### B.3 `pyroomacoustics` + `rir-generator`
+
+Simulate room impulse responses cho realistic reverb augmentation.
+
+```python
+import pyroomacoustics as pra
+import numpy as np
+
+# Simulate small room
+room = pra.ShoeBox([4, 5, 3], fs=16000, max_order=3)  # dimensions in meters
+room.add_source([1, 1, 1], signal=clean_audio)
+room.add_microphone([2, 3, 1.5])
+room.simulate()
+reverberant_audio = room.mic_array.signals[0]
+```
+
+#### B.4 `nlpaug` audio submodule
+
+Multimodal augmentation library, có audio support đơn giản. Less features than audiomentations but easy API.
+
+#### B.5 SpecAugment via torchaudio
+
+```python
+import torchaudio.transforms as T
+
+freq_masking = T.FrequencyMasking(freq_mask_param=15)
+time_masking = T.TimeMasking(time_mask_param=35)
+
+# Apply to mel spectrogram
+mel = compute_mel(audio)
+mel_aug = time_masking(freq_masking(mel))
+```
+
+SpecAugment được áp dụng directly trên mel spectrogram, không phải trên waveform.
+
+### C. Loading pretrained models (HuggingFace Transformers focus)
+
+HF Transformers là default framework cho loading SOTA speech models.
+
+#### C.1 Whisper
+
+```python
+from transformers import WhisperFeatureExtractor, WhisperForConditionalGeneration, WhisperTokenizer
+import torch
+
+# Load components
+feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-large-v3")
+tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-large-v3")
+model = WhisperForConditionalGeneration.from_pretrained(
+    "openai/whisper-large-v3",
+    torch_dtype=torch.float16,  # half precision for speed
+    device_map="cuda:0",
+)
+
+# Inference
+audio, sr = load_audio("test.wav", target_sr=16000)
+inputs = feature_extractor(audio, sampling_rate=16000, return_tensors="pt")
+inputs = inputs.to("cuda:0", torch.float16)
+
+predicted_ids = model.generate(
+    inputs.input_features,
+    language="vi",  # Vietnamese
+    task="transcribe",
+)
+transcription = tokenizer.batch_decode(predicted_ids, skip_special_tokens=True)
+print(transcription)
+```
+
+#### C.2 Wav2Vec 2.0 / PhoWhisper
+
+```python
+from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+
+# PhoWhisper (Vietnamese)
+processor = Wav2Vec2Processor.from_pretrained("vinai/PhoWhisper-base")
+model = Wav2Vec2ForCTC.from_pretrained("vinai/PhoWhisper-base")
+
+# Process
+inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+logits = model(**inputs).logits
+predicted_ids = torch.argmax(logits, dim=-1)
+transcription = processor.batch_decode(predicted_ids)[0]
+```
+
+#### C.3 Loading custom checkpoint
+
+```python
+# Load from local path
+model = WhisperForConditionalGeneration.from_pretrained("/path/to/local/whisper")
+
+# Load from HF cache
+from huggingface_hub import snapshot_download
+local_dir = snapshot_download(repo_id="openai/whisper-large-v3")
+model = WhisperForConditionalGeneration.from_pretrained(local_dir)
+
+# Load specific revision
+model = WhisperForConditionalGeneration.from_pretrained(
+    "openai/whisper-large-v3",
+    revision="abc123def",  # specific commit
+)
+```
+
+### D. Optimization stack
+
+Production needs aggressive optimization. Stack overview:
+
+#### D.1 ONNX Runtime
+
+```python
+import onnxruntime as ort
+import numpy as np
+
+# Convert PyTorch -> ONNX
+dummy_input = torch.randn(1, 80, 3000)  # whisper mel
+torch.onnx.export(
+    model,
+    dummy_input,
+    "whisper.onnx",
+    opset_version=17,
+    input_names=["mel"],
+    output_names=["logits"],
+)
+
+# Run với ONNX Runtime
+session = ort.InferenceSession(
+    "whisper.onnx",
+    providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+)
+outputs = session.run(None, {"mel": dummy_input.numpy()})
+```
+
+#### D.2 TensorRT-LLM
+
+Cho LLM-based speech models (Qwen2-Audio, Moshi).
+
+```bash
+# Install
+pip install tensorrt_llm
+
+# Convert HF model -> TRT engine
+python -m tensorrt_llm.examples.llama.build \
+    --model_dir Qwen2-Audio-7B \
+    --output_dir qwen2_audio_trt \
+    --dtype float16 \
+    --max_batch_size 16
+```
+
+#### D.3 vLLM cho Speech LLMs
+
+```python
+from vllm import LLM, SamplingParams
+
+llm = LLM(model="Qwen/Qwen2-Audio-7B-Instruct", dtype="float16")
+sampling = SamplingParams(temperature=0.7, max_tokens=200)
+outputs = llm.generate(prompts, sampling)
+```
+
+#### D.4 Triton Inference Server
+
+Production serving với multi-model support.
+
+```bash
+# Model repository structure
+model_repository/
+├── whisper/
+│   ├── config.pbtxt
+│   └── 1/model.onnx
+├── tts/
+│   └── ...
+└── llm/
+    └── ...
+
+# Launch
+tritonserver --model-repository=/path/to/model_repository
+```
+
+#### D.5 Quantization libraries
+
+- **bitsandbytes**: INT8 và INT4 quantization for HF models.
+- **AWQ**: activation-aware quantization, popular for LLMs.
+- **GPTQ**: weight-only quantization.
+- **PyTorch native quantization**: torch.quantization for PyTorch models.
+
+```python
+from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+quant_config = BitsAndBytesConfig(
+    load_in_8bit=True,
+    bnb_8bit_compute_dtype=torch.float16,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    "Qwen/Qwen2-Audio-7B",
+    quantization_config=quant_config,
+    device_map="auto",
+)
+```
+
+---
+
+## Phần Mở rộng: WeNet Deep Guide
+
+WeNet là một trong những ASR training/inference frameworks phổ biến nhất, đặc biệt cho streaming ASR và Chinese/Asian languages. Phần này là hướng dẫn deep dive về cách dùng WeNet trong production.
+
+### WeNet 1 — Design philosophy
+
+WeNet (Mobvoi/Xiaomi, 2021+) được thiết kế xoay quanh **U2 architecture** (Unified streaming + non-streaming): một mô hình train được, có thể chạy cả streaming và offline mode chỉ bằng cách thay decoding strategy.
+
+Key features:
+
+- **Joint CTC + attention loss**: best of both worlds.
+- **Dynamic chunk training**: train với variable chunk sizes, deploy với fixed chunk.
+- **Streaming friendly**: causal Conformer encoder, chunk-based attention.
+- **Production-ready export**: ONNX, LibTorch, TensorRT.
+
+### WeNet 2 — Installation
+
+```bash
+# Clone repo
+git clone https://github.com/wenet-e2e/wenet.git
+cd wenet
+
+# Install Python deps
+pip install -r requirements.txt
+
+# Optional: install C++ runtime for production
+cd runtime/server/x86
+mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j4
+```
+
+### WeNet 3 — Data preparation (Kaldi-style)
+
+WeNet uses Kaldi data format:
+
+```
+data/train/
+├── wav.scp        # utterance_id /path/to/audio.wav
+├── text           # utterance_id transcription
+├── utt2spk        # utterance_id speaker_id
+└── spk2utt        # speaker_id utterance_id [utterance_id ...]
+```
+
+Example `wav.scp`:
+
+```
+BAC009S0002W0123 /data/aishell/wav/train/S0002/BAC009S0002W0123.wav
+BAC009S0002W0124 /data/aishell/wav/train/S0002/BAC009S0002W0124.wav
+```
+
+Example `text`:
+
+```
+BAC009S0002W0123 而 对 楼 市 成 交 抑 制 作 用 最 大 的 限 购
+BAC009S0002W0124 也 成 为 地 方 政 府 的 调 控 工 具
+```
+
+Generate Kaldi-style data từ raw audio:
+
+```bash
+# Có example scripts trong examples/aishell/
+cd examples/aishell/s0
+bash local/aishell_data_prep.sh /path/to/aishell/data
+```
+
+### WeNet 4 — Configuration YAML
+
+WeNet config example (`conf/train_unified_conformer.yaml`):
+
+```yaml
+# Model architecture
+input_dim: 80
+output_dim: 5000  # BPE vocab size
+
+# Encoder: Conformer
+encoder: conformer
+encoder_conf:
+    output_size: 256
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 12
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    attention_dropout_rate: 0.0
+    input_layer: conv2d  # Subsampling
+    normalize_before: true
+    cnn_module_kernel: 15
+    use_cnn_module: True
+    activation_type: 'swish'
+    pos_enc_layer_type: 'rel_pos'
+    selfattention_layer_type: 'rel_selfattn'
+
+# Decoder: Bi-Transformer
+decoder: bitransformer
+decoder_conf:
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 3
+    r_num_blocks: 3  # Right-to-left decoder for rescoring
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    self_attention_dropout_rate: 0.0
+    src_attention_dropout_rate: 0.0
+
+# Joint CTC + Attention loss
+model_conf:
+    ctc_weight: 0.3
+    lsm_weight: 0.1
+    length_normalized_loss: false
+    reverse_weight: 0.3  # Bidirectional decoder weight
+
+# Optimizer
+optim: adam
+optim_conf:
+    lr: 0.002
+scheduler: warmuplr
+scheduler_conf:
+    warmup_steps: 25000
+
+# Data
+dataset_conf:
+    filter_conf:
+        max_length: 40960  # samples (frames)
+        min_length: 0
+        token_max_length: 200
+        token_min_length: 1
+    resample_conf:
+        resample_rate: 16000
+    speed_perturb: true  # Speed augmentation
+    fbank_conf:
+        num_mel_bins: 80
+        frame_shift: 10
+        frame_length: 25
+        dither: 0.1
+    spec_aug: true  # SpecAugment
+    spec_aug_conf:
+        num_t_mask: 2
+        num_f_mask: 2
+        max_t: 50
+        max_f: 10
+    shuffle: true
+    sort: true
+    batch_conf:
+        batch_type: 'dynamic'
+        max_frames_in_batch: 12000
+```
+
+### WeNet 5 — Training command
+
+```bash
+# Single GPU
+python wenet/bin/train.py \
+    --config conf/train_unified_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer \
+    --num_workers 4 \
+    --pin_memory
+
+# Multi-GPU distributed
+torchrun --nproc_per_node=4 --master_port=29500 \
+    wenet/bin/train.py \
+    --config conf/train_unified_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer
+```
+
+Monitor via TensorBoard:
+
+```bash
+tensorboard --logdir exp/conformer/tensorboard
+```
+
+Typical training time: 4-5 ngày on 8x V100 for AISHELL-1 (170h Chinese data).
+
+### WeNet 6 — Decoding modes
+
+WeNet supports 4 decoding modes:
+
+1. **ctc_greedy_search**: fastest, lowest accuracy.
+2. **ctc_prefix_beam_search**: standard CTC beam, balanced.
+3. **attention_rescoring**: best accuracy, slowest. Uses bidirectional decoder.
+4. **attention**: pure attention decoding (offline only).
+
+```bash
+# Offline decoding với attention rescoring (best accuracy)
+python wenet/bin/recognize.py \
+    --config exp/conformer/train.yaml \
+    --test_data data/test/data.list \
+    --checkpoint exp/conformer/avg_30.pt \
+    --beam_size 10 \
+    --batch_size 1 \
+    --penalty 0.0 \
+    --dict data/dict/lang_char.txt \
+    --ctc_weight 0.3 \
+    --reverse_weight 0.3 \
+    --result_file exp/conformer/test_attention_rescoring/text \
+    --mode attention_rescoring
+```
+
+### WeNet 7 — Streaming inference setup
+
+Streaming mode dùng chunk-based attention:
+
+```python
+import wenet
+import torch
+
+# Load model
+model = wenet.load_model('exp/conformer/avg_30.pt')
+model.eval()
+
+# Streaming config
+chunk_size = 16  # frames per chunk (~160ms)
+num_left_chunks = 4  # Look back 4 chunks (640ms history)
+
+# Simulate streaming
+audio_chunks = stream_audio_from_mic()  # generator yielding chunks
+
+for chunk in audio_chunks:
+    # Decode this chunk
+    result = model.streaming_decode(
+        chunk,
+        chunk_size=chunk_size,
+        num_left_chunks=num_left_chunks,
+        decoding_chunk_size=chunk_size,
+        simulate_streaming=True,
+    )
+    print(f"Partial: {result.partial_text}")
+    if result.is_final:
+        print(f"Final: {result.text}")
+```
+
+### WeNet 8 — Export to ONNX/LibTorch
+
+For production deployment:
+
+```bash
+# Export to ONNX (cho ONNX Runtime, TensorRT)
+python wenet/bin/export_onnx_cpu.py \
+    --config exp/conformer/train.yaml \
+    --checkpoint exp/conformer/avg_30.pt \
+    --output_dir exp/conformer/onnx \
+    --chunk_size 16 \
+    --num_decoding_left_chunks 4
+
+# Export to LibTorch (cho C++ runtime)
+python wenet/bin/export_jit.py \
+    --config exp/conformer/train.yaml \
+    --checkpoint exp/conformer/avg_30.pt \
+    --output_file exp/conformer/final.zip
+```
+
+### WeNet 9 — Vietnamese fine-tuning recipe
+
+Cho team Vi muốn fine-tune WeNet trên Vi data:
+
+```bash
+# 1. Prepare Vi data (e.g., from VLSP, VIVOS)
+cd examples/aishell/s0  # use as template
+mkdir -p data/vi_train
+
+# Generate wav.scp, text, etc.
+python scripts/prepare_vi_data.py \
+    --audio_dir /path/to/vi_audio \
+    --transcription_file /path/to/transcripts.txt \
+    --output_dir data/vi_train
+
+# 2. Generate dictionary (Vi tokens)
+cat data/vi_train/text | python tools/text2token.py \
+    --space "<space>" \
+    --bpe_model bpe.model \
+    > data/dict/vi_lang_char.txt
+
+# 3. Modify config for Vi
+cp conf/train_unified_conformer.yaml conf/train_vi.yaml
+# Edit:
+#   output_dim: <vocabulary_size>
+#   speed_perturb: true (helpful for Vi tones)
+
+# 4. Initialize từ pretrained Whisper or multilingual Wav2Vec
+# (Optional: download pretrained checkpoint, load as init)
+
+# 5. Train với multi-GPU
+torchrun --nproc_per_node=2 \
+    wenet/bin/train.py \
+    --config conf/train_vi.yaml \
+    --data_type raw \
+    --train_data data/vi_train/data.list \
+    --cv_data data/vi_dev/data.list \
+    --model_dir exp/vi_conformer \
+    --init_checkpoint /path/to/pretrained.pt
+```
+
+### WeNet 10 — Common pitfalls
+
+1. **OOM during training**: reduce `max_frames_in_batch` từ 12000 xuống 8000 hoặc 6000.
+2. **Slow convergence**: ensure `speed_perturb: true` (3-way augmentation).
+3. **Streaming accuracy worse than offline**: tune `num_left_chunks` (more context = better accuracy, more latency).
+4. **Export to ONNX fails**: ensure `chunk_size` divisible by subsampling factor (4).
+5. **Vietnamese tone confusion**: use character-level dictionary, not BPE merged tokens that span tones.
+
+---
+
 ## Tóm tắt
 
-1. **TensorRT + Triton**: Gold standard cho NVIDIA GPU deployment - 3-5x faster
-2. **ONNX Runtime**: Cross-platform, dễ dùng, hỗ trợ nhiều backends
-3. **CTranslate2/faster-whisper**: Tối ưu cho Whisper - 3-4x faster, 8x less memory
-4. **vLLM**: Cho Speech LLM serving (Qwen2-Audio, etc.)
-5. **OpenVINO**: Intel CPU optimization
-6. **BentoML/Ray Serve**: High-level serving frameworks cho complex pipelines
-7. Production speech pipeline cần **multiple engines** cho different components
+1. **TensorRT + Triton**: Gold standard cho NVIDIA GPU deployment, 3-5x faster than naive PyTorch.
+2. **ONNX Runtime**: Cross-platform, dễ dùng, hỗ trợ nhiều backends.
+3. **CTranslate2/faster-whisper**: Tối ưu cho Whisper, 3-4x faster, 8x less memory.
+4. **vLLM**: Cho Speech LLM serving (Qwen2-Audio, Moshi, etc.).
+5. **OpenVINO**: Intel CPU optimization.
+6. **BentoML/Ray Serve**: High-level serving frameworks cho complex pipelines.
+7. **WeNet**: End-to-end framework cho ASR training + production deployment, đặc biệt streaming.
+8. **Production speech pipeline cần multiple engines** cho different components.
+9. **Data preprocessing/augmentation libraries** (torchaudio, librosa, audiomentations) là essential cho training quality.
+10. **Quantization** (INT8, AWQ, GPTQ) là key cho cost-effective deployment.
 
 
 
