@@ -20,9 +20,11 @@ Tiếng Việt là **tonal language** với 6 thanh điệu (lexical tones)  -  
 !!! note "Tone = Fundamental Frequency (F0) Contour"
     Mỗi thanh điệu tương ứng với một **F0 contour** (đường biến thiên tần số cơ bản) đặc trưng. F0 là đặc trưng quan trọng nhất cần capture trong cả ASR và TTS cho tiếng Việt:
 
+    <a id="eq-tone-f0"></a>
+
     $$
     \text{Tone} \leftrightarrow F0(t), \quad t \in [t_{\text{onset}}, t_{\text{offset}}]
-    $$ <a id="eq-tone-f0"></a>
+    $$
 
     F0 range điển hình:
 
@@ -298,7 +300,7 @@ $$
 <a id="eq-speaker-embedding"></a>
 
 $$
-\mathbf{s} = \text{SpeakerEncoder}(\text{reference\_audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
+\mathbf{s} = \text{SpeakerEncoder}(\text{reference_audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
 $$
 
 Speaker encoder cần capture:

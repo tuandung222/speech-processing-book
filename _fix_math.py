@@ -36,23 +36,32 @@ ROOT = Path(__file__).resolve().parent
 DOCS = ROOT / "docs"
 
 
-# Match a display math block whose closing $$ has a trailing anchor:
-#   $$
-#   ...content...
-#   $$ <a id="eq-xxx"></a>
+# Match a display math block whose closing $$ has a trailing anchor.
+# Supports leading indentation (e.g. inside admonitions).
+#   [INDENT]$$
+#   [INDENT]...content...
+#   [INDENT]$$ <a id="eq-xxx"></a>
 #
-# Capture: (content), (anchor_id)
+# Captures: (indent), (content), (anchor_id)
 BLOCK_RE = re.compile(
-    r"(?ms)^\$\$\n(.*?)\n\$\$[ \t]+(<a id=\"([\w:-]+)\"></a>)[ \t]*$",
+    r"(?ms)^([ \t]*)\$\$\n(.*?)\n[ \t]*\$\$[ \t]+<a id=\"([\w:-]+)\"></a>[ \t]*$",
 )
 
 
 def fix_file(path: Path) -> int:
     text = path.read_text(encoding="utf-8")
-    new, n = BLOCK_RE.subn(
-        lambda m: f'<a id="{m.group(3)}"></a>\n\n$$\n{m.group(1)}\n$$',
-        text,
-    )
+
+    def repl(m: re.Match) -> str:
+        indent = m.group(1)
+        content = m.group(2)
+        anchor_id = m.group(3)
+        # Place anchor BEFORE the math block, preserving indent
+        return (
+            f'{indent}<a id="{anchor_id}"></a>\n\n'
+            f'{indent}$$\n{content}\n{indent}$$'
+        )
+
+    new, n = BLOCK_RE.subn(repl, text)
     if n:
         path.write_text(new, encoding="utf-8")
     return n

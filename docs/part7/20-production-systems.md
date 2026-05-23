@@ -204,7 +204,7 @@ $$
 <a id="eq-tts-first-chunk"></a>
 
 $$
-L_{\text{TTS, first}} = L_{\text{text\_process}} + L_{\text{mel\_first\_chunk}} + L_{\text{vocoder\_first\_chunk}}
+L_{\text{TTS, first}} = L_{\text{text_process}} + L_{\text{mel_first_chunk}} + L_{\text{vocoder_first_chunk}}
 $$
 
 | TTS Model | First Chunk Latency | Total RTF |
@@ -252,7 +252,7 @@ Cho autoregressive models (Whisper decoder, VALL-E):
 <a id="eq-kv-cache"></a>
 
 $$
-\text{Memory}_{\text{KV}} = 2 \times n_{\text{layers}} \times n_{\text{heads}} \times d_{\text{head}} \times L_{\text{seq}} \times \text{dtype\_size}
+\text{Memory}_{\text{KV}} = 2 \times n_{\text{layers}} \times n_{\text{heads}} \times d_{\text{head}} \times L_{\text{seq}} \times \text{dtype_size}
 $$
 
 Optimization strategies:

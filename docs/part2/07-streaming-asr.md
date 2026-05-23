@@ -97,7 +97,7 @@ trong đó $c$ là chunk index, và keys/values chỉ từ:
 <a id="eq-dynamic-chunk"></a>
 
 $$
-\text{chunk\_size} \sim \text{Uniform}(\{1, 2, 4, 8, 16, \infty\}) \times \text{subsampling\_factor}
+\text{chunk_size} \sim \text{Uniform}(\{1, 2, 4, 8, 16, \infty\}) \times \text{subsampling_factor}
 $$
 
 - chunk_size = $\infty$ → offline mode (full attention)
@@ -164,7 +164,7 @@ Endpointing (Voice Activity Detection + End-of-Query detection) quyết định 
 
 $$
 \text{endpoint} = \begin{cases}
-\text{True} & \text{nếu } \text{silence\_duration} > \tau_{\text{threshold}} \\
+\text{True} & \text{nếu } \text{silence_duration} > \tau_{\text{threshold}} \\
 \text{False} & \text{ngược lại}
 \end{cases}
 $$
@@ -237,7 +237,7 @@ Ngoài WER (Word Error Rate), streaming ASR cần thêm:
 | Metric | Công thức | Ý nghĩa |
 |--------|----------|---------|
 | **RTF** (Real-Time Factor) | $\frac{T_{\text{process}}}{T_{\text{audio}}}$ | < 1.0 = real-time |
-| **Latency** | $T_{\text{first\_token}} - T_{\text{speech\_end}}$ | Thời gian chờ kết quả |
+| **Latency** | $T_{\text{first_token}} - T_{\text{speech_end}}$ | Thời gian chờ kết quả |
 | **EL** (Emission Latency) | Average delay per token | Token-level latency |
 | **WER** | $\frac{S + D + I}{N}$ | Accuracy |
 | **Partial stability** | % partial results không thay đổi | UX quality |

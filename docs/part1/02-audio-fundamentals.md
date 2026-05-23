@@ -8,6 +8,8 @@
 
 <a id="eq-sampling"></a>
 
+<a id="eq-nyquist"></a>
+
 $$
 x[n] = x_a(n \cdot T_s), \quad n = 0, 1, 2, \ldots
 $$
@@ -21,7 +23,7 @@ trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, v
 
     $$
     f_s \geq 2 f_{\max}
-    $$ <a id="eq-nyquist"></a>
+$$
 
     Tần số $f_N = f_s / 2$ được gọi là **Nyquist frequency**.
 
@@ -139,8 +141,8 @@ $$
 $$
 \begin{aligned}
 f_s &= 16{,}000 \text{ Hz} \\
-\text{frame\_length} &= 25 \text{ ms} \Rightarrow N = f_s \times 0.025 = 400 \\
-\text{frame\_shift} &= 10 \text{ ms} \Rightarrow H = f_s \times 0.010 = 160 \\
+\text{frame_length} &= 25 \text{ ms} \Rightarrow N = f_s \times 0.025 = 400 \\
+\text{frame_shift} &= 10 \text{ ms} \Rightarrow H = f_s \times 0.010 = 160 \\
 \text{Frequency bins} &= N/2 + 1 = 201 \\
 \text{Frames per second} &= f_s / H = 100
 \end{aligned}
