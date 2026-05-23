@@ -20,9 +20,11 @@ Moshi xử lý **hai audio streams song song**:
 - **User stream**: Audio từ microphone (input)
 - **Model stream**: Audio do model generate (output)
 
+<a id="eq-moshi-dual"></a>
+
 $$
 p(\mathbf{a}_t^{\text{model}} | \mathbf{a}_{<t}^{\text{user}}, \mathbf{a}_{<t}^{\text{model}}, \mathbf{c}_{<t})
-$$ <a id="eq-moshi-dual"></a>
+$$
 
 trong đó $\mathbf{a}_t$ là audio tokens tại time step $t$, $\mathbf{c}_t$ là inner text tokens.
 
@@ -30,9 +32,11 @@ trong đó $\mathbf{a}_t$ là audio tokens tại time step $t$, $\mathbf{c}_t$ l
 
 Moshi sử dụng **inner monologue** - text tokens nội bộ giúp model "suy nghĩ":
 
+<a id="eq-moshi-stream"></a>
+
 $$
 \text{Stream} = [\underbrace{\mathbf{c}_t}_{\text{inner text}}, \underbrace{\mathbf{a}_t^{(1:Q_{\text{user}})}}_{\text{user audio}}, \underbrace{\mathbf{a}_t^{(1:Q_{\text{model}})}}_{\text{model audio}}]
-$$ <a id="eq-moshi-stream"></a>
+$$
 
 ### Mimi Audio Codec
 
@@ -43,9 +47,11 @@ Moshi sử dụng **Mimi** codec riêng (không dùng EnCodec):
 - First codebook encode semantic information
 - Remaining codebooks encode acoustic details
 
+<a id="eq-mimi-bitrate"></a>
+
 $$
 \text{Bitrate}_{\text{Mimi}} = 12.5 \times Q \times \log_2(C) \text{ bps}
-$$ <a id="eq-mimi-bitrate"></a>
+$$
 
 với $Q = 8$ codebooks, $C = 2048$ entries → 1.1 kbps.
 
@@ -56,9 +62,11 @@ Moshi sử dụng **Depth Transformer** để predict $Q$ codebook levels:
 - **Temporal Transformer**: Process sequence over time (large, autoregressive)
 - **Depth Transformer**: Process codebook levels at each timestep (small)
 
+<a id="eq-moshi-depth"></a>
+
 $$
 \mathbf{h}_t = \text{TemporalTF}(\mathbf{h}_{<t}), \quad \mathbf{a}_t^{(q)} = \text{DepthTF}(\mathbf{h}_t, \mathbf{a}_t^{(<q)})
-$$ <a id="eq-moshi-depth"></a>
+$$
 
 ```python
 #| eval: false
@@ -151,9 +159,11 @@ Turn-taking trong conversation tự nhiên cực kỳ phức tạp:
 
 VAP [^ekstedt2022voice] dự đoán ai sẽ nói tiếp:
 
+<a id="eq-vap"></a>
+
 $$
 p(\text{speaker}_{\text{next}} | \text{audio}_{t-L:t}) = \sigma(\text{VAP}(\mathbf{x}_{t-L:t}))
-$$ <a id="eq-vap"></a>
+$$
 
 ## So sánh Full-Duplex Models
 

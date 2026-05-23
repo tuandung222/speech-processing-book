@@ -4,9 +4,11 @@
 
 Automatic Speech Recognition (ASR) là bài toán ánh xạ từ tín hiệu âm thanh sang chuỗi ký tự/từ:
 
+<a id="eq-asr-objective"></a>
+
 $$
 \hat{Y} = \arg\max_{Y} P(Y \mid X)
-$$ <a id="eq-asr-objective"></a>
+$$
 
 trong đó $X = (x_1, x_2, \ldots, x_T)$ là chuỗi acoustic frames và $Y = (y_1, y_2, \ldots, y_U)$ là chuỗi text tokens, với $T \gg U$ (audio dài hơn text rất nhiều).
 
@@ -35,21 +37,27 @@ Cho output vocabulary $\mathcal{V} = \{a, b, c, \ldots, z, \langle b \rangle\}$ 
 
 **Collapsing function** $\mathcal{B}$: loại bỏ repeated characters và blanks:
 
+<a id="eq-ctc-collapse"></a>
+
 $$
 \mathcal{B}(\langle b \rangle h \langle b \rangle e \langle b \rangle l l \langle b \rangle l o \langle b \rangle) = \text{"hello"}
-$$ <a id="eq-ctc-collapse"></a>
+$$
 
 ### CTC Loss
 
 CTC loss marginalize trên tất cả valid paths:
 
+<a id="eq-ctc-prob"></a>
+
 $$
 P_{\text{CTC}}(Y \mid X) = \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t \mid X)
-$$ <a id="eq-ctc-prob"></a>
+$$
+
+<a id="eq-ctc-loss"></a>
 
 $$
 \mathcal{L}_{\text{CTC}} = -\log P_{\text{CTC}}(Y \mid X)
-$$ <a id="eq-ctc-loss"></a>
+$$
 
 !!! note "Tại sao cần Blank Token?"
     Không có blank, model không thể phân biệt "hello" (1 chữ l) và "helllo" (2 chữ l liên tiếp). Blank cho phép "reset"  -  mỗi non-blank emission sau blank (hoặc khác character) là một ký tự mới.
@@ -59,26 +67,32 @@ $$ <a id="eq-ctc-loss"></a>
 
 Tính $P_{\text{CTC}}(Y \mid X)$ bằng dynamic programming. Định nghĩa modified label sequence $Z$ bằng cách chèn blank giữa mỗi label:
 
+<a id="eq-ctc-modified"></a>
+
 $$
 Z = (\langle b \rangle, y_1, \langle b \rangle, y_2, \langle b \rangle, \ldots, \langle b \rangle, y_U, \langle b \rangle)
-$$ <a id="eq-ctc-modified"></a>
+$$
 
 có độ dài $|Z| = 2U + 1$.
 
 **Forward variable:**
 
+<a id="eq-ctc-forward"></a>
+
 $$
 \alpha(t, s) = \sum_{\substack{\pi_{1:t}: \\ \mathcal{B}(\pi_{1:t}) = Z_{1:s}}} \prod_{t'=1}^{t} P(\pi_{t'} \mid X)
-$$ <a id="eq-ctc-forward"></a>
+$$
 
 **Recurrence:**
+
+<a id="eq-ctc-recurrence"></a>
 
 $$
 \alpha(t, s) = P(z_s \mid x_t) \times \begin{cases}
 \alpha(t-1, s) + \alpha(t-1, s-1) & \text{if } z_s = \langle b \rangle \text{ or } z_s = z_{s-2} \\
 \alpha(t-1, s) + \alpha(t-1, s-1) + \alpha(t-1, s-2) & \text{otherwise}
 \end{cases}
-$$ <a id="eq-ctc-recurrence"></a>
+$$
 
 ```python
 #| eval: false
@@ -197,15 +211,19 @@ class CTCModel(nn.Module):
 
 **Greedy decoding:**
 
+<a id="eq-ctc-greedy"></a>
+
 $$
 \hat{\pi}_t = \arg\max_{c} P(c \mid x_t), \quad \hat{Y} = \mathcal{B}(\hat{\pi})
-$$ <a id="eq-ctc-greedy"></a>
+$$
 
 **Beam search decoding** kết hợp language model:
 
+<a id="eq-ctc-beam"></a>
+
 $$
 \hat{Y} = \arg\max_{Y} \left[\log P_{\text{CTC}}(Y \mid X) + \lambda \log P_{\text{LM}}(Y)\right]
-$$ <a id="eq-ctc-beam"></a>
+$$
 
 ### Hạn chế của CTC
 
@@ -220,20 +238,24 @@ $$ <a id="eq-ctc-beam"></a>
 
 Kiến trúc seq2seq kinh điển cho ASR, tương tự machine translation:
 
+<a id="eq-enc-dec"></a>
+
 $$
 \begin{aligned}
 \mathbf{h} &= \text{Encoder}(X) \quad & \text{// } [\text{batch}, T, d_{\text{model}}] \\
 P(y_u \mid y_{<u}, X) &= \text{Decoder}(\mathbf{h}, y_{<u}) \quad & \text{// autoregressive}
 \end{aligned}
-$$ <a id="eq-enc-dec"></a>
+$$
 
 ### Attention Mechanism cho ASR
 
 **Cross-attention** giữa decoder query và encoder keys:
 
+<a id="eq-asr-attention"></a>
+
 $$
 \text{Attention}(Q_{\text{dec}}, K_{\text{enc}}, V_{\text{enc}}) = \text{softmax}\left(\frac{Q_{\text{dec}} K_{\text{enc}}^\top}{\sqrt{d_k}}\right) V_{\text{enc}}
-$$ <a id="eq-asr-attention"></a>
+$$
 
 !!! note "Location-Sensitive Attention"
     Standard attention có thể "nhảy"  -  không bảo đảm monotonic alignment. **Location-sensitive attention** (LAS, Listen Attend and Spell) thêm convolution trên attention weights trước đó để khuyến khích monotonic progression.
@@ -270,13 +292,17 @@ RNN-T gồm 3 thành phần:
 2. **Prediction network** (label history): $\mathbf{g}_u = \text{PredNet}(y_{1:u-1})$
 3. **Joint network**: kết hợp encoder và prediction outputs
 
+<a id="eq-rnnt-joint"></a>
+
 $$
 \mathbf{z}_{t,u} = \text{Joint}(\mathbf{h}_t, \mathbf{g}_u) = \text{Linear}\left(\tanh(\mathbf{W}_h \mathbf{h}_t + \mathbf{W}_g \mathbf{g}_u + \mathbf{b})\right)
-$$ <a id="eq-rnnt-joint"></a>
+$$
+
+<a id="eq-rnnt-output"></a>
 
 $$
 P(k \mid t, u) = \text{softmax}(\mathbf{z}_{t,u})_k, \quad k \in \mathcal{V} \cup \{\langle b \rangle\}
-$$ <a id="eq-rnnt-output"></a>
+$$
 
 ### Lattice & Forward-Backward
 
@@ -292,15 +318,19 @@ RNN-T hoạt động trên **lattice** 2D $(T \times U)$:
 
 **Forward variable:**
 
+<a id="eq-rnnt-forward"></a>
+
 $$
 \alpha(t, u) = \alpha(t-1, u) \cdot P(\langle b \rangle \mid t-1, u) + \alpha(t, u-1) \cdot P(y_u \mid t, u-1)
-$$ <a id="eq-rnnt-forward"></a>
+$$
 
 **Loss:**
 
+<a id="eq-rnnt-loss"></a>
+
 $$
 \mathcal{L}_{\text{RNN-T}} = -\log \alpha(T, U)
-$$ <a id="eq-rnnt-loss"></a>
+$$
 
 !!! warning "Latency Warning"
     RNN-T forward-backward trên lattice $(T \times U)$ yêu cầu memory $O(T \times U \times V)$ cho full lattice. Với $T=1000, U=100, V=5000$: cần ~2 GB per sample. Production systems sử dụng **pruned RNN-T** để giảm memory.
@@ -470,17 +500,21 @@ class RNNTransducer(nn.Module):
 
 ### Word Error Rate (WER)
 
+<a id="eq-wer"></a>
+
 $$
 \text{WER} = \frac{S + D + I}{N} \times 100\%
-$$ <a id="eq-wer"></a>
+$$
 
 trong đó $S$ = substitutions, $D$ = deletions, $I$ = insertions, $N$ = total words in reference.
 
 ### Character Error Rate (CER)
 
+<a id="eq-cer"></a>
+
 $$
 \text{CER} = \frac{S_c + D_c + I_c}{N_c} \times 100\%
-$$ <a id="eq-cer"></a>
+$$
 
 Tương tự WER nhưng ở character level  -  hữu ích cho ngôn ngữ không có word boundaries rõ ràng (tiếng Trung, tiếng Nhật).
 

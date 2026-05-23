@@ -36,9 +36,11 @@ Tiếng Việt là **tonal language** với 6 thanh điệu (lexical tones)  -  
 
 Trong phương ngữ Nam Bộ, thanh Hỏi (falling-rising) và thanh Ngã (rising-glottalized) **hợp nhất** thành một thanh:
 
+<a id="eq-hoi-nga-merger"></a>
+
 $$
 \text{Bắc Bộ: } \underbrace{\text{mả}}_{\text{Hỏi}} \neq \underbrace{\text{mã}}_{\text{Ngã}} \qquad \text{Nam Bộ: } \underbrace{\text{mả} \approx \text{mã}}_{\text{merged}}
-$$ <a id="eq-hoi-nga-merger"></a>
+$$
 
 Điều này nghĩa là ASR model phải:
 
@@ -80,9 +82,11 @@ $$ <a id="eq-hoi-nga-merger"></a>
 
 **Approach 1: Fine-tune Whisper**
 
+<a id="eq-whisper-vi"></a>
+
 $$
 \text{Whisper Large-v3} \xrightarrow{\text{Fine-tune trên Vietnamese data}} \text{Whisper-Vi}
-$$ <a id="eq-whisper-vi"></a>
+$$
 
 ```python
 #| eval: false
@@ -136,9 +140,11 @@ def prepare_whisper_vietnamese_training(
 
 **Approach 2: Wav2Vec 2.0 + CTC**
 
+<a id="eq-xlsr-vi"></a>
+
 $$
 \text{XLSR-53 (multilingual Wav2Vec 2.0)} \xrightarrow{\text{CTC fine-tune}} \text{Vietnamese ASR}
-$$ <a id="eq-xlsr-vi"></a>
+$$
 
 - XLSR-53: Pre-trained on 56K hours, 53 languages
 - Fine-tune với CTC loss trên Vietnamese data
@@ -146,9 +152,11 @@ $$ <a id="eq-xlsr-vi"></a>
 
 **Approach 3: Conformer + RNN-T (Production)**
 
+<a id="eq-conformer-vi"></a>
+
 $$
 \text{Conformer Encoder} + \text{RNN-T Decoder} \xrightarrow{\text{Train from scratch}} \text{Streaming Vietnamese ASR}
-$$ <a id="eq-conformer-vi"></a>
+$$
 
 ### Vietnamese WER Results
 
@@ -273,9 +281,11 @@ print(f"Output: {normalized}")
 
 VALL-E và F5-TTS có thể clone giọng Việt chỉ với **3 giây** audio prompt:
 
+<a id="eq-vi-cloning"></a>
+
 $$
 \text{[Text Vietnamese]} + \text{[3s Audio Prompt]} \xrightarrow{\text{F5-TTS}} \text{[Cloned Voice Audio]}
-$$ <a id="eq-vi-cloning"></a>
+$$
 
 **Thách thức đặc thù:**
 
@@ -285,9 +295,11 @@ $$ <a id="eq-vi-cloning"></a>
 
 ### Speaker Embedding for Vietnamese
 
+<a id="eq-speaker-embedding"></a>
+
 $$
 \mathbf{s} = \text{SpeakerEncoder}(\text{reference\_audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
-$$ <a id="eq-speaker-embedding"></a>
+$$
 
 Speaker encoder cần capture:
 

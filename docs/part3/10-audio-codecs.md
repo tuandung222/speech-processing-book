@@ -4,9 +4,11 @@
 
 Neural audio codecs giải quyết bài toán **nén audio thành discrete tokens**  -  cầu nối trực tiếp giữa speech và language modeling:
 
+<a id="eq-codec-overview"></a>
+
 $$
 \text{Waveform} \xrightarrow{\text{Encoder}} \text{Latent} \xrightarrow{\text{RVQ}} \text{Discrete Tokens} \xrightarrow{\text{Decoder}} \text{Reconstructed Waveform}
-$$ <a id="eq-codec-overview"></a>
+$$
 
 !!! tip "NLP Parallel: Tokenizer cho Audio"
     | Text Processing | Audio Processing |
@@ -24,25 +26,31 @@ $$ <a id="eq-codec-overview"></a>
 
 Vector Quantization [^oord2017vqvae] ánh xạ continuous vector sang nearest codebook entry:
 
+<a id="eq-vq"></a>
+
 $$
 q(\mathbf{z}) = \arg\min_{\mathbf{e}_k \in \mathcal{C}} \|\mathbf{z} - \mathbf{e}_k\|_2
-$$ <a id="eq-vq"></a>
+$$
 
 trong đó $\mathcal{C} = \{\mathbf{e}_1, \mathbf{e}_2, \ldots, \mathbf{e}_K\}$ là codebook với $K$ entries.
 
 **Vấn đề**: argmin không differentiable → cần **Straight-Through Estimator (STE)**:
 
+<a id="eq-ste"></a>
+
 $$
 \hat{\mathbf{z}} = \mathbf{z} + \text{sg}(\mathbf{e}_{k^*} - \mathbf{z})
-$$ <a id="eq-ste"></a>
+$$
 
 trong đó $\text{sg}(\cdot)$ là stop-gradient operator. Forward pass: $\hat{\mathbf{z}} = \mathbf{e}_{k^*}$. Backward pass: gradient flows straight through to $\mathbf{z}$.
 
 ### VQ-VAE Loss
 
+<a id="eq-vqvae-loss"></a>
+
 $$
 \mathcal{L}_{\text{VQ-VAE}} = \underbrace{\|\mathbf{x} - \hat{\mathbf{x}}\|_2^2}_{\text{reconstruction}} + \underbrace{\|\text{sg}(\mathbf{z}) - \mathbf{e}\|_2^2}_{\text{codebook loss}} + \beta \underbrace{\|\mathbf{z} - \text{sg}(\mathbf{e})\|_2^2}_{\text{commitment loss}}
-$$ <a id="eq-vqvae-loss"></a>
+$$
 
 ### Hạn chế của Single VQ
 
@@ -59,6 +67,8 @@ Với codebook size $K = 1024$ và dimension $d = 128$:
 
 Thay vì 1 codebook lớn, dùng **nhiều codebooks nhỏ** quantize **residual** (phần dư):
 
+<a id="eq-rvq"></a>
+
 $$
 \begin{aligned}
 \mathbf{r}_0 &= \mathbf{z} & \text{// Original latent} \\
@@ -68,21 +78,25 @@ $$
 \hat{\mathbf{z}}_Q &= q_Q(\mathbf{r}_{Q-1}) & \text{// Final quantization} \\
 \hat{\mathbf{z}} &= \sum_{q=1}^{Q} \hat{\mathbf{z}}_q & \text{// Reconstructed latent}
 \end{aligned}
-$$ <a id="eq-rvq"></a>
+$$
 
 ### Bitrate Calculation
 
 Với $Q$ codebooks, mỗi codebook size $K$, ở frame rate $f$:
 
+<a id="eq-rvq-bitrate"></a>
+
 $$
 \text{Bitrate} = Q \times \log_2(K) \times f \text{ bps}
-$$ <a id="eq-rvq-bitrate"></a>
+$$
 
 **EnCodec example**: $Q=8, K=1024, f=75$:
 
+<a id="eq-encodec-bitrate"></a>
+
 $$
 \text{Bitrate} = 8 \times 10 \times 75 = 6{,}000 \text{ bps} = 6 \text{ kbps}
-$$ <a id="eq-encodec-bitrate"></a>
+$$
 
 !!! note "RVQ Hierarchy"
     Các codebook layers mang thông tin khác nhau:
@@ -214,9 +228,11 @@ EnCodec [^defossez2022encodec] là neural audio codec của Meta:
 
 ### Training Losses
 
+<a id="eq-encodec-loss"></a>
+
 $$
 \mathcal{L}_{\text{EnCodec}} = \lambda_t \mathcal{L}_{\text{time}} + \lambda_f \mathcal{L}_{\text{freq}} + \lambda_g \mathcal{L}_{\text{gan}} + \lambda_{\text{fm}} \mathcal{L}_{\text{feat}} + \lambda_w \mathcal{L}_{\text{vq}}
-$$ <a id="eq-encodec-loss"></a>
+$$
 
 | Loss | Formula | Purpose |
 |------|---------|---------|
@@ -271,9 +287,11 @@ SpeechTokenizer tách biệt **semantic** và **acoustic** information:
 
 Training: Thêm **semantic distillation loss** cho layer 1:
 
+<a id="eq-speechtokenizer"></a>
+
 $$
 \mathcal{L}_{\text{semantic}} = \|\hat{\mathbf{z}}^{(1)} - \text{HuBERT}(\mathbf{x})\|_2^2
-$$ <a id="eq-speechtokenizer"></a>
+$$
 
 **Lợi ích**: Speech LLMs có thể xử lý semantic tokens (layer 1) riêng → tốt hơn cho language understanding tasks.
 
@@ -283,9 +301,11 @@ $$ <a id="eq-speechtokenizer"></a>
 
 Mimi (dùng trong Moshi [^defossez2024moshi]) đạt **ultra-low frame rate**:
 
+<a id="eq-mimi-framerate"></a>
+
 $$
 \text{EnCodec: 75 Hz} \quad \xrightarrow{\text{Mimi}} \quad \text{12.5 Hz}
-$$ <a id="eq-mimi-framerate"></a>
+$$
 
 ### Cách đạt 12.5 Hz
 
@@ -296,9 +316,11 @@ $$ <a id="eq-mimi-framerate"></a>
 
 ### Tại sao 12.5 Hz quan trọng?
 
+<a id="eq-mimi-tokens"></a>
+
 $$
 \text{Tokens per second} = 12.5 \times 8 = 100 \text{ tokens/s (total)}
-$$ <a id="eq-mimi-tokens"></a>
+$$
 
 So sánh: EnCodec = $75 \times 8 = 600$ tokens/s. Mimi giảm **6×** số tokens → Transformer self-attention nhanh hơn **36×** ($O(L^2)$).
 

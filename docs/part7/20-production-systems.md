@@ -11,9 +11,11 @@ Production voice AI system kết nối nhiều components thành pipeline hoàn 
 
 ### Latency Budget
 
+<a id="eq-latency-budget"></a>
+
 $$
 L_{\text{total}} = L_{\text{VAD}} + L_{\text{ASR}} + L_{\text{LLM}} + L_{\text{TTS}} + L_{\text{network}}
-$$ <a id="eq-latency-budget"></a>
+$$
 
 | Component | Target Latency | Typical Range |
 |-----------|---------------|---------------|
@@ -36,9 +38,11 @@ $$ <a id="eq-latency-budget"></a>
 
 VAD phân loại mỗi audio frame là **speech** hoặc **non-speech**:
 
+<a id="eq-vad"></a>
+
 $$
 \hat{y}_t = \begin{cases} 1 & \text{if frame } t \text{ contains speech} \\ 0 & \text{otherwise} \end{cases}
-$$ <a id="eq-vad"></a>
+$$
 
 ### Silero VAD
 
@@ -144,6 +148,8 @@ class VADSegmenter:
 
 Chia audio thành chunks và process incrementally:
 
+<a id="eq-chunked-streaming"></a>
+
 $$
 \begin{aligned}
 \text{Chunk}_1 &: [0, C] & \to \text{Partial}_1 \\
@@ -151,15 +157,17 @@ $$
 &\vdots \\
 \text{Chunk}_N &: [(N-1)C, NC] & \to \text{Final}
 \end{aligned}
-$$ <a id="eq-chunked-streaming"></a>
+$$
 
 với chunk size $C$ thường là 160ms–640ms.
 
 ### Latency-Accuracy Trade-off
 
+<a id="eq-streaming-latency"></a>
+
 $$
 \text{Latency} \propto C + L_{\text{lookahead}}
-$$ <a id="eq-streaming-latency"></a>
+$$
 
 | Chunk Size | Lookahead | Latency | WER Increase |
 |-----------|-----------|---------|--------------|
@@ -185,15 +193,19 @@ Endpointing quyết định **khi nào user đã nói xong**:
 
 Thay vì generate toàn bộ audio rồi play, streaming TTS tạo và play **từng chunk**:
 
+<a id="eq-streaming-tts"></a>
+
 $$
 \text{Text} \xrightarrow{\text{chunk}_1} \text{Audio}_1 \xrightarrow{\text{play}} \text{chunk}_2 \xrightarrow{\text{play}} \cdots
-$$ <a id="eq-streaming-tts"></a>
+$$
 
 ### First-Chunk Latency
 
+<a id="eq-tts-first-chunk"></a>
+
 $$
 L_{\text{TTS, first}} = L_{\text{text\_process}} + L_{\text{mel\_first\_chunk}} + L_{\text{vocoder\_first\_chunk}}
-$$ <a id="eq-tts-first-chunk"></a>
+$$
 
 | TTS Model | First Chunk Latency | Total RTF |
 |-----------|--------------------|---------  |
@@ -208,9 +220,11 @@ $$ <a id="eq-tts-first-chunk"></a>
 
 ### Quantization
 
+<a id="eq-quantization-chain"></a>
+
 $$
 \text{FP32 (4B)} \xrightarrow{\text{FP16}} \text{FP16 (2B)} \xrightarrow{\text{INT8}} \text{INT8 (1B)} \xrightarrow{\text{INT4}} \text{INT4 (0.5B)}
-$$ <a id="eq-quantization-chain"></a>
+$$
 
 | Precision | Memory | Speed vs FP32 | Quality Loss |
 |-----------|--------|---------------|-------------|
@@ -235,9 +249,11 @@ $$ <a id="eq-quantization-chain"></a>
 
 Cho autoregressive models (Whisper decoder, VALL-E):
 
+<a id="eq-kv-cache"></a>
+
 $$
 \text{Memory}_{\text{KV}} = 2 \times n_{\text{layers}} \times n_{\text{heads}} \times d_{\text{head}} \times L_{\text{seq}} \times \text{dtype\_size}
-$$ <a id="eq-kv-cache"></a>
+$$
 
 Optimization strategies:
 
@@ -412,8 +428,10 @@ class DynamicBatcher:
 
 : Production speech systems summary <a id="tbl-production-summary"></a>
 
+<a id="eq-production-formula"></a>
+
 $$
 \text{Production Speech AI} = \text{Model Quality} \times \text{Inference Speed} \times \text{System Reliability}
-$$ <a id="eq-production-formula"></a>
+$$
 
 Mỗi yếu tố đều quan trọng  -  model tốt nhưng chậm sẽ không được users chấp nhận, model nhanh nhưng kém chất lượng sẽ bị bỏ qua.

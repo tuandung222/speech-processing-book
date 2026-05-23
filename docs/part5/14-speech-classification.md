@@ -10,9 +10,11 @@ Speech classification bao gồm nhiều bài toán quan trọng: **emotion recog
 
 Cho audio $\mathbf{x}$ và tập emotion labels $\mathcal{Y} = \{\text{neutral}, \text{happy}, \text{sad}, \text{angry}, \text{fear}, \text{surprise}, \text{disgust}\}$:
 
+<a id="eq-ser-classify"></a>
+
 $$
 \hat{y} = \arg\max_{y \in \mathcal{Y}} p(y | \mathbf{x}) = \arg\max_{y} \text{softmax}(\mathbf{W} \cdot \text{Pool}(f(\mathbf{x})) + \mathbf{b})
-$$ <a id="eq-ser-classify"></a>
+$$
 
 ### Kiến trúc phổ biến
 
@@ -87,9 +89,11 @@ class SERModel(nn.Module):
 
 Ngoài categorical emotions, có thể predict continuous values:
 
+<a id="eq-vad-regression"></a>
+
 $$
 (\hat{v}, \hat{a}, \hat{d}) = f(\mathbf{x}), \quad v, a, d \in [-1, 1]
-$$ <a id="eq-vad-regression"></a>
+$$
 
 - **Valence**: Positive ↔ Negative
 - **Arousal**: High energy ↔ Low energy
@@ -97,9 +101,11 @@ $$ <a id="eq-vad-regression"></a>
 
 Loss function: Concordance Correlation Coefficient (CCC):
 
+<a id="eq-ccc"></a>
+
 $$
 \text{CCC}(\hat{y}, y) = \frac{2 \rho \sigma_{\hat{y}} \sigma_y}{\sigma_{\hat{y}}^2 + \sigma_y^2 + (\mu_{\hat{y}} - \mu_y)^2}
-$$ <a id="eq-ccc"></a>
+$$
 
 ## Speaker Identification & Verification
 
@@ -107,29 +113,37 @@ $$ <a id="eq-ccc"></a>
 
 Phân loại speaker từ tập cố định $N$ speakers:
 
+<a id="eq-sid"></a>
+
 $$
 \hat{s} = \arg\max_{s \in [N]} p(s | \mathbf{x}) = \arg\max_s \text{softmax}(\mathbf{W}\mathbf{e} + \mathbf{b})
-$$ <a id="eq-sid"></a>
+$$
 
 ### Speaker Verification (Open-set)
 
 Xác minh 2 audio có cùng speaker không:
 
+<a id="eq-sv-cosine"></a>
+
 $$
 \text{score}(\mathbf{x}_1, \mathbf{x}_2) = \cos(\mathbf{e}_1, \mathbf{e}_2) = \frac{\mathbf{e}_1 \cdot \mathbf{e}_2}{\|\mathbf{e}_1\| \|\mathbf{e}_2\|}
-$$ <a id="eq-sv-cosine"></a>
+$$
+
+<a id="eq-sv-decision"></a>
 
 $$
 \text{decision} = \begin{cases} \text{same speaker} & \text{nếu score} > \tau \\ \text{different} & \text{ngược lại} \end{cases}
-$$ <a id="eq-sv-decision"></a>
+$$
 
 ### Loss Functions cho Speaker Embedding
 
 **AAM-Softmax** (Additive Angular Margin):
 
+<a id="eq-aam-softmax"></a>
+
 $$
 \mathcal{L}_{\text{AAM}} = -\log \frac{e^{s(\cos(\theta_{y_i} + m))}}{e^{s(\cos(\theta_{y_i} + m))} + \sum_{j \neq y_i} e^{s \cos \theta_j}}
-$$ <a id="eq-aam-softmax"></a>
+$$
 
 với $m$ là angular margin, $s$ là scale factor.
 
@@ -153,9 +167,11 @@ ECAPA-TDNN [^desplanques2020ecapa] là kiến trúc speaker verification phổ b
 
 Nhận dạng ngôn ngữ từ audio:
 
+<a id="eq-lid"></a>
+
 $$
 \hat{l} = \arg\max_{l \in \mathcal{L}} p(l | \mathbf{x})
-$$ <a id="eq-lid"></a>
+$$
 
 ### Approaches
 
@@ -174,17 +190,21 @@ $$ <a id="eq-lid"></a>
 
 Phát hiện và phân loại các sự kiện âm thanh (không phải speech):
 
+<a id="eq-sed"></a>
+
 $$
 p(e_k | \mathbf{x}_t) = \sigma(\text{Model}(\mathbf{x})_{t,k}), \quad k \in \{1, \ldots, K\}
-$$ <a id="eq-sed"></a>
+$$
 
 ### Audio Tagging
 
 Gán nhãn cho toàn bộ audio clip (weak labeling):
 
+<a id="eq-audio-tagging"></a>
+
 $$
 \hat{\mathbf{y}} = \sigma(\text{Pool}(\text{Model}(\mathbf{x}))) \in [0, 1]^K
-$$ <a id="eq-audio-tagging"></a>
+$$
 
 ### Pretrained Audio Neural Networks (PANNs)
 

@@ -28,9 +28,11 @@ Streaming ASR (hay Online ASR) là bài toán nhận dạng giọng nói **real-
 
 Tổng latency của một voice AI system:
 
+<a id="eq-latency-budget"></a>
+
 $$
 L_{\text{total}} = L_{\text{audio}} + L_{\text{endpointing}} + L_{\text{ASR}} + L_{\text{NLU}} + L_{\text{TTS}}
-$$ <a id="eq-latency-budget"></a>
+$$
 
 Trong đó:
 
@@ -50,9 +52,11 @@ Trong đó:
 
 CTC tự nhiên hỗ trợ streaming vì output tại mỗi frame **độc lập** (conditional independence):
 
+<a id="eq-ctc-streaming"></a>
+
 $$
 p(\mathbf{y} | \mathbf{x}) = \sum_{\boldsymbol{\pi} \in \mathcal{B}^{-1}(\mathbf{y})} \prod_{t=1}^{T} p(\pi_t | \mathbf{x}_{\leq t})
-$$ <a id="eq-ctc-streaming"></a>
+$$
 
 Chỉ cần **causal encoder** (không nhìn future frames) là có thể streaming.
 
@@ -60,9 +64,11 @@ Chỉ cần **causal encoder** (không nhìn future frames) là có thể stream
 
 RNN-T [^graves2012sequence] là kiến trúc streaming phổ biến nhất trong production:
 
+<a id="eq-rnnt-streaming"></a>
+
 $$
 p(y_u | \mathbf{x}_{\leq t}, y_{<u}) = \text{JointNet}(\text{Encoder}(\mathbf{x}_{\leq t}), \text{Predictor}(y_{<u}))
-$$ <a id="eq-rnnt-streaming"></a>
+$$
 
 - **Encoder**: Causal (chỉ nhìn past + current)
 - **Predictor**: Autoregressive trên previous tokens
@@ -72,9 +78,11 @@ $$ <a id="eq-rnnt-streaming"></a>
 
 Thay vì full bidirectional attention, chunked attention [^zhang2020streaming] chia audio thành chunks:
 
+<a id="eq-chunked-attention"></a>
+
 $$
 \text{Attention}(\mathbf{Q}_c, \mathbf{K}_c, \mathbf{V}_c) = \text{softmax}\left(\frac{\mathbf{Q}_c \mathbf{K}_c^T}{\sqrt{d_k}}\right) \mathbf{V}_c
-$$ <a id="eq-chunked-attention"></a>
+$$
 
 trong đó $c$ là chunk index, và keys/values chỉ từ:
 
@@ -86,9 +94,11 @@ trong đó $c$ là chunk index, và keys/values chỉ từ:
 
 **Unified model** [^zhang2022wenet] train với **random chunk sizes** để một model duy nhất hoạt động ở nhiều latency modes:
 
+<a id="eq-dynamic-chunk"></a>
+
 $$
 \text{chunk\_size} \sim \text{Uniform}(\{1, 2, 4, 8, 16, \infty\}) \times \text{subsampling\_factor}
-$$ <a id="eq-dynamic-chunk"></a>
+$$
 
 - chunk_size = $\infty$ → offline mode (full attention)
 - chunk_size = 1 → streaming mode (minimum latency)
@@ -150,12 +160,14 @@ print(f"Sparsity: {(~mask).float().mean():.1%}")
 
 Endpointing (Voice Activity Detection + End-of-Query detection) quyết định **khi nào người dùng ngừng nói** để trigger response generation:
 
+<a id="eq-endpointing"></a>
+
 $$
 \text{endpoint} = \begin{cases}
 \text{True} & \text{nếu } \text{silence\_duration} > \tau_{\text{threshold}} \\
 \text{False} & \text{ngược lại}
 \end{cases}
-$$ <a id="eq-endpointing"></a>
+$$
 
 ### 3 Chiến lược Endpointing
 

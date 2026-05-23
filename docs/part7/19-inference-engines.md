@@ -39,9 +39,11 @@ TensorRT [^nvidia2024tensorrt] là inference optimizer của NVIDIA:
 
 **Optimization Pipeline:**
 
+<a id="eq-trt-pipeline"></a>
+
 $$
 \text{PyTorch/ONNX} \xrightarrow{\text{TRT Builder}} \text{TRT Engine} \xrightarrow{\text{TRT Runtime}} \text{Inference}
-$$ <a id="eq-trt-pipeline"></a>
+$$
 
 **Các tối ưu chính:**
 
@@ -414,9 +416,11 @@ Ray Serve [^moritz2018ray] cho **distributed model serving**:
 
 Một production speech pipeline điển hình:
 
+<a id="eq-speech-pipeline"></a>
+
 $$
 \text{Audio} \xrightarrow{\text{VAD}} \text{Segments} \xrightarrow{\text{ASR}} \text{Text} \xrightarrow{\text{NLU}} \text{Intent}
-$$ <a id="eq-speech-pipeline"></a>
+$$
 
 ### Deployment Pattern
 

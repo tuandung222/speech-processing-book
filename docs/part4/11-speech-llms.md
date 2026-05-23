@@ -22,13 +22,15 @@ AudioLM [^borsos2023audiolm] là model đầu tiên chứng minh rằng **audio 
 
 ### Three-Stage Generation
 
+<a id="eq-audiolm-stages"></a>
+
 $$
 \begin{aligned}
 \text{Stage 1:} \quad & P(\mathbf{s}_{t+1:T} \mid \mathbf{s}_{1:t}) & \text{// Semantic token continuation} \\
 \text{Stage 2:} \quad & P(\mathbf{a}^{1:4} \mid \mathbf{s}) & \text{// Semantic → coarse acoustic} \\
 \text{Stage 3:} \quad & P(\mathbf{a}^{5:12} \mid \mathbf{a}^{1:4}) & \text{// Coarse → fine acoustic}
 \end{aligned}
-$$ <a id="eq-audiolm-stages"></a>
+$$
 
 Mỗi stage là một **autoregressive Transformer**  -  cùng architecture, khác tokenization level.
 
@@ -76,12 +78,14 @@ Qwen2-Audio hỗ trợ **đa dạng audio tasks** qua text prompting:
 
 2-stage training:
 
+<a id="eq-qwen2-training"></a>
+
 $$
 \begin{aligned}
 \text{Stage 1:} \quad & \text{Audio-text alignment} & \text{(freeze LLM, train adapter)} \\
 \text{Stage 2:} \quad & \text{Instruction tuning} & \text{(unfreeze all, multitask)}
 \end{aligned}
-$$ <a id="eq-qwen2-training"></a>
+$$
 
 ## Moshi  -  Full-Duplex Speech Dialogue
 
@@ -105,9 +109,11 @@ Moshi [^defossez2024moshi] xử lý **2 audio streams song song** (user + AI):
 
 Moshi processes **2 parallel token streams** tại mỗi time step:
 
+<a id="eq-moshi-dual"></a>
+
 $$
 P(a_t^{\text{AI}}, w_t \mid a_{<t}^{\text{user}}, a_{<t}^{\text{AI}}, w_{<t})
-$$ <a id="eq-moshi-dual"></a>
+$$
 
 trong đó:
 
@@ -124,20 +130,24 @@ Moshi sử dụng **Depth Transformer** để handle multi-codebook prediction:
   <figcaption>Moshi: Temporal + Depth Transformer</figcaption>
 </figure>
 
+<a id="eq-depth-transformer"></a>
+
 $$
 \begin{aligned}
 \mathbf{h}_t &= \text{TemporalTransformer}(\text{tokens}_{1:t-1}) \\
 c_t^{(q)} &= \text{DepthTransformer}(\mathbf{h}_t, c_t^{(1)}, \ldots, c_t^{(q-1)})
 \end{aligned}
-$$ <a id="eq-depth-transformer"></a>
+$$
 
 ### Inner Monologue
 
 Moshi có khả năng **text reasoning** đồng thời với speech:
 
+<a id="eq-inner-monologue"></a>
+
 $$
 \text{Audio tokens (speech)} \parallel \text{Text tokens (reasoning)}
-$$ <a id="eq-inner-monologue"></a>
+$$
 
 Text stream hoạt động như "inner thought"  -  giúp model plan response trước khi nói.
 

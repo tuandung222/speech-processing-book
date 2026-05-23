@@ -4,9 +4,11 @@
 
 Text-to-Speech (TTS) là bài toán ngược của ASR  -  chuyển text thành waveform:
 
+<a id="eq-tts-objective"></a>
+
 $$
 \hat{\mathbf{x}} = \arg\max_{\mathbf{x}} P(\mathbf{x} \mid Y)
-$$ <a id="eq-tts-objective"></a>
+$$
 
 trong đó $Y = (y_1, \ldots, y_U)$ là chuỗi text tokens và $\mathbf{x}$ là waveform.
 
@@ -44,13 +46,15 @@ Tacotron 2 [^shen2018natural] là attention-based seq2seq model cho Text-to-Mel:
 
 Attention cho TTS phải **monotonic**  -  không được nhảy lùi. Location-sensitive attention thêm convolution trên previous attention weights:
 
+<a id="eq-location-attention"></a>
+
 $$
 \begin{aligned}
 f_i &= F * \alpha_{i-1} & \text{// Conv1d on previous alignment} \\
 e_{i,j} &= \mathbf{v}^\top \tanh(\mathbf{W}_s \mathbf{s}_i + \mathbf{W}_h \mathbf{h}_j + \mathbf{W}_f f_{i,j} + \mathbf{b}) \\
 \alpha_{i,j} &= \text{softmax}(e_{i,:})_j & \text{// Attention weights}
 \end{aligned}
-$$ <a id="eq-location-attention"></a>
+$$
 
 trong đó $\alpha_{i-1}$ là attention weights từ decoder step trước.
 
@@ -58,21 +62,25 @@ trong đó $\alpha_{i-1}$ là attention weights từ decoder step trước.
 
 Autoregressive prediction  -  mỗi step predict 1 mel frame (hoặc $r$ frames với reduction factor):
 
+<a id="eq-tacotron-decoder"></a>
+
 $$
 \begin{aligned}
 \mathbf{c}_i &= \sum_j \alpha_{i,j} \mathbf{h}_j & \text{// Context vector} \\
 (\mathbf{s}_i, \mathbf{o}_i) &= \text{LSTM}([\text{PreNet}(\hat{\mathbf{m}}_{i-1}); \mathbf{c}_i], \mathbf{s}_{i-1}) \\
 \hat{\mathbf{m}}_i &= \text{Linear}([\mathbf{o}_i; \mathbf{c}_i]) & \text{// [80] mel prediction}
 \end{aligned}
-$$ <a id="eq-tacotron-decoder"></a>
+$$
 
 ### Stop Token
 
 Binary classifier dự đoán khi nào dừng generation:
 
+<a id="eq-stop-token"></a>
+
 $$
 p_{\text{stop}}(i) = \sigma(\mathbf{w}_{\text{stop}}^\top [\mathbf{o}_i; \mathbf{c}_i] + b_{\text{stop}})
-$$ <a id="eq-stop-token"></a>
+$$
 
 ### Hạn chế của Tacotron 2
 
@@ -100,43 +108,55 @@ FastSpeech 2 [^ren2020fastspeech] giải quyết tất cả hạn chế của Ta
 
 **Duration predictor:**
 
+<a id="eq-duration-predictor"></a>
+
 $$
 \hat{d}_u = \text{ReLU}(\text{DurationPredictor}(\mathbf{h}_u)), \quad d_u \in \mathbb{Z}^+
-$$ <a id="eq-duration-predictor"></a>
+$$
 
 Trained với L2 loss trên log-duration (ground truth từ forced alignment):
 
+<a id="eq-duration-loss"></a>
+
 $$
 \mathcal{L}_{\text{dur}} = \frac{1}{U} \sum_{u=1}^{U} \left(\log(\hat{d}_u + 1) - \log(d_u + 1)\right)^2
-$$ <a id="eq-duration-loss"></a>
+$$
 
 **Pitch predictor** (F0):
 
+<a id="eq-pitch-predictor"></a>
+
 $$
 \hat{f}_0(t) = \text{PitchPredictor}(\mathbf{h}_{u(t)})
-$$ <a id="eq-pitch-predictor"></a>
+$$
 
 **Energy predictor:**
 
+<a id="eq-energy-predictor"></a>
+
 $$
 \hat{e}(t) = \text{EnergyPredictor}(\mathbf{h}_{u(t)})
-$$ <a id="eq-energy-predictor"></a>
+$$
 
 ### Length Regulator
 
 Biến phoneme-level sequence thành mel-level sequence bằng cách repeat:
 
+<a id="eq-length-regulator"></a>
+
 $$
 \text{LR}(\mathbf{H}, \mathbf{d}) = [\underbrace{\mathbf{h}_1, \ldots, \mathbf{h}_1}_{d_1 \text{ times}}, \underbrace{\mathbf{h}_2, \ldots, \mathbf{h}_2}_{d_2 \text{ times}}, \ldots]
-$$ <a id="eq-length-regulator"></a>
+$$
 
 Output length: $T_{\text{mel}} = \sum_{u=1}^{U} d_u$
 
 ### Total Loss
 
+<a id="eq-fastspeech-loss"></a>
+
 $$
 \mathcal{L} = \mathcal{L}_{\text{mel}} + \lambda_d \mathcal{L}_{\text{dur}} + \lambda_p \mathcal{L}_{\text{pitch}} + \lambda_e \mathcal{L}_{\text{energy}}
-$$ <a id="eq-fastspeech-loss"></a>
+$$
 
 ### Speed Comparison
 
@@ -254,17 +274,21 @@ class LengthRegulator(nn.Module):
 
 Vocoder chuyển mel spectrogram thành waveform  -  bài toán **super-resolution** vì mel (80 dims, 100 fps) chứa ít thông tin hơn waveform (1 dim, 16000 fps):
 
+<a id="eq-vocoder"></a>
+
 $$
 \hat{\mathbf{x}} = \text{Vocoder}(\mathbf{S}_{\text{mel}}), \quad \mathbf{S}_{\text{mel}} \in \mathbb{R}^{80 \times T}, \quad \hat{\mathbf{x}} \in \mathbb{R}^{160 \cdot T}
-$$ <a id="eq-vocoder"></a>
+$$
 
 ### WaveNet (2016)
 
 WaveNet [^oord2016wavenet]  -  vocoder đầu tiên cho chất lượng human-level:
 
+<a id="eq-wavenet"></a>
+
 $$
 P(\mathbf{x}) = \prod_{n=1}^{N} P(x_n \mid x_1, \ldots, x_{n-1})
-$$ <a id="eq-wavenet"></a>
+$$
 
 **Autoregressive**: Generate 1 sample at a time → 16,000 steps/sec → **cực kỳ chậm**.
 
@@ -278,17 +302,21 @@ HiFi-GAN [^kong2020hifigan]  -  vocoder hiện đại, **nhanh** và **chất l�
 
 **Generator**: Upsample mel → waveform qua transposed convolutions:
 
+<a id="eq-hifigan-upsample"></a>
+
 $$
 \text{Mel} \xrightarrow{\text{Upsample}_{8\times}} \xrightarrow{\text{Upsample}_{8\times}} \xrightarrow{\text{Upsample}_{2\times}} \xrightarrow{\text{Upsample}_{2\times}} \text{Waveform}
-$$ <a id="eq-hifigan-upsample"></a>
+$$
 
 Total upsampling factor: $8 \times 8 \times 2 \times 2 = 256$ (matches hop_length=256 ở 22.05kHz, hoặc 160 ở 16kHz).
 
 **Multi-Period Discriminator (MPD)** + **Multi-Scale Discriminator (MSD)**:
 
+<a id="eq-hifigan-loss"></a>
+
 $$
 \mathcal{L}_G = \mathcal{L}_{\text{adv}}(G) + \lambda_{\text{fm}} \mathcal{L}_{\text{fm}}(G) + \lambda_{\text{mel}} \mathcal{L}_{\text{mel}}(G)
-$$ <a id="eq-hifigan-loss"></a>
+$$
 
 trong đó:
 

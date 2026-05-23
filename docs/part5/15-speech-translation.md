@@ -26,15 +26,19 @@ Speech Translation (ST) là bài toán dịch trực tiếp từ **speech sang t
 
 **Cascaded pipeline:**
 
+<a id="eq-cascaded-st"></a>
+
 $$
 \text{Speech}_A \xrightarrow{\text{ASR}} \text{Text}_A \xrightarrow{\text{MT}} \text{Text}_B \xrightarrow{\text{TTS}} \text{Speech}_B
-$$ <a id="eq-cascaded-st"></a>
+$$
 
 **End-to-End:**
 
+<a id="eq-e2e-st"></a>
+
 $$
 \text{Speech}_A \xrightarrow{\text{E2E Model}} \text{Text}_B \text{ hoặc } \text{Speech}_B
-$$ <a id="eq-e2e-st"></a>
+$$
 
 | Tiêu chí | Cascaded | End-to-End |
 |----------|---------|------------|
@@ -51,17 +55,21 @@ $$ <a id="eq-e2e-st"></a>
 
 ### Encoder-Decoder Architecture
 
+<a id="eq-s2tt-arch"></a>
+
 $$
 \mathbf{h} = \text{SpeechEncoder}(\mathbf{x}_{\text{source}}), \quad \mathbf{y} = \text{TextDecoder}(\mathbf{h})
-$$ <a id="eq-s2tt-arch"></a>
+$$
 
 ### Multi-task Training
 
 Kết hợp ASR và ST objectives:
 
+<a id="eq-s2tt-multitask"></a>
+
 $$
 \mathcal{L} = \alpha \mathcal{L}_{\text{ST}} + (1 - \alpha) \mathcal{L}_{\text{ASR}}
-$$ <a id="eq-s2tt-multitask"></a>
+$$
 
 trong đó:
 
@@ -156,9 +164,11 @@ class S2TTMultitask(nn.Module):
 
 ### Unit-based S2ST
 
+<a id="eq-unit-s2st"></a>
+
 $$
 \text{Speech}_A \xrightarrow{\text{Encoder}} \text{Units}_A \xrightarrow{\text{Unit-to-Unit}} \text{Units}_B \xrightarrow{\text{Vocoder}} \text{Speech}_B
-$$ <a id="eq-unit-s2st"></a>
+$$
 
 Discrete units từ HuBERT k-means clustering - không cần text!
 
@@ -194,9 +204,11 @@ SeamlessStreaming [^communication2023seamless] hỗ trợ **simultaneous transla
 - **EMMA** (Efficient Monotonic Multihead Attention): Quyết định khi nào read vs write
 - **Monotonic policy**: Chờ đủ context trước khi dịch
 
+<a id="eq-monotonic-attention"></a>
+
 $$
 \text{READ/WRITE policy}: \quad p_i^j = \sigma\left(\frac{\mathbf{q}_j \cdot \mathbf{k}_i}{\sqrt{d}}\right)
-$$ <a id="eq-monotonic-attention"></a>
+$$
 
 | Model | S2TT (BLEU) | S2ST (BLEU) | Languages | Streaming |
 |-------|-------------|-------------|-----------|-----------|
@@ -213,9 +225,11 @@ $$ <a id="eq-monotonic-attention"></a>
 
 Simultaneous translation phải bắt đầu dịch **trước khi người nói kết thúc**:
 
+<a id="eq-quality-latency"></a>
+
 $$
 \text{Quality} \propto \frac{1}{\text{Latency}}: \quad \text{BLEU} \downarrow \text{ khi } \text{AL} \downarrow
-$$ <a id="eq-quality-latency"></a>
+$$
 
 ### Metrics
 

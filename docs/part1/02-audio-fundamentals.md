@@ -6,9 +6,11 @@
 
 Âm thanh là sóng cơ học truyền qua không khí. Khi thu bằng microphone, tín hiệu analog liên tục được chuyển thành tín hiệu số (digital) thông qua quá trình **sampling** (lấy mẫu) và **quantization** (lượng tử hóa).
 
+<a id="eq-sampling"></a>
+
 $$
 x[n] = x_a(n \cdot T_s), \quad n = 0, 1, 2, \ldots
-$$ <a id="eq-sampling"></a>
+$$
 
 trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, và $f_s$ là **sample rate** (tần số lấy mẫu).
 
@@ -39,9 +41,11 @@ trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, v
 
 Bộ lọc high-pass đơn giản để bù spectral rolloff tự nhiên của giọng nói:
 
+<a id="eq-pre-emphasis"></a>
+
 $$
 y[n] = x[n] - \alpha \cdot x[n-1], \quad \alpha \approx 0.97
-$$ <a id="eq-pre-emphasis"></a>
+$$
 
 !!! tip "NLP Parallel"
     Pre-emphasis giống như **text normalization**  -  một bước tiền xử lý đơn giản nhưng cải thiện kết quả downstream. Tuy nhiên, các model hiện đại (Whisper, Wav2Vec 2.0) thường **bỏ qua** bước này.
@@ -53,9 +57,11 @@ $$ <a id="eq-pre-emphasis"></a>
 
 DFT chuyển tín hiệu từ miền thời gian sang miền tần số:
 
+<a id="eq-dft"></a>
+
 $$
 X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-j \frac{2\pi k n}{N}}, \quad k = 0, 1, \ldots, N-1
-$$ <a id="eq-dft"></a>
+$$
 
 trong đó:
 
@@ -66,9 +72,11 @@ trong đó:
 
 **Inverse DFT:**
 
+<a id="eq-idft"></a>
+
 $$
 x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] \cdot e^{j \frac{2\pi k n}{N}}
-$$ <a id="eq-idft"></a>
+$$
 
 ### Tính chất Quan trọng
 
@@ -84,9 +92,11 @@ $$ <a id="eq-idft"></a>
 
 FFT là thuật toán tính DFT hiệu quả với complexity $O(N \log N)$ thay vì $O(N^2)$:
 
+<a id="eq-fft-complexity"></a>
+
 $$
 \text{DFT}: O(N^2) \quad \xrightarrow{\text{FFT}} \quad O(N \log N)
-$$ <a id="eq-fft-complexity"></a>
+$$
 
 Khi $N = 512$: DFT cần ~262K phép tính, FFT chỉ cần ~4.6K.
 
@@ -96,9 +106,11 @@ Khi $N = 512$: DFT cần ~262K phép tính, FFT chỉ cần ~4.6K.
 
 DFT phân tích **toàn bộ** tín hiệu → không có thông tin về **khi nào** một tần số xuất hiện. Speech là non-stationary (tần số thay đổi theo thời gian), nên cần phân tích **từng đoạn ngắn**:
 
+<a id="eq-stft"></a>
+
 $$
 \text{STFT}(m, k) = \sum_{n=0}^{N-1} x[n + m \cdot H] \cdot w[n] \cdot e^{-j \frac{2\pi k n}{N}}
-$$ <a id="eq-stft"></a>
+$$
 
 trong đó:
 
@@ -114,11 +126,15 @@ Window function giảm **spectral leakage** (rò rỉ phổ):
 
 **Hann window** (phổ biến nhất):
 
+<a id="eq-hann"></a>
+
 $$
 w[n] = 0.5 \times \left(1 - \cos\left(\frac{2\pi n}{N-1}\right)\right), \quad n = 0, 1, \ldots, N-1
-$$ <a id="eq-hann"></a>
+$$
 
 ### Tham số Thực tế
+
+<a id="eq-stft-params"></a>
 
 $$
 \begin{aligned}
@@ -128,13 +144,15 @@ f_s &= 16{,}000 \text{ Hz} \\
 \text{Frequency bins} &= N/2 + 1 = 201 \\
 \text{Frames per second} &= f_s / H = 100
 \end{aligned}
-$$ <a id="eq-stft-params"></a>
+$$
 
 ### Power Spectrogram
 
+<a id="eq-power-spectrogram"></a>
+
 $$
 P(m, k) = |\text{STFT}(m, k)|^2 = \text{Re}(\text{STFT})^2 + \text{Im}(\text{STFT})^2
-$$ <a id="eq-power-spectrogram"></a>
+$$
 
 **Dimensions:**
 
@@ -148,15 +166,19 @@ $$ <a id="eq-power-spectrogram"></a>
 
 Tai người cảm nhận tần số theo thang **logarithmic**, không linear. Mel scale mô hình hóa điều này:
 
+<a id="eq-mel-scale"></a>
+
 $$
 \text{mel}(f) = 2595 \times \log_{10}\left(1 + \frac{f}{700}\right)
-$$ <a id="eq-mel-scale"></a>
+$$
 
 **Inverse:**
 
+<a id="eq-mel-inverse"></a>
+
 $$
 f(\text{mel}) = 700 \times \left(10^{\text{mel}/2595} - 1\right)
-$$ <a id="eq-mel-inverse"></a>
+$$
 
 !!! note "Ý nghĩa Trực giác"
     Ở tần số thấp (< 1 kHz), mel scale gần linear  -  tai phân biệt tốt. Ở tần số cao (> 1 kHz), mel scale nén lại  -  tai kém nhạy hơn. Đây là lý do mel filterbank dùng narrow filters ở low freq và wide filters ở high freq.
@@ -166,6 +188,8 @@ $$ <a id="eq-mel-inverse"></a>
 
 Tập hợp $M$ bộ lọc tam giác trên mel scale:
 
+<a id="eq-mel-filterbank"></a>
+
 $$
 H_m(k) = \begin{cases}
 0 & \text{if } f(k) < f(m-1) \\
@@ -173,15 +197,17 @@ H_m(k) = \begin{cases}
 \frac{f(m+1) - f(k)}{f(m+1) - f(m)} & \text{if } f(m) \leq f(k) \leq f(m+1) \\
 0 & \text{if } f(k) > f(m+1)
 \end{cases}
-$$ <a id="eq-mel-filterbank"></a>
+$$
 
 trong đó $f(m)$ là center frequency của filter $m$, phân bố đều trên mel scale.
 
 ### Mel Spectrogram
 
+<a id="eq-mel-spectrogram"></a>
+
 $$
 S_{\text{mel}}(m, t) = \log\left(\sum_{k=0}^{N/2} H_m(k) \cdot P(t, k) + \epsilon\right)
-$$ <a id="eq-mel-spectrogram"></a>
+$$
 
 với $\epsilon = 10^{-10}$ để tránh $\log(0)$.
 
@@ -248,9 +274,11 @@ print(f"Output shape: {log_mel.shape}")    # [1, 80, 100]
 
 MFCC áp dụng **Discrete Cosine Transform (DCT)** lên log mel spectrogram để decorrelate các mel bands:
 
+<a id="eq-mfcc"></a>
+
 $$
 \text{MFCC}(c, t) = \sum_{m=0}^{M-1} S_{\text{mel}}(m, t) \cdot \cos\left(\frac{\pi c (2m + 1)}{2M}\right)
-$$ <a id="eq-mfcc"></a>
+$$
 
 trong đó $c = 0, 1, \ldots, C-1$ là MFCC index (thường $C = 13$ hoặc $C = 40$).
 
@@ -280,12 +308,14 @@ SpecAugment [^park2019specaugment] là kỹ thuật data augmentation cực kỳ
 2. **Frequency masking**: Che $F$ consecutive mel bands
 3. **Time masking**: Che $T$ consecutive time steps
 
+<a id="eq-specaugment"></a>
+
 $$
 \begin{aligned}
 \text{Freq mask}: \quad S'(m, t) &= \begin{cases} 0 & \text{if } f_0 \leq m < f_0 + F \\ S(m, t) & \text{otherwise} \end{cases} \\[6pt]
 \text{Time mask}: \quad S'(m, t) &= \begin{cases} 0 & \text{if } t_0 \leq t < t_0 + T \\ S(m, t) & \text{otherwise} \end{cases}
 \end{aligned}
-$$ <a id="eq-specaugment"></a>
+$$
 
 trong đó $f_0, t_0$ được chọn ngẫu nhiên, $F$ và $T$ là mask widths.
 

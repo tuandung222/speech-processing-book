@@ -43,9 +43,11 @@ Chương này tổng hợp toàn bộ **datasets**, **benchmarks**, **models**, 
 
 ### Tổng kết Data Landscape
 
+<a id="eq-vi-total-data"></a>
+
 $$
 \text{Total Vietnamese labeled speech} \approx 500\text{-}700 \text{ giờ (public)}
-$$ <a id="eq-vi-total-data"></a>
+$$
 
 !!! warning "So sánh với English"
     English có hàng trăm nghìn giờ labeled data (LibriSpeech: 960h, GigaSpeech: 10,000h, SPGISpeech: 5,000h). Vietnamese vẫn còn **thiếu nghiêm trọng** cả về lượng và đa dạng.
@@ -158,9 +160,11 @@ def transcribe_vietnamese(
 
 Voice conversion - biến đổi giọng nói người A thành giọng người B mà giữ nguyên nội dung:
 
+<a id="eq-voice-conversion"></a>
+
 $$
 \hat{\mathbf{x}}_B = G(\mathbf{x}_A, \mathbf{s}_B)
-$$ <a id="eq-voice-conversion"></a>
+$$
 
 trong đó $G$ là generator, $\mathbf{s}_B$ là speaker embedding target.
 

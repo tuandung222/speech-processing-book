@@ -22,31 +22,39 @@ Wav2Vec 2.0 [^baevski2020wav2vec] là mô hình SSL tiên phong, kết hợp **c
 
 1. **Feature Encoder** (CNN): Raw waveform $\mathbf{x} \in \mathbb{R}^T$ được encode thành latent representations $\mathbf{z}_1, \ldots, \mathbf{z}_L$
 
+<a id="eq-wav2vec-encoder"></a>
+
 $$
 \mathbf{z} = f_{\text{CNN}}(\mathbf{x}), \quad \mathbf{z} \in \mathbb{R}^{L \times d}
-$$ <a id="eq-wav2vec-encoder"></a>
+$$
 
 2. **Quantization Module**: Discretize $\mathbf{z}$ thành $\mathbf{q}$ qua product quantization với $G$ codebook groups, mỗi group có $V$ entries:
 
+<a id="eq-wav2vec-quant"></a>
+
 $$
 \mathbf{q}_t = \text{argmin}_{v \in [V], g \in [G]} \| \mathbf{z}_t - \mathbf{e}_{g,v} \|^2
-$$ <a id="eq-wav2vec-quant"></a>
+$$
 
 3. **Transformer Encoder**: Masked latent $\tilde{\mathbf{z}}$ được đưa vào Transformer để tạo context representations $\mathbf{c}_t$
 
 **Training Objective - Contrastive Loss:**
 
+<a id="eq-wav2vec-loss"></a>
+
 $$
 \mathcal{L}_{\text{contrastive}} = -\log \frac{\exp(\text{sim}(\mathbf{c}_t, \mathbf{q}_t) / \kappa)}{\sum_{\tilde{\mathbf{q}} \in \mathcal{Q}_t} \exp(\text{sim}(\mathbf{c}_t, \tilde{\mathbf{q}}) / \kappa)}
-$$ <a id="eq-wav2vec-loss"></a>
+$$
 
 trong đó $\kappa$ là temperature, $\mathcal{Q}_t$ gồm 1 positive và $K$ distractors (negative samples).
 
 **Diversity Loss** để tránh codebook collapse:
 
+<a id="eq-wav2vec-diversity"></a>
+
 $$
 \mathcal{L}_{\text{diversity}} = \frac{1}{GV} \sum_{g=1}^{G} H(\bar{p}_g) = -\frac{1}{GV} \sum_{g=1}^{G} \sum_{v=1}^{V} \bar{p}_{g,v} \log \bar{p}_{g,v}
-$$ <a id="eq-wav2vec-diversity"></a>
+$$
 
 **Total loss**: $\mathcal{L} = \mathcal{L}_{\text{contrastive}} + \alpha \mathcal{L}_{\text{diversity}}$
 
@@ -114,9 +122,11 @@ HuBERT [^hsu2021hubert] thay thế contrastive loss bằng **masked prediction**
 
 **Masked Prediction Loss:**
 
+<a id="eq-hubert-loss"></a>
+
 $$
 \mathcal{L}_{\text{HuBERT}} = \sum_{t \in \mathcal{M}} -\log p(c_t = \hat{y}_t \mid \tilde{\mathbf{X}})
-$$ <a id="eq-hubert-loss"></a>
+$$
 
 trong đó $\mathcal{M}$ là tập các masked positions và $\hat{y}_t$ là pseudo-label.
 
@@ -134,9 +144,11 @@ trong đó $\mathcal{M}$ là tập các masked positions và $\hat{y}_t$ là pse
 
 WavLM [^chen2022wavlm] mở rộng HuBERT với **denoising objective** - train trên cả clean và noisy/overlapping speech:
 
+<a id="eq-wavlm-loss"></a>
+
 $$
 \mathcal{L}_{\text{WavLM}} = \mathcal{L}_{\text{masked}} + \lambda \mathcal{L}_{\text{denoising}}
-$$ <a id="eq-wavlm-loss"></a>
+$$
 
 Điều này giúp WavLM học representations **robust với noise** và **hiểu speaker overlap** - quan trọng cho speaker diarization va separation.
 
@@ -148,9 +160,11 @@ data2vec [^baevski2022data2vec] tiến tới **modality-agnostic SSL**:
 - **Student**: Predict teacher's output tại masked positions
 - **Loss**: Smooth L1 giữa student và teacher representations
 
+<a id="eq-data2vec-loss"></a>
+
 $$
 \mathcal{L}_{\text{data2vec}} = \sum_{t \in \mathcal{M}} \text{SmoothL1}(\mathbf{c}_t^{\text{student}}, \mathbf{c}_t^{\text{teacher}})
-$$ <a id="eq-data2vec-loss"></a>
+$$
 
 ### BEST-RQ
 
@@ -174,9 +188,11 @@ CLAP (Contrastive Language-Audio Pretraining) [^elizalde2023clap] là phiên b�
 
 **Contrastive Loss (InfoNCE):**
 
+<a id="eq-clap-loss"></a>
+
 $$
 \mathcal{L}_{\text{CLAP}} = -\frac{1}{2N} \sum_{i=1}^{N} \left[ \log \frac{\exp(\mathbf{a}_i^\top \mathbf{t}_i / \tau)}{\sum_{j=1}^{N} \exp(\mathbf{a}_i^\top \mathbf{t}_j / \tau)} + \log \frac{\exp(\mathbf{t}_i^\top \mathbf{a}_i / \tau)}{\sum_{j=1}^{N} \exp(\mathbf{t}_i^\top \mathbf{a}_j / \tau)} \right]
-$$ <a id="eq-clap-loss"></a>
+$$
 
 trong đó $\mathbf{a}_i = f_a(\text{audio}_i)$, $\mathbf{t}_i = f_t(\text{text}_i)$, $\tau$ là learnable temperature.
 
@@ -216,9 +232,11 @@ trong đó $\mathbf{a}_i = f_a(\text{audio}_i)$, $\mathbf{t}_i = f_t(\text{text}
 
 **AudioLM** [^borsos2023audiolm] và **VALL-E** [^wang2023neural] sử dụng autoregressive modeling trên codec tokens:
 
+<a id="eq-ar-pretrain"></a>
+
 $$
 p(\mathbf{c}_{1:T}) = \prod_{t=1}^{T} p(c_t \mid c_1, \ldots, c_{t-1})
-$$ <a id="eq-ar-pretrain"></a>
+$$
 
 Đây chính là **language modeling on audio tokens** - cầu nối trực tiếp giữa NLP và speech.
 
@@ -226,9 +244,11 @@ $$ <a id="eq-ar-pretrain"></a>
 
 **UniSpeech-SAT** [^chen2022unispeech] kết hợp SSL với speaker supervision:
 
+<a id="eq-unispeech-loss"></a>
+
 $$
 \mathcal{L} = \mathcal{L}_{\text{SSL}} + \alpha \mathcal{L}_{\text{speaker}} + \beta \mathcal{L}_{\text{utterance}}
-$$ <a id="eq-unispeech-loss"></a>
+$$
 
 ## So sánh Speech Representation Models
 

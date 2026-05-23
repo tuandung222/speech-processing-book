@@ -12,11 +12,15 @@ DFT basis vectors form an orthogonal set  -  any discrete signal of length $N$ c
 
 Define DFT basis vector $\mathbf{w}_k = [1, e^{-j2\pi k/N}, e^{-j2\pi k \cdot 2/N}, \ldots, e^{-j2\pi k(N-1)/N}]$.
 
+<a id="eq-dft-orthogonality"></a>
+
 $$
 \langle \mathbf{w}_k, \mathbf{w}_l \rangle = \sum_{n=0}^{N-1} e^{-j2\pi kn/N} \cdot e^{j2\pi ln/N} = \sum_{n=0}^{N-1} e^{j2\pi(l-k)n/N}
-$$ <a id="eq-dft-orthogonality"></a>
+$$
 
 **Case 1:** $k = l$
+
+<a id="eq-idft-proof"></a>
 
 $$
 \sum_{n=0}^{N-1} e^{j2\pi \cdot 0 \cdot n/N} = \sum_{n=0}^{N-1} 1 = N
@@ -36,7 +40,7 @@ Therefore: $\langle \mathbf{w}_k, \mathbf{w}_l \rangle = N \cdot \delta_{kl}$  -
 
 $$
 x[n] = \frac{1}{N} \sum_{k=0}^{N-1} X[k] \cdot e^{j2\pi kn/N}
-$$ <a id="eq-idft-proof"></a>
+$$
 
 ## CTC Forward-Backward Algorithm
 
@@ -48,24 +52,30 @@ The CTC loss can be efficiently computed in $O(T \times U)$ time using dynamic p
 
 Define $\alpha_t(s)$ = probability of outputting the first $s$ symbols of the modified label sequence $\ell'$ (with blanks) in $t$ time steps:
 
+<a id="eq-ctc-forward-def"></a>
+
 $$
 \alpha_t(s) = P(\pi_{1:t} \text{ maps to } \ell'_{1:s} \mid \mathbf{x})
-$$ <a id="eq-ctc-forward-def"></a>
+$$
 
 **Initialization** ($t = 1$):
 
+<a id="eq-ctc-forward-init"></a>
+
 $$
 \alpha_1(1) = P(\text{blank} \mid \mathbf{x}_1), \quad \alpha_1(2) = P(\ell_1 \mid \mathbf{x}_1), \quad \alpha_1(s) = 0 \text{ for } s > 2
-$$ <a id="eq-ctc-forward-init"></a>
+$$
 
 **Recursion** ($t > 1$):
+
+<a id="eq-ctc-forward-recursion"></a>
 
 $$
 \alpha_t(s) = P(\ell'_s \mid \mathbf{x}_t) \cdot \begin{cases}
 \alpha_{t-1}(s) + \alpha_{t-1}(s-1) & \text{if } \ell'_s = \text{blank or } \ell'_s = \ell'_{s-2} \\
 \alpha_{t-1}(s) + \alpha_{t-1}(s-1) + \alpha_{t-1}(s-2) & \text{otherwise}
 \end{cases}
-$$ <a id="eq-ctc-forward-recursion"></a>
+$$
 
 **Proof of correctness:**
 
@@ -79,15 +89,19 @@ Case 3 is excluded when $\ell'_s = \text{blank}$ or when two consecutive non-bla
 
 ### Total CTC Loss
 
+<a id="eq-ctc-total"></a>
+
 $$
 P(\ell \mid \mathbf{x}) = \alpha_T(|\ell'|) + \alpha_T(|\ell'| - 1)
-$$ <a id="eq-ctc-total"></a>
+$$
 
 The two terms account for paths ending with the last label or with a trailing blank.
 
+<a id="eq-ctc-loss-final"></a>
+
 $$
 \mathcal{L}_{\text{CTC}} = -\log P(\ell \mid \mathbf{x})
-$$ <a id="eq-ctc-loss-final"></a>
+$$
 
 ## VQ-VAE ELBO Derivation
 
@@ -99,27 +113,35 @@ The VQ-VAE training objective is a lower bound on the log-likelihood $\log p_\th
 
 Starting from the marginal log-likelihood:
 
+<a id="eq-vqvae-marginal"></a>
+
 $$
 \log p_\theta(\mathbf{x}) = \log \sum_{\mathbf{z}} p_\theta(\mathbf{x}, \mathbf{z})
-$$ <a id="eq-vqvae-marginal"></a>
+$$
 
 Introduce approximate posterior $q_\phi(\mathbf{z} \mid \mathbf{x})$:
 
+<a id="eq-vqvae-importance"></a>
+
 $$
 \log p_\theta(\mathbf{x}) = \log \sum_{\mathbf{z}} q_\phi(\mathbf{z} \mid \mathbf{x}) \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z} \mid \mathbf{x})}
-$$ <a id="eq-vqvae-importance"></a>
+$$
 
 By Jensen's inequality ($\log$ is concave):
 
+<a id="eq-vqvae-elbo-derivation"></a>
+
 $$
 \log p_\theta(\mathbf{x}) \geq \sum_{\mathbf{z}} q_\phi(\mathbf{z} \mid \mathbf{x}) \log \frac{p_\theta(\mathbf{x}, \mathbf{z})}{q_\phi(\mathbf{z} \mid \mathbf{x})} = \text{ELBO}
-$$ <a id="eq-vqvae-elbo-derivation"></a>
+$$
 
 Expanding:
 
+<a id="eq-vqvae-elbo-expanded"></a>
+
 $$
 \text{ELBO} = \underbrace{\mathbb{E}_{q_\phi}[\log p_\theta(\mathbf{x} \mid \mathbf{z})]}_{\text{reconstruction}} - \underbrace{D_{\text{KL}}(q_\phi(\mathbf{z} \mid \mathbf{x}) \| p(\mathbf{z}))}_{\text{regularization}}
-$$ <a id="eq-vqvae-elbo-expanded"></a>
+$$
 
 **For VQ-VAE specifically:**
 
@@ -127,15 +149,19 @@ The posterior is **deterministic** (argmin quantization): $q_\phi(\mathbf{z} = \
 
 With a uniform prior $p(\mathbf{z}) = 1/K$ over $K$ codebook entries:
 
+<a id="eq-vqvae-kl"></a>
+
 $$
 D_{\text{KL}} = \log K - H(q_\phi) = \log K - 0 = \log K \quad (\text{constant})
-$$ <a id="eq-vqvae-kl"></a>
+$$
 
 Since the KL term is constant, maximizing ELBO reduces to minimizing reconstruction loss + keeping encoder close to codebook entries:
 
+<a id="eq-vqvae-loss-derived"></a>
+
 $$
 \mathcal{L}_{\text{VQ-VAE}} = \|\mathbf{x} - \text{dec}(\mathbf{e}_{k^*})\|^2 + \|\text{sg}(\text{enc}(\mathbf{x})) - \mathbf{e}_{k^*}\|^2 + \beta\|\text{enc}(\mathbf{x}) - \text{sg}(\mathbf{e}_{k^*})\|^2
-$$ <a id="eq-vqvae-loss-derived"></a>
+$$
 
 $\blacksquare$
 
@@ -149,43 +175,55 @@ The Conditional Flow Matching (CFM) objective provides a simulation-free trainin
 
 We want to learn a time-dependent velocity field $v_\theta(\mathbf{x}, t)$ that transforms a simple distribution $p_0$ (e.g., Gaussian) into a target distribution $p_1$ (e.g., data) via the ODE:
 
+<a id="eq-cfm-ode"></a>
+
 $$
 \frac{d\mathbf{x}_t}{dt} = v_\theta(\mathbf{x}_t, t), \quad t \in [0, 1]
-$$ <a id="eq-cfm-ode"></a>
+$$
 
 ### Optimal Transport Path
 
 Choose the **linear interpolation path** (optimal transport):
 
+<a id="eq-cfm-ot-path"></a>
+
 $$
 \mathbf{x}_t = (1-t)\mathbf{x}_0 + t\mathbf{x}_1, \quad \mathbf{x}_0 \sim p_0, \quad \mathbf{x}_1 \sim p_1
-$$ <a id="eq-cfm-ot-path"></a>
+$$
 
 The conditional velocity field generating this path is:
 
+<a id="eq-cfm-cond-velocity"></a>
+
 $$
 u_t(\mathbf{x} \mid \mathbf{x}_1) = \mathbf{x}_1 - \mathbf{x}_0
-$$ <a id="eq-cfm-cond-velocity"></a>
+$$
 
 **Proof:** Taking the time derivative of the interpolation:
 
+<a id="eq-cfm-velocity-proof"></a>
+
 $$
 \frac{d\mathbf{x}_t}{dt} = \frac{d}{dt}[(1-t)\mathbf{x}_0 + t\mathbf{x}_1] = -\mathbf{x}_0 + \mathbf{x}_1 = \mathbf{x}_1 - \mathbf{x}_0
-$$ <a id="eq-cfm-velocity-proof"></a>
+$$
 
 ### Training Objective
 
 The CFM loss matches the learned velocity to the conditional velocity:
 
+<a id="eq-cfm-loss-derived"></a>
+
 $$
 \mathcal{L}_{\text{CFM}}(\theta) = \mathbb{E}_{t \sim \mathcal{U}[0,1], \mathbf{x}_0 \sim p_0, \mathbf{x}_1 \sim p_1} \left[\|v_\theta(\mathbf{x}_t, t) - (\mathbf{x}_1 - \mathbf{x}_0)\|^2\right]
-$$ <a id="eq-cfm-loss-derived"></a>
+$$
 
 **Key result** [^lipman2023flow]: Minimizing this conditional objective is equivalent to minimizing the **marginal** flow matching objective:
 
+<a id="eq-fm-marginal"></a>
+
 $$
 \mathcal{L}_{\text{FM}}(\theta) = \mathbb{E}_{t, \mathbf{x}_t \sim p_t} \left[\|v_\theta(\mathbf{x}_t, t) - u_t(\mathbf{x}_t)\|^2\right]
-$$ <a id="eq-fm-marginal"></a>
+$$
 
 The proof relies on the fact that $\nabla_\theta \mathcal{L}_{\text{CFM}} = \nabla_\theta \mathcal{L}_{\text{FM}}$ (gradients are equal), making CFM a valid training procedure. $\blacksquare$
 
@@ -199,9 +237,11 @@ Gumbel-Softmax provides a differentiable approximation to sampling from a catego
 
 To sample from a categorical distribution with logits $\ell_1, \ldots, \ell_K$:
 
+<a id="eq-gumbel-max"></a>
+
 $$
 k^* = \arg\max_k [\ell_k + g_k], \quad g_k \sim \text{Gumbel}(0, 1)
-$$ <a id="eq-gumbel-max"></a>
+$$
 
 where $g_k = -\log(-\log(u_k)), \quad u_k \sim \text{Uniform}(0, 1)$.
 
@@ -209,9 +249,11 @@ where $g_k = -\log(-\log(u_k)), \quad u_k \sim \text{Uniform}(0, 1)$.
 
 Replace $\arg\max$ with softmax at temperature $\tau$:
 
+<a id="eq-gumbel-softmax"></a>
+
 $$
 y_k = \frac{\exp((\ell_k + g_k) / \tau)}{\sum_{j=1}^{K} \exp((\ell_j + g_j) / \tau)}
-$$ <a id="eq-gumbel-softmax"></a>
+$$
 
 **Properties:**
 
@@ -221,9 +263,11 @@ $$ <a id="eq-gumbel-softmax"></a>
 
 **Proof of convergence:**
 
+<a id="eq-gumbel-limit"></a>
+
 $$
 \lim_{\tau \to 0} y_k = \begin{cases} 1 & \text{if } k = \arg\max_j (\ell_j + g_j) \\ 0 & \text{otherwise} \end{cases}
-$$ <a id="eq-gumbel-limit"></a>
+$$
 
 This holds because as $\tau \to 0$, softmax concentrates all mass on the maximum element. $\blacksquare$
 
@@ -231,9 +275,11 @@ This holds because as $\tau \to 0$, softmax concentrates all mass on the maximum
 
 Wav2Vec 2.0 uses Gumbel-Softmax to make codebook selection differentiable during training:
 
+<a id="eq-gumbel-w2v"></a>
+
 $$
 \mathbf{q} = \sum_{k=1}^{K} y_k \cdot \mathbf{e}_k, \quad y_k = \text{GumbelSoftmax}(\ell_k, \tau)
-$$ <a id="eq-gumbel-w2v"></a>
+$$
 
 Temperature $\tau$ is annealed from 2.0 to 0.5 during training.
 
@@ -245,21 +291,27 @@ VITS maximizes a variational lower bound on $\log p_\theta(\mathbf{x} \mid c)$ w
 
 ### Derivation
 
+<a id="eq-vits-marginal"></a>
+
 $$
 \log p_\theta(\mathbf{x} \mid c) = \log \int p_\theta(\mathbf{x} \mid \mathbf{z}) p_\theta(\mathbf{z} \mid c) \, d\mathbf{z}
-$$ <a id="eq-vits-marginal"></a>
+$$
 
 Introducing variational posterior $q_\phi(\mathbf{z} \mid \mathbf{x})$:
 
+<a id="eq-vits-elbo-proof"></a>
+
 $$
 \log p_\theta(\mathbf{x} \mid c) \geq \underbrace{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}[\log p_\theta(\mathbf{x} \mid \mathbf{z})]}_{\text{reconstruction (HiFi-GAN)}} - \underbrace{D_{\text{KL}}(q_\phi(\mathbf{z} \mid \mathbf{x}) \| p_\theta(\mathbf{z} \mid c))}_{\text{prior matching}}
-$$ <a id="eq-vits-elbo-proof"></a>
+$$
 
 The normalizing flow in VITS transforms the posterior to make it more flexible:
 
+<a id="eq-vits-flow-posterior"></a>
+
 $$
 q_\phi(\mathbf{z}_K \mid \mathbf{x}) = q_\phi(\mathbf{z}_0 \mid \mathbf{x}) \prod_{k=1}^{K} \left|\det \frac{\partial f_k^{-1}}{\partial \mathbf{z}_k}\right|
-$$ <a id="eq-vits-flow-posterior"></a>
+$$
 
 This allows $q_\phi$ to model complex, multi-modal posterior distributions while maintaining tractable density evaluation. $\blacksquare$
 

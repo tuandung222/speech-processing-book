@@ -14,27 +14,37 @@ Chương này trình bày các kiến trúc ASR hiện đại nhất, từ **Con
 
 Conformer [^gulati2020conformer] xếp chồng các **Conformer blocks**, mỗi block gồm 4 modules theo thứ tự "macaron-style":
 
+<a id="eq-conformer-ffn1"></a>
+
 $$
 \mathbf{x}' = \mathbf{x} + \frac{1}{2}\text{FFN}_1(\mathbf{x})
-$$ <a id="eq-conformer-ffn1"></a>
+$$
+
+<a id="eq-conformer-mhsa"></a>
 
 $$
 \mathbf{x}'' = \mathbf{x}' + \text{MHSA}(\mathbf{x}')
-$$ <a id="eq-conformer-mhsa"></a>
+$$
+
+<a id="eq-conformer-conv"></a>
 
 $$
 \mathbf{x}''' = \mathbf{x}'' + \text{Conv}(\mathbf{x}'')
-$$ <a id="eq-conformer-conv"></a>
+$$
+
+<a id="eq-conformer-ffn2"></a>
 
 $$
 \mathbf{y} = \text{LayerNorm}\left(\mathbf{x}''' + \frac{1}{2}\text{FFN}_2(\mathbf{x}''')\right)
-$$ <a id="eq-conformer-ffn2"></a>
+$$
 
 **Convolution Module** sử dụng depthwise separable convolution:
 
+<a id="eq-conformer-conv-module"></a>
+
 $$
 \text{Conv}(\mathbf{x}) = \text{PointwiseConv} \circ \text{GLU} \circ \text{DepthwiseConv}_{k} \circ \text{PointwiseConv}(\mathbf{x})
-$$ <a id="eq-conformer-conv-module"></a>
+$$
 
 với kernel size $k = 31$ (capture ~310ms context ở 10ms frame rate).
 
@@ -133,9 +143,11 @@ class ConvolutionModule(nn.Module):
 
 E-Branchformer [^kim2023ebranchformer] cải tiến Conformer bằng **parallel branches**:
 
+<a id="eq-ebranchformer"></a>
+
 $$
 \mathbf{y} = \text{Merge}(\text{GlobalBranch}(\mathbf{x}), \text{LocalBranch}(\mathbf{x})) + \mathbf{x}
-$$ <a id="eq-ebranchformer"></a>
+$$
 
 - **Global Branch**: Multi-head self-attention (MHSA)
 - **Local Branch**: Convolutional gating mechanism (cgMLP)
@@ -157,23 +169,29 @@ Sử dụng **multi-scale architecture** với different frame rates ở các la
 - Layers giữa: 25 fps (20ms) - downsample 2x
 - Layers cuối: 12.5 fps (40ms) - downsample thêm 2x
 
+<a id="eq-zipformer-fps"></a>
+
 $$
 \text{fps}_l = \frac{50}{2^{d_l}}, \quad d_l \in \{0, 1, 2\}
-$$ <a id="eq-zipformer-fps"></a>
+$$
 
 ### Swoosh Activation
 
 Thay SiLU bằng **Swoosh** activation:
 
+<a id="eq-swoosh"></a>
+
 $$
 \text{Swoosh}(x) = x \cdot \sigma(x - 1)
-$$ <a id="eq-swoosh"></a>
+$$
 
 ### BiasNorm thay LayerNorm
 
+<a id="eq-biasnorm"></a>
+
 $$
 \text{BiasNorm}(\mathbf{x}) = \frac{\mathbf{x} + \mathbf{b}}{\text{learn\_scale} \cdot \|\mathbf{x} + \mathbf{b}\|_{\text{RMS}}}
-$$ <a id="eq-biasnorm"></a>
+$$
 
 | Model | Params | test-clean | test-other | Speed |
 |-------|--------|-----------|------------|-------|
@@ -191,9 +209,11 @@ FastConformer [^rekesh2023fast] từ NVIDIA NeMo tối ưu Conformer cho product
 - **Multi-blank CTC** - thêm blank symbols cho phép skip nhiều frames
 - **Hybrid CTC/RNNT** training
 
+<a id="eq-fastconformer-rtf"></a>
+
 $$
 \text{RTF}_{\text{FastConformer}} \approx 0.01 \text{ (trên A100)}
-$$ <a id="eq-fastconformer-rtf"></a>
+$$
 
 ## MoE trong Speech Recognition
 
@@ -201,9 +221,11 @@ $$ <a id="eq-fastconformer-rtf"></a>
 
 Mixture of Experts (MoE) [^shazeer2017outrageously] cho phép **scale model capacity** mà không tăng compute proportionally:
 
+<a id="eq-moe-speech"></a>
+
 $$
 \text{MoE}(\mathbf{x}) = \sum_{i=1}^{N} g_i(\mathbf{x}) \cdot E_i(\mathbf{x})
-$$ <a id="eq-moe-speech"></a>
+$$
 
 với $g_i(\mathbf{x})$ là routing weights (chỉ top-$k$ experts được activate).
 
@@ -214,9 +236,11 @@ Kết hợp E-Branchformer với MoE routing [^you2024moe]:
 - Thay FFN layers bằng MoE layers (8-64 experts, top-2 routing)
 - Load balancing loss để tránh expert collapse:
 
+<a id="eq-moe-balance"></a>
+
 $$
 \mathcal{L}_{\text{balance}} = N \sum_{i=1}^{N} f_i \cdot P_i
-$$ <a id="eq-moe-balance"></a>
+$$
 
 trong đó $f_i$ là fraction of tokens routed to expert $i$, $P_i$ là average routing probability.
 
@@ -226,12 +250,14 @@ trong đó $f_i$ là fraction of tokens routed to expert $i$, $P_i$ là average 
 
 S4 [^gu2022efficiently] và Mamba [^gu2023mamba] xử lý sequences dài hiệu quả - rất phù hợp cho audio (16kHz = 16000 samples/sec):
 
+<a id="eq-ssm-speech"></a>
+
 $$
 \begin{aligned}
 \mathbf{h}_{t+1} &= \bar{\mathbf{A}} \mathbf{h}_t + \bar{\mathbf{B}} x_t \\
 y_t &= \mathbf{C} \mathbf{h}_t + D x_t
 \end{aligned}
-$$ <a id="eq-ssm-speech"></a>
+$$
 
 ### Hybrid Attention-SSM cho ASR
 

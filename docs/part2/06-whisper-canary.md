@@ -8,9 +8,11 @@ Whisper [^radford2023robust] là ASR model của OpenAI, được train trên **
 
 Thay vì tự tạo labels (self-supervised) hay thuê người gán nhãn (supervised), Whisper thu thập **audio + transcript pairs từ internet**  -  noisy nhưng massive scale:
 
+<a id="eq-whisper-scale"></a>
+
 $$
 \underbrace{\text{680K hours}}_{\text{Whisper (weak supervision)}} \gg \underbrace{\text{60K hours}}_{\text{Wav2Vec 2.0 (self-supervised)}} \gg \underbrace{\text{960 hours}}_{\text{LibriSpeech (supervised)}}
-$$ <a id="eq-whisper-scale"></a>
+$$
 
 !!! tip "NLP Parallel"
     Whisper's approach tương tự **GPT pre-training**: thu thập text từ internet (noisy, uncurated) nhưng massive scale → model tự học filtering noise. Trong speech: thu thập audio + subtitles từ YouTube/podcasts.
@@ -29,6 +31,8 @@ Whisper là **encoder-decoder Transformer** kinh điển:
 
 ### Audio Encoder
 
+<a id="eq-whisper-encoder"></a>
+
 $$
 \begin{aligned}
 \mathbf{x}_{\text{mel}} &\in \mathbb{R}^{80 \times 3000} & \text{// Log mel spectrogram} \\
@@ -36,15 +40,17 @@ $$
 \mathbf{x}_2 &= \text{GELU}(\text{Conv1d}(\mathbf{x}_1, k{=}3, s{=}2)) & \text{// [d, 1500]  -  2× downsampling} \\
 \mathbf{h} &= \text{TransformerEncoder}(\mathbf{x}_2 + \mathbf{p}_{\text{sin}}) & \text{// [1500, d]}
 \end{aligned}
-$$ <a id="eq-whisper-encoder"></a>
+$$
 
 ### Text Decoder
 
 Autoregressive decoder với **special tokens** cho multitask:
 
+<a id="eq-whisper-decoder"></a>
+
 $$
 P(y_u \mid y_{<u}, \mathbf{h}) = \text{softmax}(\mathbf{W}_o \cdot \text{TransformerDecoder}(y_{<u}, \mathbf{h}))
-$$ <a id="eq-whisper-decoder"></a>
+$$
 
 ### Model Sizes
 
@@ -99,6 +105,8 @@ Whisper sử dụng sequence of special tokens để chỉ định task:
 
 ### Training Setup
 
+<a id="eq-whisper-training"></a>
+
 $$
 \begin{aligned}
 \text{Optimizer} &: \text{AdamW}, \quad \beta = (0.9, 0.98), \quad \epsilon = 10^{-6} \\
@@ -107,15 +115,17 @@ $$
 \text{Total steps} &: \sim 2^{20} \approx 1{,}048{,}576 \\
 \text{Total compute} &: \sim 5{,}500 \text{ GPU-days (A100)}
 \end{aligned}
-$$ <a id="eq-whisper-training"></a>
+$$
 
 ### Loss Function
 
 Standard cross-entropy trên text tokens:
 
+<a id="eq-whisper-loss"></a>
+
 $$
 \mathcal{L} = -\frac{1}{U} \sum_{u=1}^{U} \log P(y_u \mid y_{<u}, \mathbf{h}_{\text{encoder}})
-$$ <a id="eq-whisper-loss"></a>
+$$
 
 ## Inference & Decoding
 
@@ -271,9 +281,11 @@ class WhisperDecoder(nn.Module):
 
 Distil-Whisper [^gandhi2023distilwhisper] giảm size bằng knowledge distillation:
 
+<a id="eq-distil-whisper"></a>
+
 $$
 \mathcal{L}_{\text{distil}} = \alpha \cdot \mathcal{L}_{\text{CE}}(y, \hat{y}_{\text{student}}) + (1-\alpha) \cdot \text{KL}(\hat{p}_{\text{teacher}} \| \hat{p}_{\text{student}})
-$$ <a id="eq-distil-whisper"></a>
+$$
 
 | Model | Params | Speed (vs Large-v3) | WER (test-clean) |
 |-------|--------|---------------------|-------------------|

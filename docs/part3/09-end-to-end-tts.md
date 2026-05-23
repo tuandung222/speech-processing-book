@@ -19,9 +19,11 @@ VITS [^kim2021conditional] là model **end-to-end** đầu tiên đạt chất l
 2. **Normalizing Flows**: Flexible posterior distribution
 3. **GAN**: High-fidelity waveform generation
 
+<a id="eq-vits-formula"></a>
+
 $$
 \text{VITS} = \text{VAE} + \text{Normalizing Flow} + \text{Adversarial Training}
-$$ <a id="eq-vits-formula"></a>
+$$
 
 ### Architecture Overview
 
@@ -32,9 +34,11 @@ $$ <a id="eq-vits-formula"></a>
 
 ### ELBO Objective
 
+<a id="eq-vits-elbo"></a>
+
 $$
 \log p_\theta(\mathbf{x} \mid c) \geq \mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})} \left[\log p_\theta(\mathbf{x} \mid \mathbf{z}) - \log \frac{q_\phi(\mathbf{z} \mid \mathbf{x})}{p_\theta(\mathbf{z} \mid c)}\right]
-$$ <a id="eq-vits-elbo"></a>
+$$
 
 trong đó:
 
@@ -46,15 +50,21 @@ trong đó:
 
 Flow biến simple distribution thành complex distribution qua invertible transformations:
 
+<a id="eq-vits-flow"></a>
+
 $$
 \mathbf{z}_K = f_K \circ f_{K-1} \circ \cdots \circ f_1(\mathbf{z}_0), \quad \mathbf{z}_0 \sim \mathcal{N}(\mu_\theta(c), \sigma_\theta(c))
-$$ <a id="eq-vits-flow"></a>
+$$
+
+<a id="eq-vits-flow-density"></a>
 
 $$
 \log q_\phi(\mathbf{z}_K \mid \mathbf{x}) = \log q(\mathbf{z}_0) - \sum_{k=1}^{K} \log \left|\det \frac{\partial f_k}{\partial \mathbf{z}_{k-1}}\right|
-$$ <a id="eq-vits-flow-density"></a>
+$$
 
 VITS sử dụng **affine coupling layers** (similar to WaveGlow/Glow):
+
+<a id="eq-affine-coupling"></a>
 
 $$
 \begin{aligned}
@@ -62,23 +72,27 @@ $$
 \mathbf{z}_b' &= \mathbf{z}_b \odot \exp(s(\mathbf{z}_a)) + t(\mathbf{z}_a) \\
 f(\mathbf{z}) &= \text{concat}(\mathbf{z}_a, \mathbf{z}_b')
 \end{aligned}
-$$ <a id="eq-affine-coupling"></a>
+$$
 
 ### Monotonic Alignment Search (MAS)
 
 VITS tìm hard alignment giữa text và latent frames bằng dynamic programming:
 
+<a id="eq-mas"></a>
+
 $$
 A^* = \arg\max_{A \in \{0,1\}^{T \times U}} \sum_{t,u} A_{t,u} \log p_\theta(z_t \mid c_u)
-$$ <a id="eq-mas"></a>
+$$
 
 subject to monotonicity constraints. Giải bằng DP $O(TU)$.
 
 ### Total Loss
 
+<a id="eq-vits-total-loss"></a>
+
 $$
 \mathcal{L}_{\text{VITS}} = \mathcal{L}_{\text{recon}} + \mathcal{L}_{\text{KL}} + \mathcal{L}_{\text{dur}} + \mathcal{L}_{\text{adv}} + \mathcal{L}_{\text{fm}}
-$$ <a id="eq-vits-total-loss"></a>
+$$
 
 ```python
 #| eval: false
@@ -163,13 +177,15 @@ class PosteriorEncoder(nn.Module):
 
 VALL-E [^wang2023valle] biến TTS thành **language modeling problem** trên neural codec tokens:
 
+<a id="eq-valle-paradigm"></a>
+
 $$
 \text{Traditional TTS: } \text{Text} \to \text{Mel} \to \text{Waveform}
 $$
 
 $$
 \text{VALL-E: } \text{Text} + \text{Audio Prompt} \to \text{Codec Tokens} \to \text{Waveform}
-$$ <a id="eq-valle-paradigm"></a>
+$$
 
 !!! tip "NLP Parallel: GPT for Speech"
     VALL-E là **GPT applied to speech**. Thay vì predict next BPE token, nó predict next audio codec token. 3-second audio prompt = **in-context learning**  -  giống few-shot prompting cho LLM.
@@ -186,9 +202,11 @@ VALL-E sử dụng EnCodec (8 RVQ codebooks) và chia thành 2 stages:
 
 ### AR Model (Codebook 1)
 
+<a id="eq-valle-ar"></a>
+
 $$
 P_{\text{AR}}(\mathbf{c}^{(1)} \mid \mathbf{y}, \tilde{\mathbf{c}}^{(1)}) = \prod_{t=1}^{T} P(c_t^{(1)} \mid c_{<t}^{(1)}, \mathbf{y}, \tilde{\mathbf{c}}^{(1)})
-$$ <a id="eq-valle-ar"></a>
+$$
 
 trong đó:
 
@@ -198,17 +216,21 @@ trong đó:
 
 ### NAR Model (Codebooks 2-8)
 
+<a id="eq-valle-nar"></a>
+
 $$
 P_{\text{NAR}}(\mathbf{c}^{(q)} \mid \mathbf{c}^{(1)}, \ldots, \mathbf{c}^{(q-1)}, \mathbf{y}) = \prod_{t=1}^{T} P(c_t^{(q)} \mid \mathbf{c}^{(<q)}, \mathbf{y})
-$$ <a id="eq-valle-nar"></a>
+$$
 
 ### Zero-Shot Voice Cloning
 
 VALL-E đạt zero-shot voice cloning chỉ với **3 giây** audio prompt:
 
+<a id="eq-valle-cloning"></a>
+
 $$
 \text{Voice Cloning} = \text{In-Context Learning trên Codec Tokens}
-$$ <a id="eq-valle-cloning"></a>
+$$
 
 | Feature | VALL-E | Tacotron 2 | VITS |
 |---------|--------|------------|------|
@@ -225,9 +247,11 @@ $$ <a id="eq-valle-cloning"></a>
 
 F5-TTS [^chen2024f5tts] sử dụng **flow matching** [^lipman2023flow]  -  phương pháp mới hơn diffusion:
 
+<a id="eq-flow-matching-ode"></a>
+
 $$
 \frac{d\mathbf{x}_t}{dt} = v_\theta(\mathbf{x}_t, t, c), \quad t \in [0, 1]
-$$ <a id="eq-flow-matching-ode"></a>
+$$
 
 trong đó:
 
@@ -238,15 +262,19 @@ trong đó:
 
 **Training objective** (Conditional Flow Matching):
 
+<a id="eq-cfm-loss"></a>
+
 $$
 \mathcal{L}_{\text{CFM}} = \mathbb{E}_{t, \mathbf{x}_0, \mathbf{x}_1} \left[\| v_\theta(\mathbf{x}_t, t, c) - (\mathbf{x}_1 - \mathbf{x}_0) \|^2\right]
-$$ <a id="eq-cfm-loss"></a>
+$$
 
 với interpolation:
 
+<a id="eq-flow-interpolation"></a>
+
 $$
 \mathbf{x}_t = (1-t) \mathbf{x}_0 + t \mathbf{x}_1
-$$ <a id="eq-flow-interpolation"></a>
+$$
 
 !!! note "Flow Matching vs Diffusion"
     | | Diffusion | Flow Matching |
@@ -269,9 +297,11 @@ F5-TTS sử dụng **DiT** (Diffusion Transformer) thay vì U-Net:
 
 **Adaptive Layer Normalization (AdaLN):**
 
+<a id="eq-adaln"></a>
+
 $$
 \text{AdaLN}(\mathbf{h}, t) = \gamma(t) \odot \frac{\mathbf{h} - \mu}{\sigma} + \beta(t)
-$$ <a id="eq-adaln"></a>
+$$
 
 trong đó $\gamma(t), \beta(t)$ được predict từ time embedding.
 

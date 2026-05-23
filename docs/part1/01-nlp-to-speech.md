@@ -30,9 +30,11 @@ Tất cả đều xây dựng trên **cùng một nền tảng Transformer** mà
 
 Pipeline quen thuộc nhất, tương tự cách xử lý ảnh:
 
+<a id="eq-spectrogram-pipeline"></a>
+
 $$
 \text{Waveform} \xrightarrow{\text{STFT}} \text{Power Spectrum} \xrightarrow{\text{Mel Filterbank}} \text{Mel Spectrogram}
-$$ <a id="eq-spectrogram-pipeline"></a>
+$$
 
 - **Output**: Ma trận 2D kích thước $(n_{\text{mels}}, T_{\text{frames}})$
 - **Ví dụ**: 10 giây audio → $(80, 1000)$ ở 100 frames/sec
@@ -43,9 +45,11 @@ $$ <a id="eq-spectrogram-pipeline"></a>
 
 Học continuous representations trực tiếp từ raw waveform:
 
+<a id="eq-self-supervised-pipeline"></a>
+
 $$
 \text{Waveform} \xrightarrow{\text{CNN Encoder}} \text{Latent} \xrightarrow{\text{Transformer}} \text{Contextualized Representations}
-$$ <a id="eq-self-supervised-pipeline"></a>
+$$
 
 - **Output**: Sequence of vectors $(T', d_{\text{model}})$ ở ~50 fps
 - **Sử dụng bởi**: Wav2Vec 2.0 [^baevski2020wav2vec], HuBERT [^hsu2021hubert]
@@ -55,9 +59,11 @@ $$ <a id="eq-self-supervised-pipeline"></a>
 
 Nén audio thành discrete token sequences  -  **cầu nối trực tiếp đến LLM**:
 
+<a id="eq-codec-pipeline"></a>
+
 $$
 \text{Waveform} \xrightarrow{\text{Encoder}} \text{Latent} \xrightarrow{\text{RVQ}} \text{Discrete Tokens} \in \{0, 1, \ldots, C-1\}^{Q \times T''}
-$$ <a id="eq-codec-pipeline"></a>
+$$
 
 trong đó $Q$ là số quantization layers (codebooks) và $C$ là codebook size.
 
@@ -116,9 +122,11 @@ trong đó $Q$ là số quantization layers (codebooks) và $C$ là codebook siz
 
 Hiểu được scale difference là rất quan trọng cho system design:
 
+<a id="eq-data-rate"></a>
+
 $$
 \text{Data rate}_{\text{text}} \approx 4 \text{ tokens/sec} \quad \text{vs} \quad \text{Data rate}_{\text{audio}} \approx 16{,}000 \text{ samples/sec}
-$$ <a id="eq-data-rate"></a>
+$$
 
 Điều này có nghĩa:
 

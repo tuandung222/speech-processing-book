@@ -37,13 +37,17 @@ Qwen2-Audio [^chu2024qwen2audio] từ Alibaba:
 - **Audio Adapter**: Linear projection + downsampling
 - **LLM**: Qwen2-7B
 
+<a id="eq-qwen2audio-encode"></a>
+
 $$
 \mathbf{h}_{\text{audio}} = \text{Adapter}(\text{WhisperEncoder}(\mathbf{x}_{\text{audio}}))
-$$ <a id="eq-qwen2audio-encode"></a>
+$$
+
+<a id="eq-qwen2audio-concat"></a>
 
 $$
 \mathbf{h}_{\text{input}} = [\mathbf{h}_{\text{text}}; \mathbf{h}_{\text{audio}}; \mathbf{h}_{\text{text}}]
-$$ <a id="eq-qwen2audio-concat"></a>
+$$
 
 ### Capabilities
 
@@ -68,17 +72,21 @@ Qwen2.5-Omni [^xu2025qwen25omni] là bước tiến lớn với kiến trúc **T
 - Generate **streaming speech tokens** song song với text tokens
 - Sử dụng **dual-track autoregressive generation**:
 
+<a id="eq-thinker-talker"></a>
+
 $$
 p(y_t^{\text{text}}, y_t^{\text{speech}} | \mathbf{h}_{\text{thinker}}, y_{<t}) = p(y_t^{\text{text}} | \mathbf{h}_t) \cdot p(y_t^{\text{speech}} | \mathbf{h}_t, y_t^{\text{text}})
-$$ <a id="eq-thinker-talker"></a>
+$$
 
 ### TMRoPE (Time-aligned Multi-Resolution RoPE)
 
 Để đồng bộ audio và video ở different frame rates:
 
+<a id="eq-tmrope"></a>
+
 $$
 \text{RoPE}_{\text{TMR}}(\mathbf{x}, t) = \text{RoPE}(\mathbf{x}, t_{\text{aligned}})
-$$ <a id="eq-tmrope"></a>
+$$
 
 trong đó $t_{\text{aligned}}$ được tính dựa trên timestamps thực tế, không phải token positions.
 
