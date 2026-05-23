@@ -374,6 +374,126 @@ Dựa trên published information, GPT-4o voice likely uses:
 
 : Speech LLM comparison <a id="tbl-speech-llm-comparison"></a>
 
+## Phần Mở rộng: Q4 2025 + 2026 Updates (Major Releases)
+
+Speech LLMs đã evolve cực nhanh giữa Q4 2025 và 2026. Phần này document các releases mới quan trọng nhất, với specific architectural details và benchmark numbers từ public technical reports.
+
+### Qwen-Omni family (Alibaba, 2024-2026)
+
+Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ vượt trội thế hệ trước. Đây là dòng open-source quan trọng nhất cho Speech LLM hiện nay.
+
+#### Qwen2-Audio (Aug 2024)
+
+- Audio encoder: Whisper-large encoder.
+- Language model: Qwen2-7B-Instruct.
+- Adapter: linear projection từ Whisper encoder → Qwen2 embedding space.
+- Capabilities: ASR, audio captioning, audio QA, multi-turn conversation.
+- License: Apache 2.0, fully open source.
+- Limitations: text output only (no speech generation), no streaming.
+
+#### Qwen2.5-Omni (early 2025)
+
+- Unified architecture: text + audio + image + video trong single transformer.
+- **Thinker-Talker design**: Thinker (planning + reasoning) sinh text, Talker (synthesis) sinh speech.
+- Audio + image + video encoders → Thinker LLM → Talker streaming speech output.
+- Streaming capable.
+
+#### Qwen3-Omni (October 2025) ⭐ Major release
+
+- Architecture: MoE (Mixture-of-Experts) Thinker-Talker.
+- Available variants:
+  - Qwen3-Omni-30B-A3B-Instruct (text+audio+video input, text+audio output).
+  - Qwen3-Omni-30B-A3B-Thinking (chain-of-thought reasoning capable).
+  - Qwen3-Omni-30B-A3B-Captioner (audio→text descriptions).
+- Languages: 119 text, 19 speech input, 10 speech output.
+- Benchmarks: SOTA on 22 of 36 audio/video benchmarks. Open-source SOTA on 32 of 36.
+- ASR + audio understanding + voice conversation comparable to Gemini 2.5 Pro.
+- License: Apache 2.0.
+
+#### Qwen3-Omni-Flash (Dec 2025)
+
+- Variant optimized for inference latency.
+- Real-time streaming voice output prioritized.
+
+#### Qwen3.5-Omni (March 2026) ⭐⭐ Current SOTA Open Source
+
+- Released March 30, 2026.
+- Plus variant: 215 SOTA results across audio, audio-video understanding, reasoning, interaction benchmarks.
+- **Outperforms Gemini 3.1 Pro** on general audio understanding, reasoning, translation.
+- Native multimodal processing (text + image + audio + video in single forward pass).
+- Streaming speech output realtime.
+
+### OpenAI Voice Stack Updates
+
+#### GPT-Realtime (August 2025)
+
+- General availability of Realtime API.
+- Most advanced speech-to-speech model from OpenAI to date.
+- New features: MCP server support, image input, SIP phone calling.
+- Better instruction following, tool calling, natural expressive speech.
+- Pricing: ~0.03 USD/min input + 0.06 USD/min output.
+
+#### Basic Voice Mode retirement (Sep 2025)
+
+- OpenAI sunset Basic Voice Mode in favor of Realtime API.
+- All voice features now use single end-to-end speech-to-speech model.
+
+### Gemini Live (Google, 2024-2026)
+
+- Gemini 2.0 Live (2025): streaming voice + video.
+- Gemini 3 Live (2026): improved translation, multi-speaker handling.
+- Closed source, available via Vertex AI and Gemini API.
+
+### Kyutai Updates
+
+#### Moshi v2 (2026)
+
+- Kyutai labs continue iterating on Moshi.
+- MoshiRAG (April 2026): asynchronous knowledge retrieval, helps Moshi answer tough questions with help from text LLM.
+- MoshiVis: image input support for Moshi while preserving real-time latency.
+
+#### Pocket TTS
+
+- 100M params TTS model.
+- Matches quality of 10x larger SOTA models.
+- Voice cloning support.
+- Real-time streaming.
+
+### Updated SOTA comparison (mid-2026)
+
+| Model | Year | Params | Speech-in | Speech-out | Full-duplex | Streaming | Open Source |
+|---|---|---|---|---|---|---|---|
+| Qwen2-Audio | 2024 | 7B | ✓ | ✗ | ✗ | ✗ | ✓ |
+| Qwen2.5-Omni | 2025 | 7B | ✓ | ✓ | partial | ✓ | ✓ |
+| Qwen3-Omni | Oct 2025 | 30B-A3B (MoE) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Qwen3-Omni-Flash | Dec 2025 | smaller MoE | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Qwen3.5-Omni Plus | Mar 2026 | larger MoE | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Moshi v1 | Sep 2024 | 7.6B | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Moshi v2 + MoshiRAG | Apr 2026 | 7.6B + RAG | ✓ | ✓ | ✓ | ✓ | ✓ |
+| GPT-Realtime | Aug 2025 | undisclosed | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Gemini 2.0 Live | 2025 | undisclosed | ✓ | ✓ | ✓ | ✓ | ✗ |
+| Gemini 3 Live | 2026 | undisclosed | ✓ | ✓ | ✓ | ✓ | ✗ |
+
+### Key trends observed 2024-2026
+
+1. **MoE architectures dominant**: Qwen3-Omni's MoE Thinker-Talker design provides best efficiency/capability tradeoff.
+2. **Native multimodal converging**: separate audio + image + video encoders are being replaced by unified transformers.
+3. **Open source catching up to closed**: Qwen3.5-Omni vượt Gemini 3.1 Pro is significant milestone.
+4. **Latency targets sub-300ms**: all serious systems now target sub-300ms first-byte for natural conversation.
+5. **Tool calling integrated**: GPT-Realtime MCP support, Qwen3-Omni function calling natively.
+6. **RAG for speech**: MoshiRAG demonstrates retrieval-augmented speech LMs as new paradigm.
+
+### Practical recommendations cho 2026
+
+| Use case | Recommended model |
+|---|---|
+| Production voice agent (closed source OK) | GPT-Realtime hoặc Gemini 3 Live |
+| Production voice agent (open source preferred) | Qwen3-Omni-Flash or Moshi v2 self-host |
+| Multilingual voice agent (Vi support) | Qwen3.5-Omni (native Vi text), GPT-Realtime |
+| Edge / mobile deployment | Moshi (smaller variants), Kyutai Pocket TTS |
+| Research / fine-tuning | Qwen3-Omni base, Moshi v2 |
+| Voice cloning | F5-TTS, VALL-E, Kyutai TTS |
+
 ## Tóm tắt
 
 | Evolution | Model | Key Innovation |
@@ -381,11 +501,14 @@ Dựa trên published information, GPT-4o voice likely uses:
 | Audio → Tokens → LM | AudioLM | Hierarchical token LM |
 | Audio → LLM → Text | Qwen2-Audio | Audio adapter for LLM |
 | Full-duplex dialogue | Moshi | Dual-stream + Depth Transformer |
-| Commercial | GPT-4o | End-to-end multimodal |
+| MoE Multimodal | Qwen3-Omni | MoE Thinker-Talker, 119 langs |
+| Native unified multimodal | Qwen3.5-Omni Plus | Outperform Gemini 3.1 Pro |
+| RAG-enhanced speech | MoshiRAG | Async knowledge retrieval |
+| Production closed | GPT-Realtime | MCP + SIP phone integration |
 
-: Speech LLM evolution <a id="tbl-speech-llm-summary"></a>
+: Speech LLM evolution timeline 2023-2026 <a id="tbl-speech-llm-summary"></a>
 
-Chương tiếp theo sẽ khám phá **Vietnamese Speech Processing**  -  thách thức đặc thù của tiếng Việt (6 tones, dialects) và các solutions hiện có.
+Chương tiếp theo sẽ khám phá **Vietnamese Speech Processing**, thách thức đặc thù của tiếng Việt (6 tones, dialects) và các solutions hiện có.
 
 
 
