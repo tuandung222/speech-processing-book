@@ -1,4 +1,8 @@
-# Notation Reference
+# Phụ lục A: Notation Reference
+
+## Mục đích
+
+Phụ lục A tập hợp toàn bộ quy ước ký hiệu toán học được dùng xuyên suốt cuốn sách. Mục đích là loại bỏ một nguồn nhầm lẫn phổ biến khi đọc paper Speech AI: cùng một ký hiệu $T$ có thể chỉ frame count, sequence length, hoặc temperature, tùy ngữ cảnh. Trong cuốn sách này, các ký hiệu được dùng nhất quán theo bảng bên dưới.
 
 ## General Notation
 

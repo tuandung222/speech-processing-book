@@ -1,10 +1,16 @@
-# Mathematical Proofs
+# Phụ lục B: Mathematical Proofs
+
+## Mục đích
+
+Phụ lục B chứa các chứng minh toán học cho các công thức quan trọng xuất hiện trong các chương chính. Trong các chương, công thức được phát biểu và sử dụng; chứng minh chi tiết được chuyển về Phụ lục B để giữ mạch đọc chính không bị gián đoạn. Người đọc cần thực sự hiểu sâu (viết paper, giải thích cho team) nên tham khảo phụ lục này; người đọc thực hành có thể bỏ qua.
+
+Các chứng minh hiện có: DFT completeness, CTC forward-backward derivation, tính chất triangular của mel filterbank.
 
 ## Discrete Fourier Transform (DFT) Completeness
 
 ### Statement
 
-DFT basis vectors form an orthogonal set  -  any discrete signal of length $N$ can be perfectly reconstructed from its $N$ DFT coefficients.
+DFT basis vectors form an orthogonal set. Any discrete signal of length $N$ can be perfectly reconstructed from its $N$ DFT coefficients.
 
 ### Proof
 

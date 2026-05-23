@@ -1,4 +1,8 @@
-# Code Listings Index
+# Phụ lục D: Code Listings Index
+
+## Mục đích
+
+Phụ lục D index các code listing xuất hiện trong các chương, kèm mô tả ngắn và kiểu tensor shape. Mục đích là cho phép người đọc nhanh chóng tìm được implementation cụ thể của một khái niệm (CTC, RNN-T, VITS, VALL-E, EnCodec, etc.) mà không cần lật lại toàn bộ chương.
 
 ## Overview
 

@@ -1,8 +1,12 @@
-# NLP ↔ Speech Complete Mapping
+# Phụ lục C: NLP ↔ Speech Complete Mapping
+
+## Mục đích
+
+Phụ lục C mở rộng Bảng NLP↔Speech của Chương 1 thành một bảng tham chiếu đầy đủ. Mỗi khái niệm NLP/LLM quen thuộc (Transformer, BPE, BERT, RLHF, KV cache, in-context learning) đều có ánh xạ sang Speech AI tương ứng. Đây là reference mà người đọc NLP/LLM nên bookmark khi đọc paper Speech AI và gặp thuật ngữ lạ.
 
 ## Concept Mapping Table
 
-Bảng ánh xạ đầy đủ giữa các khái niệm NLP và Speech  -  giúp NLP researchers nhanh chóng tìm được counterpart trong speech domain.
+Bảng ánh xạ đầy đủ giữa các khái niệm NLP và Speech, giúp NLP researchers nhanh chóng tìm được counterpart trong speech domain.
 
 ### Data & Representation
 
