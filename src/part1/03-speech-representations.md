@@ -1,4 +1,23 @@
-# Speech Pretraining & Representation Learning
+# Chương 3: Speech Representations và Self-Supervised Pretraining
+
+## Vì sao chương này quan trọng
+
+Chương 2 đã giới thiệu mel spectrogram, một biểu diễn audio dạng *handcrafted* dựa trên kiến thức về thính giác con người. Tuy hiệu quả, mel spectrogram không phải là biểu diễn duy nhất, và càng không phải biểu diễn tối ưu cho mọi tác vụ Speech AI hiện đại. Chương này trình bày ba họ representation đang định hình toàn bộ ngành:
+
+- **Self-supervised continuous representations** (Wav2Vec 2.0, HuBERT, WavLM): học features từ hàng nghìn giờ audio không có nhãn, vai trò tương tự BERT MLM trong NLP.
+- **Neural audio codec tokens** (EnCodec, DAC, Mimi, SpeechTokenizer): biến tín hiệu liên tục thành chuỗi token rời rạc, cho phép áp dụng paradigm autoregressive LM trực tiếp lên audio.
+- **Contrastive multimodal embedding** (CLAP, AudioCLIP): căn cứ audio với text trong cùng không gian embedding, cho phép zero-shot classification và retrieval.
+
+Đối với độc giả NLP/LLM, chương này có giá trị đặc biệt: ba họ representation trên chính là tương đương Speech của BERT, BPE, và CLIP. Hiểu chúng là chìa khoá để đọc paper Speech LLM hiện đại (Moshi, Qwen3-Omni, GPT-Realtime) và để xây dựng Speech AI pipeline có hiệu suất ngang với baseline NLP.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: tổng quan và động lực cho self-supervised pretraining trong speech.
+> - **Phần 2**: Wav2Vec 2.0, HuBERT, WavLM (Big 3 của SSL speech).
+> - **Phần 3**: contrastive learning cho audio (CLAP, AudioCLIP, multimodal).
+> - **Phần 4**: neural audio codec tokens (EnCodec, DAC, Mimi, SpeechTokenizer).
+> - **Phần 5**: SUPERB benchmark và đánh giá representation chất lượng.
+> - **Phần 6**: lựa chọn representation cho bài toán cụ thể.
 
 ## Tổng quan
 

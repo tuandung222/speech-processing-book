@@ -1,10 +1,33 @@
-# Audio Signal Fundamentals
+# Chương 2: Audio Signal Fundamentals
 
-## Waveform & Sampling
+## Vì sao chương này quan trọng
 
-### Tín hiệu Âm thanh
+Nếu bạn đến từ NLP/LLM, có lẽ bạn chưa từng đụng nhiều tới Fourier transform, mel filterbank, hoặc spectrogram. Đó là vốn nền tảng "ai cũng giả định bạn biết" trong literature Speech AI, từ paper Whisper đến code Wav2Vec 2.0. Chương 2 phát triển bốn khái niệm cốt lõi cho phép bạn đọc và sử dụng feature audio thành thạo:
 
-Âm thanh là sóng cơ học truyền qua không khí. Khi thu bằng microphone, tín hiệu analog liên tục được chuyển thành tín hiệu số (digital) thông qua quá trình **sampling** (lấy mẫu) và **quantization** (lượng tử hóa).
+- Sampling và quantization: cách tín hiệu analog của giọng nói được chuyển thành chuỗi số mà model có thể tiêu thụ.
+- DFT và FFT: phân tích tín hiệu trong miền tần số, nền tảng toán học của mọi feature acoustic hiện đại.
+- STFT, mel filterbank, MFCC: pipeline feature extraction chuẩn cho ASR và TTS.
+- SpecAugment: kỹ thuật augmentation chuẩn cho ASR training.
+
+Sau khi đọc xong, bạn có thể đọc một mel spectrogram, hiểu vì sao chọn `n_fft = 400`, `hop_length = 160`, `n_mels = 80`, và viết được pipeline feature extraction từ waveform thô.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: waveform, sampling, quantization, Nyquist theorem, pre-emphasis filter.
+> - **Phần 2**: Discrete Fourier Transform và FFT, nền tảng toán học cho phân tích phổ.
+> - **Phần 3**: Short-Time Fourier Transform (STFT) và windowing.
+> - **Phần 4**: Mel scale, mel filterbank, mel spectrogram, log-mel features.
+> - **Phần 5**: MFCC và Delta features cho ASR cổ điển.
+> - **Phần 6**: SpecAugment, kỹ thuật augmentation tiêu chuẩn cho ASR.
+> - **Phần 7**: pipeline đầy đủ từ waveform tới feature, kèm code PyTorch.
+
+Tham khảo nền tảng nếu bạn cần đi sâu hơn: Rabiner và Schafer, *Theory and Applications of Digital Speech Processing*, hoặc Chương 16 của Jurafsky và Martin SLP3.
+
+## Phần 1 — Waveform và Sampling
+
+### 1.1 Tín hiệu âm thanh từ analog tới digital
+
+Âm thanh là sóng cơ học truyền qua không khí. Khi thu bằng microphone, tín hiệu analog liên tục được chuyển thành tín hiệu số (digital) thông qua quá trình **sampling** (lấy mẫu) và **quantization** (lượng tử hoá).
 
 <a id="eq-sampling"></a>
 
@@ -52,7 +75,7 @@ $$
 
 > **💡 NLP Parallel**
 >
-> Pre-emphasis giống như **text normalization**  -  một bước tiền xử lý đơn giản nhưng cải thiện kết quả downstream. Tuy nhiên, các model hiện đại (Whisper, Wav2Vec 2.0) thường **bỏ qua** bước này.
+> Pre-emphasis có vai trò tương tự **text normalization** trong NLP: một bước tiền xử lý đơn giản nhưng cải thiện kết quả downstream. Các model hiện đại (Whisper, Wav2Vec 2.0) thường bỏ qua pre-emphasis, vì model có thể tự học biến đổi tương đương khi train trên data lớn.
 
 
 ## Discrete Fourier Transform (DFT)
@@ -90,7 +113,7 @@ $$
 
 > **📝 Ý nghĩa Vật lý**
 >
-> $|X[k]|$ cho biết **biên độ** (amplitude) của thành phần tần số $f_k$, còn $\angle X[k]$ cho biết **pha** (phase). Mel spectrogram chỉ giữ lại magnitude, loại bỏ phase  -  đó là lý do cần vocoder (như HiFi-GAN) để tái tạo waveform từ mel.
+> $|X[k]|$ cho biết **biên độ** (amplitude) của thành phần tần số $f_k$, còn $\angle X[k]$ cho biết **pha** (phase). Mel spectrogram chỉ giữ lại magnitude và loại bỏ phase. Đây là lý do cần vocoder (HiFi-GAN, BigVGAN) để tái tạo waveform từ mel spectrogram trong pipeline TTS.
 
 
 ### Fast Fourier Transform (FFT)
@@ -502,7 +525,7 @@ class AudioFeatureExtractor(nn.Module):
 
 : Tóm tắt các phép biến đổi audio <a id="tbl-audio-summary"></a>
 
-Với nền tảng signal processing này, chương tiếp theo sẽ xây dựng **ASR Foundations**  -  cách chuyển mel spectrogram thành text.
+Với nền tảng signal processing này, Chương 3 sẽ trình bày **Speech Representations** (Wav2Vec 2.0, HuBERT, codec tokens), và Chương 4 sẽ phát triển **ASR Foundations**: cách chuyển mel spectrogram thành text qua CTC, attention seq2seq, và RNN-Transducer.
 
 
 
