@@ -63,7 +63,7 @@ Wake-word detection KHÔNG phải ASR:
 Tại sao không dùng ASR cho wake-word detection? Lý do là **power budget**:
 
 - ASR (Whisper-tiny): ~50 MB model, ~50-100 mW inference, ~10 USD GPU per server-hour.
-- WWD (typical): ~50 KB model, <10 mW inference, $0 (runs on device DSP).
+- WWD (typical): ~50 KB model, <10 mW inference, gần như 0 USD (runs on device DSP).
 
 Nói cách khác, WWD là một specialized binary classifier optimized cực mạnh cho 1 phrase, trong khi ASR là general transcription.
 
