@@ -29,8 +29,14 @@ jobs:
 
       - name: Install mdBook + mdbook-katex
         run: |
-          cargo install --version ${{ env.MDBOOK_VERSION }} mdbook
-          cargo install --version ${{ env.MDBOOK_KATEX_VERSION }} mdbook-katex
+          if ! command -v mdbook >/dev/null 2>&1; then
+            cargo install --version ${{ env.MDBOOK_VERSION }} mdbook
+          fi
+          if ! command -v mdbook-katex >/dev/null 2>&1; then
+            cargo install --version ${{ env.MDBOOK_KATEX_VERSION }} mdbook-katex
+          fi
+          mdbook --version
+          mdbook-katex --version
 
       - name: Build book
         run: mdbook build
