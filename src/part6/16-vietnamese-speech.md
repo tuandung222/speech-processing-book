@@ -304,7 +304,7 @@ $$
 <a id="eq-speaker-embedding"></a>
 
 $$
-\mathbf{s} = \text{SpeakerEncoder}(\text{reference_audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
+\mathbf{s} = \text{SpeakerEncoder}(\text{reference\_audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
 $$
 
 Speaker encoder cần capture:

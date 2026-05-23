@@ -23,10 +23,9 @@ trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, v
 
     $$
     f_s \geq 2 f_{\max}
-$$
+    $$
 
     Tần số $f_N = f_s / 2$ được gọi là **Nyquist frequency**.
-
 
 Đối với speech processing:
 
@@ -51,7 +50,6 @@ $$
 
 !!! tip "NLP Parallel"
     Pre-emphasis giống như **text normalization**  -  một bước tiền xử lý đơn giản nhưng cải thiện kết quả downstream. Tuy nhiên, các model hiện đại (Whisper, Wav2Vec 2.0) thường **bỏ qua** bước này.
-
 
 ## Discrete Fourier Transform (DFT)
 
@@ -88,7 +86,6 @@ $$
 
 !!! note "Ý nghĩa Vật lý"
     $|X[k]|$ cho biết **biên độ** (amplitude) của thành phần tần số $f_k$, còn $\angle X[k]$ cho biết **pha** (phase). Mel spectrogram chỉ giữ lại magnitude, loại bỏ phase  -  đó là lý do cần vocoder (như HiFi-GAN) để tái tạo waveform từ mel.
-
 
 ### Fast Fourier Transform (FFT)
 
@@ -184,7 +181,6 @@ $$
 
 !!! note "Ý nghĩa Trực giác"
     Ở tần số thấp (< 1 kHz), mel scale gần linear  -  tai phân biệt tốt. Ở tần số cao (> 1 kHz), mel scale nén lại  -  tai kém nhạy hơn. Đây là lý do mel filterbank dùng narrow filters ở low freq và wide filters ở high freq.
-
 
 ### Mel Filterbank
 
@@ -299,7 +295,6 @@ trong đó $c = 0, 1, \ldots, C-1$ là MFCC index (thường $C = 13$ hoặc $C 
 !!! warning "Latency Warning"
     MFCC bỏ mất thông tin spectral detail mà deep models có thể khai thác. Hầu hết models hiện đại (Whisper, Conformer, VITS) sử dụng **mel spectrogram trực tiếp** thay vì MFCC.
 
-
 ## SpecAugment
 
 SpecAugment [^park2019specaugment] là kỹ thuật data augmentation cực kỳ hiệu quả cho ASR  -  giảm WER 10–25% relative mà không cần thêm dữ liệu.
@@ -323,7 +318,6 @@ trong đó $f_0, t_0$ được chọn ngẫu nhiên, $F$ và $T$ là mask widths
 
 !!! tip "NLP Parallel"
     SpecAugment tương đương **token dropout / span masking** trong NLP. Frequency masking ≈ masking specific features, time masking ≈ masking contiguous tokens.
-
 
 ```python
 #| eval: false
