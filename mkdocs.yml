@@ -1,11 +1,11 @@
-site_name: Speech AI
+site_name: S-AI
 site_description: "Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI tiếng Việt"
-site_url: https://tuandung222.github.io/speech-processing-book/
+site_url: https://tuandung222.github.io/S-AI/
 site_author: tuandung222
-copyright: "&copy; 2026 Speech AI Book — MIT License"
+copyright: "&copy; 2026 S-AI — MIT License"
 
-repo_name: tuandung222/speech-processing-book
-repo_url: https://github.com/tuandung222/speech-processing-book
+repo_name: tuandung222/S-AI
+repo_url: https://github.com/tuandung222/S-AI
 edit_uri: edit/main/docs/
 
 docs_dir: docs
