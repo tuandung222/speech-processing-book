@@ -1,0 +1,9 @@
+\R:\mathbb{R}
+\E:\mathbb{E}
+\N:\mathbb{N}
+\Z:\mathbb{Z}
+\T:\mathsf{T}
+\eps:\epsilon
+\softmax:\operatorname{softmax}
+\argmax:\operatorname*{arg\,max}
+\argmin:\operatorname*{arg\,min}

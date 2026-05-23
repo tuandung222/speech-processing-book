@@ -1,0 +1,46 @@
+name: Deploy mdBook
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+env:
+  MDBOOK_VERSION: 0.4.40
+  MDBOOK_KATEX_VERSION: 0.9.4
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Cache cargo
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+          key: cargo-${{ runner.os }}-mdbook-${{ env.MDBOOK_VERSION }}-katex-${{ env.MDBOOK_KATEX_VERSION }}
+
+      - name: Install mdBook + mdbook-katex
+        run: |
+          cargo install --version ${{ env.MDBOOK_VERSION }} mdbook
+          cargo install --version ${{ env.MDBOOK_KATEX_VERSION }} mdbook-katex
+
+      - name: Build book
+        run: mdbook build
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./book
+          publish_branch: gh-pages
+          force_orphan: true
+          user_name: tuandung222
+          user_email: 75377334+tuandung222@users.noreply.github.com

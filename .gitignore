@@ -2,6 +2,7 @@
 /.quarto/
 /_freeze/
 /site/
+/book/
 /.cache/
 *.html
 *.pdf

@@ -1,0 +1,54 @@
+[book]
+title = "S-AI"
+description = "Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)"
+authors = ["tuandung222"]
+language = "vi"
+multilingual = false
+src = "src"
+
+[build]
+build-dir = "book"
+create-missing = false
+
+[output.html]
+default-theme = "navy"
+preferred-dark-theme = "navy"
+git-repository-url = "https://github.com/tuandung222/S-AI"
+git-repository-icon = "fa-github"
+edit-url-template = "https://github.com/tuandung222/S-AI/edit/main/{path}"
+mathjax-support = false
+no-section-label = false
+additional-css = ["theme/custom.css"]
+additional-js = ["theme/custom.js"]
+
+[output.html.fold]
+enable = true
+level = 1
+
+[output.html.search]
+enable = true
+limit-results = 30
+use-boolean-and = true
+boost-title = 2
+boost-hierarchy = 1
+boost-paragraph = 1
+expand = true
+heading-split-level = 2
+
+[output.html.playground]
+editable = false
+copyable = true
+copy-js = true
+line-numbers = true
+
+[preprocessor.katex]
+# KaTeX runs BEFORE markdown -> HTML, so `x_t` and \text{frame\_length}
+# inside math are protected from the markdown italic parser.
+# This eliminates the entire class of bugs we hit with MathJax + MkDocs.
+after = []
+macros = "./theme/katex-macros.txt"
+throw-on-error = false
+no-css = false
+include-src = false
+block-delimiter = { left = "$$", right = "$$" }
+inline-delimiter = { left = "$", right = "$" }
