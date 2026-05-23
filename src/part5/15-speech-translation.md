@@ -162,7 +162,7 @@ Human-rated, scale 1-5 cho naturalness, similarity với reference voice.
 - **MOS-S**: Similarity (giống voice reference không, cho voice cloning).
 - **CMOS**: Comparative MOS, so sánh hai outputs theo cặp.
 
-**Nhược điểm**: tốn kém ($1-5/sample human rating), không scalable.
+**Nhược điểm**: tốn kém (chi phí 1-5 USD/sample cho human rating), không scalable.
 
 #### 2.2.3 UTMOS, NISQA, DNSMOS (auto MOS approximations)
 
