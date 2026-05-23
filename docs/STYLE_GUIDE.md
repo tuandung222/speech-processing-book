@@ -1,383 +1,326 @@
-# Style Guide — S-AI Speech Book
+# S-AI Style Guide
 
-**Audience target**: Data scientist nền tảng **NLP/LLM** (BERT, GPT, Transformer) muốn chuyển sang **Speech AI**.
+Tài liệu chuẩn biên tập cho cuốn sách **S-AI: Speech AI từ Signal Processing đến Full-Duplex Dialogue**.
 
-**Goal**: Viết với chất lượng giảng viên đại học tận tâm, có năng lực sư phạm. KHÔNG phải lecture notes vắn tắt. KHÔNG phải bullet-list dump.
+**Đối tượng độc giả**: data scientist nền tảng **NLP/LLM** (BERT, GPT, Transformer) và **CV** chuyển sang **Speech AI**.
+
+**Mục tiêu chất lượng**: chất lượng giảng viên đại học chuyên nghiệp, giàu năng lực sư phạm. Sách phải vừa chính xác về kỹ thuật, vừa truyền tải được trực giác và bối cảnh thực tiễn cho người mới.
 
 ---
 
-## 1. Voice & Tone (Bắt buộc)
+## 1. Voice và Tone (bắt buộc)
 
-### 1.1 Build intuition trước formalism
+### 1.1 Tone chuẩn: giảng viên Việt chuyên nghiệp
 
-❌ **BAD** (vắn tắt, formalism-first):
-> CTC loss được định nghĩa:
-> $$\mathcal{L}_{CTC} = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t | X)$$
+Toàn bộ chương phải được viết bằng giọng **một giảng viên đại học người Việt có kinh nghiệm**: tự nhiên, rõ ràng, nghiêm túc, có khả năng dẫn dắt sinh viên qua khái niệm khó mà không hạ thấp trình độ người đọc.
 
-✅ **GOOD** (intuition-first):
-> Để hiểu CTC, đặt câu hỏi: làm sao một model có thể "khớp" output text với input audio mà KHÔNG có alignment label sẵn?
+**Đặc điểm tone đúng**:
+
+- Câu văn dứt khoát, có cấu trúc, không lan man.
+- Dùng `ta`, `chúng ta`, `người đọc`, hoặc `bạn` ở mức trang trọng vừa phải; tránh lạm dụng đại từ nhân xưng.
+- Đặt câu hỏi dẫn dắt khi cần định hướng tư duy, nhưng phải mang tính học thuật, không phải retoric kiểu marketing.
+- Diễn đạt trực tiếp khi bàn về trade-off và hạn chế; không tô vẽ.
+- Ưu tiên chính xác về kỹ thuật hơn là dễ thương về văn phong.
+
+**Đặc điểm tone phải tránh**:
+
+- Văn phong cợt nhã, đùa giỡn, hoặc kể chuyện cá nhân không phục vụ nội dung.
+- Từ cảm thán biểu lộ phấn khích quá mức (`Bùm`, `cực kỳ elegant`, `đẹp ghê`).
+- Câu mở bài kiểu trò chuyện suồng sã (`OK giờ ta`, `Anyway`, `Alright`, `Nói thật là`).
+- Câu trấn an kiểu cá nhân hoá (`đừng hoảng nhé`, `đừng lo`, `bình tĩnh nào`).
+- Bullet-dump khô khan, không có dòng nối hay diễn giải.
+- Khẳng định tuyệt đối khi không có nguồn (`luôn luôn`, `chắc chắn`, `không bao giờ`) trừ khi đúng về mặt toán học.
+
+### 1.2 Xây dựng trực giác trước, hình thức hoá sau
+
+Mỗi khái niệm mới nên đi qua ba lớp:
+
+1. **Trực giác**: vì sao bài toán này tồn tại, bài toán cố giải quyết điều gì, mâu thuẫn nào dẫn đến giải pháp này.
+2. **Hình thức hoá**: phát biểu toán học rõ ràng, biến số được khai báo, ràng buộc rõ.
+3. **Hệ quả thực tiễn**: ý nghĩa cho training, inference, deployment hoặc debugging.
+
+**Đối lập (cần tránh)**:
+
+> CTC loss được định nghĩa: $\mathcal{L}_{CTC} = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t | X)$. Cần lưu ý CTC giả định độc lập có điều kiện theo thời gian.
+
+**Cách viết đạt chuẩn**:
+
+> Trong bài toán nhận dạng giọng nói, ta thường có chuỗi audio frames dài hàng nghìn bước nhưng nhãn text chỉ vài chục ký tự. Khác với dịch máy seq2seq, ta không có alignment sẵn giữa frame và ký tự. CTC giải bài toán này bằng cách mở rộng vocabulary với một token đặc biệt `blank` ($\epsilon$), cho phép model phát ra một ký tự hoặc `blank` tại mỗi frame, sau đó **collapse** chuỗi này về nhãn cuối bằng cách lược bỏ ký tự lặp liền kề và bỏ `blank`.
 >
-> Trong NLP, bạn quen với seq2seq: encoder đọc input → decoder sinh output token-by-token, mỗi step decoder chọn 1 token. Audio thì khác — input có thể có 1000 frames nhưng output text chỉ 10 ký tự. Không có "1-1 alignment" giữa frame và character.
+> Loss CTC marginalize trên tập tất cả paths $\pi$ collapse về nhãn $Y$:
 >
-> CTC giải bài toán này bằng cách nói: "OK, tôi sẽ cho model output 1 ký tự HOẶC blank tại mỗi frame, rồi collapse lại". Ví dụ frames = `[h, h, ε, ε, e, e, l, ε, l, o]` → collapse → `"hello"`.
+> $$\mathcal{L}_{CTC}(X, Y) = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t \mid X)$$
 >
-> Loss function CTC marginalize trên TẤT CẢ các paths đều collapse về target Y:
-> $$\mathcal{L}_{CTC} = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t | X)$$
+> trong đó $X$ là chuỗi feature đầu vào, $T$ là số frames, $\mathcal{B}^{-1}(Y)$ là tập paths collapse về $Y$.
 >
-> trong đó $\mathcal{B}^{-1}(Y)$ là tập tất cả paths collapse về Y, $T$ là số frames.
+> Một giả định quan trọng cần ghi nhận: CTC giả định các output theo time step là độc lập có điều kiện cho input. Đây là điểm yếu mà RNN-Transducer sẽ khắc phục bằng predictor network, được trình bày ở mục sau.
 
-### 1.2 NLP→Speech bridge mỗi concept mới
+### 1.3 Bắc cầu NLP↔Speech mỗi khái niệm mới
 
-Mọi concept lạ phải có 1 đoạn "**Đối chiếu với NLP**" hoặc "**Cho audience NLP**".
+Vì độc giả mục tiêu đến từ NLP/LLM, mỗi khái niệm Speech lạ đều nên có một đoạn liên hệ tương ứng với khái niệm NLP đã quen thuộc.
 
 Ví dụ:
-- **Mel spectrogram** → "tương tự BPE tokenization: cả 2 chuyển continuous signal/text thành discrete representation phù hợp neural net"
-- **CTC blank token** → "tương tự `<MASK>` của BERT, nhưng cho phép skip thay vì predict"
-- **Codec tokens (EnCodec, Mimi)** → "tương tự BPE tokens nhưng cho audio: vocabulary ~1024-4096, dùng VQ-VAE"
-- **Wav2Vec self-supervised** → "tương tự BERT MLM nhưng masked frame thay vì masked token"
 
-### 1.3 Anticipate confusion — dừng lại giải thích
+- **Mel spectrogram** có thể được nhìn như một dạng biểu diễn dense, deterministic của audio, đóng vai trò tương đương feature handcrafted cho ASR, khác với learned embeddings của ngôn ngữ.
+- **CTC blank token** đóng vai trò tương tự token đặc biệt trong NLP (ví dụ `<pad>` khi xử lý chuỗi có độ dài thay đổi), nhưng mang ý nghĩa "không phát ra ký tự nào tại frame này".
+- **Codec tokens** (EnCodec, Mimi) là analog gần nhất của BPE tokens cho audio: biến tín hiệu liên tục thành chuỗi token rời rạc có vocabulary cỡ 1k-8k, cho phép áp dụng paradigm autoregressive LM.
+- **Wav2Vec 2.0 / HuBERT self-supervised pretraining** lặp lại đúng triết lý của BERT MLM: masked prediction trên input bị che, học representation tổng quát từ dữ liệu không nhãn.
 
-Khi gặp concept khó/phản trực giác, ĐỪNG bỏ qua. Pause và viết:
+### 1.4 Tiên đoán và xử lý điểm khó hiểu
 
-> **🤔 Tại sao điều này lại đúng?**
-> Bạn có thể nghĩ X, nhưng thực ra Y vì Z. Lý do là...
+Khi gặp khái niệm phản trực giác hoặc dễ nhầm lẫn, dừng lại để giải thích trước khi đi tiếp. Cụm thường dùng:
+
+> **Lưu ý dễ nhầm**
+> Khái niệm $A$ và $B$ thoạt nhìn giống nhau nhưng khác biệt ở $\ldots$. Cụ thể, $A$ là $\ldots$, còn $B$ là $\ldots$.
 
 Hoặc:
 
-> **⚠️ Lưu ý dễ nhầm**
-> Đừng nhầm A với B. A là [định nghĩa A], còn B là [định nghĩa B]. Khác nhau ở chỗ...
+> **Vì sao điều này đúng?**
+> Người đọc có thể đặt câu hỏi: tại sao không dùng phương án $X$? Lý do là $\ldots$.
 
-### 1.4 Concrete analogies
+Khi đoạn nội dung nặng về toán, mở đầu bằng một câu cảnh báo ngắn về độ khó và mục tiêu của đoạn:
 
-Mỗi concept abstract nên có **ít nhất 1 analogy** từ NLP, daily life, hoặc CS.
+> Phần này phát triển công thức đầy đủ cho forward-backward algorithm trong CTC. Mục tiêu là thu được công thức cho gradient của loss theo logit, từ đó hiểu vì sao CTC ổn định khi train sequence dài.
 
-| Analogy class | Ví dụ |
-|---|---|
-| **NLP analogy** | "STFT giống như sliding window n-gram" |
-| **Daily life** | "Sample rate giống frame rate khi quay video" |
-| **CS** | "Beam search giống DFS với pruning" |
-| **Linear algebra** | "Mel filterbank là ma trận triangular weights" |
+### 1.5 Tự nhiên trong mix Vietnamese-English
 
-### 1.5 GIỌNG VĂN NATURAL — Giảng viên Việt nói chuyện, không robot
+Cuốn sách chấp nhận và khuyến khích mix Vietnamese-English ở những chỗ thuật ngữ English là chuẩn ngành. Đây không phải vay mượn tuỳ tiện mà là cách diễn đạt chính xác hơn cho practitioner.
 
-**ĐÂY LÀ NGUYÊN TẮC QUAN TRỌNG NHẤT.** Văn phong phải nghe như một giảng viên Việt đang đứng lớp, nhiệt huyết, đôi khi vui đùa, đôi khi nghiêm túc, KHÔNG phải textbook đều đều khô khan.
+**Dùng English**:
 
-#### Patterns natural lecturer Việt
+- Thuật ngữ kỹ thuật chuẩn: `encoder`, `decoder`, `transformer`, `attention`, `embedding`, `tokenizer`, `pipeline`, `inference`, `latency`, `throughput`, `fine-tune`, `pretrain`, `deploy`, `streaming`, `endpointing`.
+- Acronym: `ASR`, `TTS`, `NLP`, `LLM`, `MoE`, `KV cache`, `STFT`, `MFCC`, `CTC`, `RNN-T`, `S2TT`, `KWS`.
+- Modern jargon: `in-context learning`, `prompt engineering`, `function calling`, `tool calling`, `hallucination`, `code-switching`, `retrieval-augmented`, `voice cloning`.
+- Tên model, framework, công ty: `Whisper`, `Conformer`, `Wav2Vec 2.0`, `Moshi`, `Qwen3-Omni`, `WeNet`, `ESPnet`, `Triton`, `vLLM`, `Cartesia`, `Deepgram`.
 
-✅ **Bắt đầu paragraph với rhetorical question**:
+**Dùng Vietnamese**:
 
-> "Bạn có để ý điều gì lạ ở đây không?"
-> "Đến đây bạn chắc đang nghĩ: vậy tại sao không dùng X?"
-> "Hãy thử nghĩ thử một chút — nếu bỏ bước này thì sẽ ra sao?"
+- Khái niệm có translation phổ biến và tự nhiên: `âm thanh`, `tần số`, `giọng nói`, `ngữ nghĩa`, `tín hiệu`, `phổ`, `mô hình`, `huấn luyện`, `dự đoán`.
+- Đoạn diễn giải, lập luận, dẫn dắt.
+- Tên các phần, chương, mục.
 
-✅ **Surprise/excitement ở các điểm thú vị**:
+**Cần tránh**:
 
-> "Và đây mới là chỗ hay nhất:"
-> "Bùm! Đó chính là lý do."
-> "Cực kỳ elegant phải không?"
+- Dịch ép thuật ngữ chuẩn (ví dụ `siêu tham số` thay cho `hyperparameter`, `bộ giải mã` thay cho `decoder` khi đoạn văn đang nói về kiến trúc transformer cụ thể).
+- Trộn lẫn không nhất quán (đôi chỗ `encoder` đôi chỗ `bộ mã hoá` trong cùng một mục).
+- Câu lai kiểu cẩu thả (`I think rằng`, `Anyway thì`, `So là`).
 
-✅ **Acknowledge difficulty / pause**:
+Nguyên tắc cuối: nếu một thuật ngữ chuẩn ngành đã đi vào ngôn ngữ kỹ thuật Việt (`mô hình`, `huấn luyện`, `chương trình`), dùng tiếng Việt; nếu thuật ngữ vẫn là English trong communication chuyên môn hằng ngày (`encoder`, `latency`, `streaming`), giữ English.
 
-> "Phần này hơi khó nhằn một chút, mình đi từ từ nhé."
-> "Đoạn formula này khó đọc, nhưng đừng lo — mình sẽ dịch ra plain English ngay."
-> "Hồi mình mới đọc paper này, cũng phải đọc lại 3 lần mới hiểu."
+### 1.6 Nhịp văn
 
-✅ **Personal touches, dùng "mình" hoặc "tôi"**:
+Đa dạng nhịp giữa các đoạn để tránh đơn điệu:
 
-> "Mình thường khuyên junior nên đọc paper này trước."
-> "Tôi từng deploy thử và thấy..."
-
-✅ **Conversational connectors**:
-
-> "OK giờ qua phần tiếp theo nhé."
-> "Anyway, quay lại câu hỏi cũ..."
-> "Alright, đến đây chắc bạn đã nắm cơ bản rồi."
-> "Nói thật là..."
-
-✅ **Mix Vietnamese-English natural như dev VN nói chuyện**:
-
-> "Pipeline này có 3 stages: encoder, decoder, vocoder. Mỗi stage có thể train độc lập, swap independently."
-> "Cái này gọi là 'in-context learning' — bạn show vài examples, model tự generalize."
-> "OK so giờ ta cần handle case khi user nói code-switched."
-
-❌ **TUYỆT ĐỐI TRÁNH**:
-
-> ❌ "Phần này thảo luận về..." (đều đều, textbook)
-> ❌ "Chương này tổng hợp..." (impersonal)
-> ❌ "Ta sẽ xem xét..." (anonymous voice)
-> ❌ "Trong phần này, ta sẽ nghiên cứu..." (cold academic)
-> ❌ "Cần lưu ý rằng..." (textbook-y)
-
-#### Compare bad vs good
-
-❌ **BAD** (robotic, even-tone, textbook):
-> Phần này thảo luận về CTC loss. CTC loss được định nghĩa là âm log của tổng xác suất trên tất cả các paths có thể collapse về target. Cần lưu ý rằng CTC giả định các output tại các time steps là độc lập có điều kiện.
-
-✅ **GOOD** (natural Vietnamese lecturer):
-> OK giờ ta vào phần thú vị nhất của CTC: cái loss function. Nhìn vào công thức bên dưới đừng hoảng nhé:
->
-> $$\mathcal{L}_{CTC} = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t | X)$$
->
-> Dịch ra plain English: "tổng xác suất trên TẤT CẢ các paths khả dĩ mà collapse về đúng target Y, lấy log âm". Nghe phức tạp, nhưng intuition rất đẹp.
->
-> Bạn đã thấy seq2seq dùng cross-entropy đúng không? Mỗi step decoder có 1 target token cụ thể, model học predict đúng cái đó. CTC khác: model không biết "frame nào tương ứng với character nào", nên thay vì pick 1 alignment, nó **marginalize** trên TẤT CẢ alignment khả dĩ. Bùm, đó là toàn bộ idea.
->
-> Có một subtle assumption ở đây: CTC giả định các output tại mỗi time step độc lập có điều kiện cho input. Đây là điểm yếu mà RNN-T sau này khắc phục. Mình sẽ quay lại lúc nói về RNN-T.
-
-Thấy sự khác biệt chứ? Bản GOOD có:
-- Câu mở rhetorical/casual ("OK giờ ta vào phần thú vị nhất...")
-- Acknowledge difficulty ("đừng hoảng nhé")
-- Dịch math ra plain English ngay sau công thức
-- Bridge sang concept đã quen (seq2seq cross-entropy)
-- Excitement đánh dấu insight ("Bùm, đó là toàn bộ idea")
-- Personal voice ("Mình sẽ quay lại lúc nói về...")
-- Tự nhiên mix Vi-En ("marginalize", "alignment", "subtle assumption", "code-switched", "swap independently")
-
-#### Quy tắc về mix Vi-En
-
-- ✅ Dùng English cho **technical terms ngắn và rõ**: encoder, decoder, pipeline, latency, throughput, fine-tune, deploy, baseline, mainstream, etc.
-- ✅ Dùng English cho **acronyms**: ASR, TTS, NLP, LLM, MoE, KV cache, etc.
-- ✅ Dùng English cho **modern jargon**: code-switching, hallucination, prompt engineering, function calling, in-context learning, etc.
-- ✅ Dùng Vietnamese cho **concepts có translation rõ và phổ biến**: âm thanh, tần số, giọng nói, ngữ nghĩa, tín hiệu.
-- ❌ KHÔNG cố ép translate mọi thuật ngữ ("siêu tham số" thay "hyperparameter" → tệ).
-- ❌ KHÔNG dùng English chỗ không cần (đừng nói "I think rằng..." khi "Mình nghĩ rằng..." đẹp hơn).
-
-#### Pacing — đừng đều đều
-
-Pacing biến đổi giữa các đoạn:
-
-- **Đoạn nặng kỹ thuật** (formula, math): chậm, careful, giải thích từng dòng.
-- **Đoạn intuition**: nhanh, animated, dùng analogy ngay.
-- **Đoạn transition**: ngắn gọn, conversational ("OK giờ ta thử thực tế hơn...").
-- **Đoạn summary**: structured nhưng vẫn có personality.
+- Đoạn nặng toán: viết chậm, từng dòng, định nghĩa biến số trước khi dùng.
+- Đoạn trực giác: súc tích, có ví dụ cụ thể, có analogy ngắn.
+- Đoạn so sánh, tổng kết: dùng bảng nếu phù hợp; nếu không, dùng paragraph có cấu trúc.
+- Đoạn chuyển: một hai câu dẫn dắt sang chủ đề tiếp theo, không cần dài.
 
 Tránh:
-- Mọi paragraph cùng độ dài.
-- Mọi câu cùng cấu trúc.
-- Không bao giờ có short punchy sentence ("Đúng vậy." "Chính xác." "Đó là điểm cốt lõi.").
 
-### 1.6 Flowing prose, không bullet-dump
+- Mọi đoạn cùng độ dài.
+- Mọi câu cùng cấu trúc chủ ngữ + động từ + bổ ngữ.
+- Đoạn dài quá 6-7 câu mà không có break (bảng, công thức, sub-heading).
 
-❌ **BAD** (bullet dump):
+### 1.7 Văn xuôi chảy thay vì bullet-dump
+
+Bullet-list phù hợp cho catalog, so sánh tham số, danh sách tham chiếu. Bullet không phù hợp cho giải thích chính.
+
+**Đối lập (cần tránh)**:
+
 > CTC có 3 đặc điểm:
 > - Thêm blank token
 > - Output mỗi frame
 > - Marginalize alignments
 
-✅ **GOOD** (narrative):
-> CTC khác với seq2seq ở 3 thiết kế cốt lõi. Đầu tiên, vocabulary được mở rộng thêm một **blank token** (ký hiệu $\langle b \rangle$ hoặc $\epsilon$) — đây không phải padding mà mang ý nghĩa "không phát ra ký tự nào tại frame này". Thứ hai, model output **một xác suất cho mỗi frame** — không có khái niệm "decoder step", mỗi input frame trực tiếp dự đoán một character (có thể là blank). Thứ ba, CTC **marginalize** trên tất cả paths khả dĩ, không chỉ một alignment cố định — đây là điểm tinh tế nhất.
+**Cách viết đạt chuẩn**:
 
-### 1.6 Tables for reference, prose for explanation
+> CTC khác seq2seq cổ điển ở ba thiết kế cốt lõi. Trước hết, vocabulary được mở rộng thêm một **blank token** $\epsilon$ với ý nghĩa "không phát ra ký tự nào tại frame này". Thứ hai, model output một phân phối xác suất tại mỗi frame, không có khái niệm "decoder step" riêng biệt như trong seq2seq. Thứ ba, hàm loss marginalize trên tất cả paths khả dĩ collapse về nhãn, thay vì cố định một alignment.
 
-Tables dùng tốt cho:
-- So sánh tham số (params, perf metrics, vocab sizes)
-- Reference data (sample rate standards, model checkpoints)
-- API/signature catalog
+### 1.8 Bảng cho tham chiếu, văn xuôi cho lập luận
 
-Tables KHÔNG dùng cho:
-- Explanation chính (dùng paragraph)
-- Reasoning/derivation steps (dùng paragraph có thứ tự)
+Dùng bảng khi:
+
+- So sánh tham số (kích thước model, accuracy, latency).
+- Catalog tham chiếu (sample rate, model checkpoint, API).
+- Bảng tra chéo (NLP↔Speech mapping).
+
+Không dùng bảng khi:
+
+- Trình bày lập luận chính (dùng paragraph).
+- Diễn giải từng bước (dùng paragraph có thứ tự).
+- Định nghĩa khái niệm trung tâm.
+
+### 1.9 Câu hỏi dẫn dắt mang tính học thuật
+
+Câu hỏi mở đầu một mục có thể được dùng, nhưng phải thật sự dẫn vào nội dung, không trang trí.
+
+**Tốt**:
+
+> Trước khi đi vào kiến trúc Conformer, ta cần trả lời một câu hỏi: vì sao Transformer thuần khi áp dụng cho audio thường kém hơn so với khi áp dụng cho text?
+
+**Tránh**:
+
+> Bạn có thấy điều gì đặc biệt ở đây không?
+> Đoán xem chuyện gì sẽ xảy ra tiếp theo?
 
 ---
 
-## 2. Glossary — NLP↔Speech Mapping (Mandatory references)
+## 2. Bảng từ vựng NLP↔Speech (bắt buộc tham chiếu)
 
-Khi gặp 1 trong các terms này, LUÔN bridge sang NLP equivalent:
+Khi gặp các thuật ngữ trong bảng này, luôn nhắc lại liên hệ với khái niệm NLP tương ứng ít nhất một lần trong chương.
 
-| Speech AI Term | NLP Analogue | Bridge Explanation |
+| Speech AI | NLP analogue | Bridge explanation |
 |---|---|---|
-| Mel spectrogram | Static word embeddings | Hand-crafted feature representation, deterministic |
-| Wav2Vec, HuBERT | BERT MLM | Self-supervised pretrain on raw input, masked prediction |
-| EnCodec, Mimi codec tokens | BPE tokens | Discrete vocabulary from continuous input, ~1024-8192 codes |
-| CTC loss | seq2seq cross-entropy | Loss for misaligned input/output sequences |
-| CTC blank | `<MASK>`/`<PAD>` | Special token for "no emission at this step" |
-| RNN-T | Transformer decoder | Stream-friendly seq2seq with joint network |
-| Conformer | Transformer encoder | Hybrid CNN + self-attention encoder |
-| Whisper | T5/BART | Encoder-decoder, multitask, large pretrained |
-| VITS, F5-TTS | GPT/Stable Diffusion | End-to-end generative for audio |
-| Phoneme | Sub-word (BPE chunk) | Linguistic unit smaller than word |
-| Forced alignment | Token-to-char alignment in seq2seq | Map audio frames to text units |
-| Voice Activity Detection (VAD) | Sentence boundary detection | Segment continuous stream |
-| Speaker embedding | User/persona embedding | Identity vector for conditional generation |
-| Streaming ASR | Causal LM (vs bidirectional) | Online prediction without future context |
-| Full-duplex dialogue | Multi-turn chat with overlapping turns | Real-time bidirectional speech |
-| Audio LLM (Moshi, Qwen2-Audio) | Multimodal LLM | LLM with audio I/O |
+| Mel spectrogram | Static word embedding | Biểu diễn handcrafted, deterministic, không tự học. |
+| Wav2Vec 2.0, HuBERT | BERT MLM | Self-supervised pretrain với masked prediction. |
+| EnCodec, Mimi codec tokens | BPE tokens | Vocabulary rời rạc cỡ 1k-8k, học từ data bằng VQ-VAE. |
+| CTC loss | seq2seq cross-entropy | Loss cho sequence input-output không có alignment sẵn. |
+| CTC blank token | `<pad>` / `<mask>` | Token đặc biệt, ở CTC mang ý nghĩa "no emission". |
+| RNN-Transducer | Transformer decoder | Streaming-friendly seq2seq với predictor + joint network. |
+| Conformer | Transformer encoder | Hybrid CNN + self-attention, optimized cho audio sequence dài. |
+| Whisper | T5 / BART | Encoder-decoder, multitask, pretrained ở quy mô lớn. |
+| VITS, F5-TTS | GPT / diffusion generator | End-to-end generative cho audio. |
+| Phoneme | Subword (BPE chunk) | Đơn vị ngôn ngữ nhỏ hơn từ. |
+| Forced alignment | Token-to-char alignment | Map frame audio sang đơn vị text. |
+| Voice Activity Detection | Sentence boundary detection | Phân đoạn stream liên tục. |
+| Speaker embedding | User / persona embedding | Vector định danh cho conditional generation. |
+| Streaming ASR | Causal LM | Dự đoán online không cần future context. |
+| Full-duplex dialogue | Multi-turn chat overlap | Đối thoại realtime hai chiều đồng thời. |
+| Audio LLM (Moshi, Qwen2-Audio) | Multimodal LLM | LLM với input/output audio. |
 
 ---
 
-## 3. Mathematical Notation Conventions
+## 3. Quy ước toán học
 
-### 3.1 Variables
+### 3.1 Biến số
 
-| Type | Convention | Example |
+| Loại | Quy ước | Ví dụ |
 |---|---|---|
-| Scalars (time, frequency, dimension) | lowercase italic | $t$, $f$, $d$ |
-| Vectors | lowercase bold | $\mathbf{x}$, $\mathbf{h}$, $\mathbf{y}$ |
-| Matrices | uppercase bold | $\mathbf{W}$, $\mathbf{H}$ |
-| Sets | mathcal | $\mathcal{V}$, $\mathcal{L}$ |
-| Random variables | uppercase italic | $X$, $Y$ |
-| Probability | $P(\cdot)$ or $p(\cdot)$ | $P(y|x)$ |
-| Expectation | $\mathbb{E}$ | $\mathbb{E}_{x \sim p}[f(x)]$ |
-| Loss | $\mathcal{L}$ | $\mathcal{L}_{\text{CTC}}$ |
+| Scalar (time, frequency, dimension) | chữ thường nghiêng | $t$, $f$, $d$ |
+| Vector | chữ thường đậm | $\mathbf{x}$, $\mathbf{h}$ |
+| Matrix | chữ hoa đậm | $\mathbf{W}$, $\mathbf{H}$ |
+| Tập hợp | mathcal | $\mathcal{V}$, $\mathcal{L}$ |
+| Biến ngẫu nhiên | chữ hoa nghiêng | $X$, $Y$ |
+| Xác suất | $P(\cdot)$ hoặc $p(\cdot)$ | $P(y \mid x)$ |
 
-### 3.2 Indices
+### 3.2 KaTeX safety
 
-- Time index for audio: $t$ (samples) or $m$ (frames)
-- Token/character index: $u$
-- Frequency bin: $k$
-- Layer index: $\ell$
-- Batch index: $b$ or $i$
+Cuốn sách dùng `mdbook-katex` preprocessor. Quy tắc bắt buộc để tránh lỗi parse:
 
-### 3.3 Functions
+1. **Underscore trong `\text{}`**: bắt buộc escape, `\text{frame\_length}` không phải `\text{frame_length}`.
+2. **Dollar sign trong prose**: tránh viết `$0`, `$5/min`, `$15-30`; dùng `0 USD`, `5 USD/min`, `15-30 USD` để không kích hoạt math span ngoài ý muốn.
+3. **Display math indentation**: nếu `$$ ... $$` nằm trong admonition hoặc list, dấu `$$` đóng phải ở cùng cấp indentation với dấu mở.
+4. **Macro**: định nghĩa macro chung trong `theme/katex-macros.txt`, không lặp lại trong chương.
+5. **Inline math không xuống dòng**: `$\ldots$` không được chứa newline.
 
-- Use `\operatorname{}` for multi-letter functions: $\operatorname{softmax}$, $\operatorname{ReLU}$
-- Use `\text{}` for non-italic labels inside math: $\text{frame\_length}$ (NOTE: KaTeX yêu cầu `\_` escape inside `\text{}`)
-- Pre-defined macros (xem `theme/katex-macros.txt`): `\R`, `\E`, `\softmax`, `\argmax`, `\argmin`
+### 3.3 Đơn vị đo
 
-### 3.4 Display vs inline math
-
-- Inline: `$...$` for short expressions trong câu văn
-- Display: `$$...$$` cho công thức quan trọng, definition, theorem
-- ALWAYS đặt `$$` trên dòng riêng (không có content khác cùng dòng)
+- Thời gian: `s`, `ms` (không dùng `mili-giây` trong công thức, dùng trong prose).
+- Tần số: `Hz`, `kHz`.
+- Kích thước model: `M params` (triệu), `B params` (tỉ).
+- Latency: `ms` cho `< 1s`, `s` cho lớn hơn.
+- Bandwidth: `kbps`, `Mbps`.
 
 ---
 
-## 4. Document Structure (Chapter Template)
+## 4. Cấu trúc chương chuẩn
 
-Mỗi chapter nên follow structure sau:
+Mỗi chương nên có:
 
-```
-# Chương N: [Tên]
+1. **Mở đầu**: nêu vì sao chương này quan trọng cho độc giả NLP/LLM/CV.
+2. **Bản đồ chương**: section breakdown ngắn (`> Cấu trúc chương`).
+3. **Các phần nội dung** đánh số `## Phần 1`, `## Phần 2`, ...
+4. **Tóm tắt**: các ý chính, không quảng cáo.
+5. **Chương tiếp theo**: một đoạn cầu nối.
+6. **Tài liệu tham khảo**: danh sách cuối chương, kèm URL khi có.
 
-[Opening paragraph: WHY chapter này quan trọng. Reference NLP background.]
-
-## Bài toán
-
-[Define problem rigorously. Use motivating example.]
-
-## Intuition
-
-[Build intuition trước khi formalism. Analogy, picture, mental model.]
-
-## Formalization
-
-[Mathematical/algorithmic definition. Step-by-step derivation if non-trivial.]
-
-## Code Walkthrough
-
-[PyTorch reference implementation, well-commented. Audience-friendly.]
-
-## So sánh & Đối chiếu
-
-[Compare with alternative approaches. Trade-offs table.]
-
-## Limitations & Open Problems
-
-[Honest discussion of what doesn't work. Modern challenges.]
-
-## Tóm tắt
-
-[5-7 bullet recap of key takeaways. NOT a TL;DR.]
-
-## Tài liệu tham khảo
-
-[Bibliography for further reading.]
-```
+Section trong chương dùng heading `##` cho phần, `###` cho mục, `####` cho mục con. Tránh đào sâu quá `####`.
 
 ---
 
-## 5. Length Expectations
+## 5. Evidence và SOTA discipline
 
-Mỗi chapter:
-- **Tối thiểu**: 1500 dòng markdown (~8000 từ Vietnamese)
-- **Mong đợi**: 2000-3000 dòng (~12000-15000 từ)
-- **Tối đa**: 4000 dòng (chia chapter nếu quá dài)
+Trong lĩnh vực đang chuyển động nhanh như Speech AI, kỷ luật về evidence là yêu cầu bắt buộc.
 
-So với hiện tại (~300-500 dòng/chapter), điều này có nghĩa **expand 4-8x**. Đây là expected — chất lượng > số lượng, nhưng chất lượng yêu cầu đủ chỗ để giải thích.
+**Khi nêu số liệu** (WER, BLEU, MOS, latency, pricing, model release date):
 
----
+- Phải có nguồn rõ: paper, blog post, release notes, công ty công bố.
+- Nếu là estimate, đánh dấu rõ: `ước lượng dựa trên`, `estimated from public pricing`.
+- Time-stamp khi nội dung có thể thay đổi nhanh: pricing, model release.
 
-## 6. Code Style
+**Khi nêu SOTA**:
 
-### 6.1 PyTorch reference implementations
+- Tránh khẳng định tuyệt đối (`SOTA hiện tại`) trừ khi có benchmark cụ thể và thời điểm.
+- Đặt context: SOTA trên benchmark nào, với điều kiện nào.
+- Cross-check ≥2 nguồn cho claim nhạy cảm.
 
-- Use type hints aggressively (`Tensor`, `Optional[Tensor]`, etc.)
-- Annotate tensor shapes inline as comments: `# [B, T, D] - float32`
-- Use descriptive variable names (NOT `x`, `h`, but `mel_spec`, `encoder_hidden`)
-- Provide minimal runnable examples after the class definition
+**Cần tránh**:
 
-```python
-class Encoder(nn.Module):
-    """Conformer encoder for ASR.
-    
-    Pedagogical note: Conformer = Transformer + ConvNet, combining
-    long-range attention with local convolution. Similar to how
-    Swin Transformer combines local windows with hierarchical structure.
-    """
-    def __init__(self, n_mels: int = 80, hidden_dim: int = 512):
-        super().__init__()
-        # Input projection: mel features -> hidden dim
-        self.input_proj = nn.Linear(n_mels, hidden_dim)
-        # ... rest
+- `Đây là model tốt nhất từng có.`
+- `Whisper giải quyết hoàn toàn bài toán ASR.`
+- `Voice cloning đã đạt mức không phân biệt được với người thật.`
 
-    def forward(self, mel: Tensor) -> Tensor:
-        """
-        Args:
-            mel: [B, T, n_mels] - float32, mel spectrogram
-        Returns:
-            hidden: [B, T, hidden_dim] - float32, encoded features
-        """
-        x = self.input_proj(mel)  # [B, T, hidden_dim]
-        # ...
-        return x
+**Diễn đạt đúng**:
 
-
-# Usage example
-encoder = Encoder(n_mels=80, hidden_dim=512)
-mel = torch.randn(2, 100, 80)  # 2 batch, 100 frames, 80 mel bins
-hidden = encoder(mel)
-print(hidden.shape)  # torch.Size([2, 100, 512])
-```
+- `Trên VLSP 2020 Task-1, PhoWhisper-large đạt WER 10.8%, giảm khoảng 35% so với Whisper-large-v3 baseline (Le et al., ICLR 2024 Tiny Papers).`
+- `Theo public pricing của ElevenLabs tháng 11/2025, gói Voice Agent có chi phí khoảng 0.08-0.12 USD/min.`
 
 ---
 
-## 7. Forbidden Patterns
+## 6. Em-dash và dấu câu
 
-### 7.1 Em dashes (—)
-NEVER use em dash (`—`) hoặc double-dash (`--`). Dùng colon, parenthesis, hoặc period.
+Em-dash (`—`, `--`) có thể gây lỗi parse trong một số trình renderer Markdown và làm văn phong nặng nề khi dùng quá nhiều. Quy tắc:
 
-### 7.2 Anonymous voice
-KHÔNG dùng "chúng ta sẽ thấy...", "you will see..." chung chung. Cụ thể hơn:
-- "Hãy quan sát hiện tượng này:" 
-- "Câu hỏi tự nhiên đặt ra là:"
-
-### 7.3 Hand-waving phrases
-KHÔNG: "rõ ràng là", "dễ thấy", "obviously", "trivially"
-DÙNG: dẫn dắt rõ ràng, show the working.
-
-### 7.4 Bullet-list explanations
-Như đã nói ở 1.5: bullet cho catalog, prose cho explanation.
-
-### 7.5 Tautology
-KHÔNG: "Mel spectrogram là spectrogram trên thang mel"
-DÙNG: "Mel spectrogram chuyển power spectrogram từ thang linear frequency sang thang **mel** — thang phi tuyến mô phỏng cách tai người cảm nhận tần số (logarithmic ở high freq, linear ở low freq)."
+- **Heading, mục**: được phép dùng em-dash để phân tách tên Phần với mô tả ngắn, ví dụ `Phần I — Nền tảng tín hiệu`.
+- **Prose**: ưu tiên dùng dấu phẩy, dấu hai chấm, hoặc ngoặc đơn thay cho em-dash.
+- **Tránh** chuỗi em-dash trong cùng một câu.
 
 ---
 
-## 8. Quality Checklist (per chapter)
+## 7. Hình ảnh và sơ đồ
 
-Trước khi merge 1 chapter, check:
+- Đặt trong thẻ `<figure>` có `id`, kèm `<figcaption>`.
+- File ảnh ở cùng thư mục với chương hoặc trong `src/<part>/assets/`.
+- Ưu tiên SVG cho sơ đồ, PNG cho screenshot, JPEG cho ảnh thật.
+- Caption mô tả nội dung, không quá súc tích đến mức không hiểu khi đọc rời.
 
-- [ ] Opening paragraph có "tại sao cần đọc chapter này?" với hook cho audience NLP
-- [ ] Mỗi concept lạ có ít nhất 1 NLP analogy hoặc daily-life analogy
-- [ ] Mỗi công thức quan trọng có **trước** intuition paragraph
-- [ ] Có ít nhất 1 "🤔" hoặc "⚠️" callout cho điểm dễ nhầm
-- [ ] Code có type hints và shape annotations
-- [ ] Code có 1 runnable example phía dưới class definition
-- [ ] Có "So sánh & Đối chiếu" với alternative approaches
-- [ ] Có "Limitations" — honest về hạn chế
-- [ ] Có "Tóm tắt" 5-7 bullets nhưng có context, không phải TL;DR
-- [ ] Đã đọc lại 1 lần sau khi viết xong, không có em-dash, không có hand-waving
-- [ ] mdBook build local pass (no KaTeX errors)
-- [ ] Vietnamese diacritics đúng chính tả (hoặc giảm thiểu)
+---
+
+## 8. Code listing
+
+- Python 3.10+, type hint đầy đủ.
+- PyTorch 2.x + `torchaudio`.
+- Inline tensor shape comments: `# [batch, seq, dim] - dtype`.
+- Imports ở đầu snippet hoặc nhắc lại nếu snippet nằm xa snippet trước.
+- Tránh code dài quá ~50 dòng; nếu cần dài, chuyển sang Appendix D và link tới.
+
+---
+
+## 9. Tham chiếu
+
+- Bibliographic style ưu tiên `Author, Year, Title, Venue`.
+- URL bọc trong `<...>` cho mdBook render đúng.
+- Đặt section `## Tài liệu tham khảo` cuối mỗi chương.
+- Khi reference nhiều lần trong chương, có thể dùng footnote `[^key]` với định nghĩa cuối file.
+
+---
+
+## 10. Checklist chất lượng cho mỗi chương
+
+Trước khi commit một chương mới hoặc rewrite chương cũ, đối chiếu:
+
+- [ ] Mở đầu nêu rõ vì sao chương quan trọng cho độc giả NLP/LLM/CV.
+- [ ] Trực giác đi trước hình thức hoá.
+- [ ] Mọi biến số trong công thức đều được khai báo.
+- [ ] Có ít nhất một analogy NLP↔Speech ở khái niệm trung tâm.
+- [ ] Section thực hành: training, inference, deployment, hoặc debugging.
+- [ ] Section limitations và failure modes.
+- [ ] Vietnamese context khi liên quan.
+- [ ] Tone giảng viên chuyên nghiệp, không cợt nhã.
+- [ ] Không có phrase casual cấm: `Bùm`, `đừng hoảng`, `OK giờ ta`, `Anyway`, `Alright`, `Nói thật là`, `cực kỳ elegant`.
+- [ ] Không có SOTA claim không có nguồn.
+- [ ] Không có em-dash trong prose (chỉ heading nếu cần).
+- [ ] Không có KaTeX error sau `mdbook build`.
+- [ ] Tài liệu tham khảo cuối chương đầy đủ.
+- [ ] Liên kết, hình ảnh, bảng đều render đúng.
