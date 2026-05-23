@@ -167,8 +167,8 @@ $$
 $$
 \begin{aligned}
 f_s &= 16{,}000 \text{ Hz} \\
-\text{frame\_length} &= 25 \text{ ms} \Rightarrow N = f_s \times 0.025 = 400 \\
-\text{frame\_shift} &= 10 \text{ ms} \Rightarrow H = f_s \times 0.010 = 160 \\
+\text{frame length} &= 25 \text{ ms} \Rightarrow N = f_s \times 0.025 = 400 \\
+\text{frame shift} &= 10 \text{ ms} \Rightarrow H = f_s \times 0.010 = 160 \\
 \text{Frequency bins} &= N/2 + 1 = 201 \\
 \text{Frames per second} &= f_s / H = 100
 \end{aligned}

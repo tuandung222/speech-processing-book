@@ -209,7 +209,7 @@ $$
 <a id="eq-biasnorm"></a>
 
 $$
-\text{BiasNorm}(\mathbf{x}) = \frac{\mathbf{x} + \mathbf{b}}{\text{learn\_scale} \cdot \|\mathbf{x} + \mathbf{b}\|_{\text{RMS}}}
+\text{BiasNorm}(\mathbf{x}) = \frac{\mathbf{x} + \mathbf{b}}{\text{learn scale} \cdot \|\mathbf{x} + \mathbf{b}\|_{\text{RMS}}}
 $$
 
 | Model | Params | test-clean | test-other | Speed |
