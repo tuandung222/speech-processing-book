@@ -100,11 +100,11 @@ format:
     documentclass: scrbook
     classoption: [oneside]
     papersize: a4
-  enabled: false
     fontsize: 11pt
     toc: true
     toc-depth: 3
-  colorlinks: true
+    number-sections: true
+    colorlinks: true
     link-citations: true
     code-overflow: wrap
     code-block-font-size: "\\scriptsize"
@@ -119,11 +119,11 @@ format:
         \renewcommand{\arraystretch}{1.3}
 
 execute:
+  enabled: false
   freeze: auto
   echo: true
   warning: false
-enabled: false
-  
+
 crossref:
   eq-prefix: "Phương trình"
   fig-prefix: "Hình"
