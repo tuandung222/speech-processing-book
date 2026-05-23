@@ -108,26 +108,55 @@ body, .content, .chapter {
 .content pre {
   font-family: var(--font-mono);
   background-color: var(--quote-bg) !important;
-  border: 1px solid rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: 6px;
   padding: 1.2rem;
   margin: 1.5em 0;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
   overflow-x: auto;
+  line-height: 1.6;
 }
 
-/* Target dark theme code borders */
+/* Target dark theme code borders and contrast */
 .theme-navy .content pre {
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background-color: #0f141c !important; /* Premium dark background */
 }
 
 .content pre > code {
-  font-size: 0.8rem;
+  font-size: 0.82rem;
   line-height: 1.6;
   padding: 0;
   background-color: transparent !important;
   color: inherit;
+  font-variant-ligatures: common-ligatures;
 }
+
+/* Syntax Highlighting overrides for better contrast on Distill.pub theme */
+.hljs-comment, .hljs-quote {
+  color: #8e908c;
+  font-style: italic;
+}
+.hljs-keyword, .hljs-selector-tag {
+  color: #8959a8;
+  font-weight: 600;
+}
+.hljs-string, .hljs-meta .hljs-string {
+  color: #718c00;
+}
+.hljs-number, .hljs-literal, .hljs-variable {
+  color: #f5871f;
+}
+.hljs-title, .hljs-section {
+  color: #4271ae;
+}
+
+/* Line numbers and custom display metrics */
+.theme-navy .hljs-comment { color: #8e96a0; }
+.theme-navy .hljs-keyword { color: #c397d8; }
+.theme-navy .hljs-string { color: #b5bd68; }
+.theme-navy .hljs-number { color: #de935f; }
+.theme-navy .hljs-title { color: #81a2be; }
 
 /* Display equations: beautiful spacing, scrollable with subtle indicators */
 .katex-display {
