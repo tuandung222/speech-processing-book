@@ -1,4 +1,23 @@
-# Vietnamese Datasets & Ecosystem
+# Chương 17: Vietnamese Datasets và Benchmarks
+
+## Vì sao chương này quan trọng
+
+Speech AI cho tiếng Việt phụ thuộc vào data: data lớn, đa dạng, có labeling chất lượng. Chương này tập hợp các dataset, benchmark, và resource công khai cho ASR, TTS, voice agent tiếng Việt, kèm đánh giá thực dụng về điểm mạnh, hạn chế, và mức độ phù hợp với từng use case.
+
+Đối với team product làm voice AI tại Việt Nam, chương này trả lời các câu hỏi cụ thể:
+
+- Có những dataset ASR tiếng Việt nào public? VLSP 2020, VIVOS, Common Voice Vietnamese, FPT data có gì khác nhau? Tổng số giờ bao nhiêu?
+- Benchmark nào được dùng để compare model? Hiệu suất SOTA hiện tại là bao nhiêu?
+- Có dataset cho code-switching Việt-Anh không? Cho emotion? Cho speaker recognition?
+- Dataset thương mại có gì? Giá bao nhiêu? License ra sao?
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: ASR datasets (VLSP, VIVOS, Common Voice Vi, FPT, VinAI private).
+> - **Phần 2**: TTS datasets và voice corpora.
+> - **Phần 3**: benchmark VLSP và các benchmark cộng đồng.
+> - **Phần 4**: PhoWhisper case study, kết quả công khai.
+> - **Phần 5**: gaps và opportunities (code-switching benchmark, emotion, speaker for Vi).
 
 ## Tổng quan
 

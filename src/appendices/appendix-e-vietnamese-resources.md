@@ -1,4 +1,10 @@
-# Vietnamese Speech Resources
+# Phụ lục E: Vietnamese Speech Resources
+
+## Mục đích
+
+Phụ lục E tập hợp các tài nguyên Speech AI cho tiếng Việt một cách có hệ thống, để người đọc có thể nhanh chóng tra cứu dataset, model, framework, API thương mại, và benchmark cộng đồng. Đây là reference material; nội dung phân tích chi tiết về tiếng Việt nằm trong Chương 16 (Vietnamese Speech Processing) và Chương 17 (Vietnamese Datasets và Benchmarks).
+
+Mỗi mục được note theo các trường: tên, mô tả ngắn, link công khai, license, ghi chú thực dụng.
 
 ## Tài nguyên Tiếng Việt cho Speech AI
 

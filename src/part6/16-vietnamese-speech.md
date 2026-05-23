@@ -1,10 +1,26 @@
-# Vietnamese Speech Processing
+# Chương 16: Vietnamese Speech Processing
 
-## Đặc điểm Ngôn ngữ học của Tiếng Việt
+## Vì sao chương này quan trọng
+
+Tiếng Việt là một ngôn ngữ đặc thù cho Speech AI: tính tonal (6 thanh điệu phân biệt nghĩa), ba phương ngữ chính, cùng sự bùng nổ của code-switching Việt-Anh trong bối cảnh công nghệ tạo ra thách thức mà các mô hình đa ngôn ngữ chuẩn thường không xử lý tốt. Whisper-large-v3 đạt WER khoảng 17% trên VLSP 2020 Task-1, trong khi PhoWhisper-large (VinAI fine-tune trên 844 giờ Việt) giảm xuống khoảng 10.8% (giảm khoảng 35%, theo Le và cộng sự, ICLR Tiny Papers 2024). Khoảng cách này minh hoạ tầm quan trọng của fine-tuning cho ngôn ngữ ít tài nguyên.
+
+Chương này phân tích các đặc thu kỹ thuật của tiếng Việt ảnh hưởng đến thiết kế ASR, TTS, voice agent, cùng bức tranh ngành trong nước (VinAI, ZaloAI, FPT.AI, VinFast, Trusting Social, Viettel AI) và những khoảng trống còn lại đáng quan tâm cho startup và team product.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: đặc điểm ngôn ngữ học tiếng Việt và hệ quả cho ASR/TTS.
+> - **Phần 2**: thanh điệu và cách mô hình cần capture pitch contour.
+> - **Phần 3**: phương ngữ Bắc, Trung, Nam và tác động đến data balance.
+> - **Phần 4**: code-switching Việt-Anh trong bối cảnh thuật ngữ kỹ thuật.
+> - **Phần 5**: text normalization, G2P, xử lý chữ viết tiếng Việt.
+> - **Phần 6**: PhoWhisper, kết quả fine-tune Whisper cho tiếng Việt.
+> - **Phần 7**: bức tranh ngành voice AI tại Việt Nam và các khoảng trống.
+
+## Phần 1 — Đặc điểm ngôn ngữ học của tiếng Việt
 
 ### Hệ thống Thanh điệu
 
-Tiếng Việt là **tonal language** với 6 thanh điệu (lexical tones)  -  thay đổi thanh điệu thay đổi nghĩa hoàn toàn:
+Tiếng Việt là **tonal language** với 6 thanh điệu (lexical tones). Thay đổi thanh điệu thay đổi nghĩa hoàn toàn:
 
 | Thanh | Tên | Ký hiệu | Ví dụ | F0 Pattern |
 |-------|-----|---------|-------|------------|
@@ -128,7 +144,7 @@ def prepare_whisper_vietnamese_training(
 
     processed_texts: list[str] = []
     for text in transcriptions:
-        # NFC normalization  -  critical for Vietnamese diacritics
+        # NFC normalization, critical for Vietnamese diacritics
         normalized: str = unicodedata.normalize("NFC", text)
         processed_texts.append(normalized)
 
@@ -466,7 +482,7 @@ Viettel (largest Vietnamese telco) has internal AI division:
 
 : Vietnamese speech processing summary <a id="tbl-vi-summary"></a>
 
-Chương tiếp theo sẽ hoàn thiện cuốn sách với **Production Speech Systems**  -  cách xây dựng voice AI pipeline cho real-world deployment.
+Chương 17 sẽ tiếp tục với **Vietnamese Datasets và Benchmarks**: VLSP, VIVOS, Common Voice Vietnamese, PhoWhisper datasets, và các benchmark cho ASR, TTS, voice agent tiếng Việt.
 
 
 
