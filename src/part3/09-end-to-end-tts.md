@@ -1,15 +1,31 @@
-# End-to-End TTS & Zero-Shot Voice Cloning
+# Chương 9: End-to-End TTS và Zero-Shot Voice Cloning
 
-## Từ Two-Stage đến End-to-End
+## Vì sao chương này quan trọng
 
-Chương trước đã trình bày pipeline **Text → Mel → Waveform** (FastSpeech 2 + HiFi-GAN). Chương này khám phá các model **end-to-end**  -  trực tiếp từ text sang waveform, và đặc biệt là **zero-shot voice cloning**.
+Chương 8 đã trình bày pipeline TTS hai giai đoạn cổ điển: text → mel spectrogram → waveform. Chương này tiến tới các mô hình **end-to-end**, sinh trực tiếp waveform từ text trong một network duy nhất, đồng thời mở ra khả năng **zero-shot voice cloning**: chỉ với 3-10 giây audio mẫu, mô hình có thể clone giọng nói của bất kỳ ai để đọc text bất kỳ.
+
+Đây là bước tiến quan trọng vì hai lý do. Thứ nhất, end-to-end loại bỏ vấn đề error compounding của pipeline hai giai đoạn (mel imperfection làm vocoder degrade thêm). Thứ hai, voice cloning đơn giản hoá nhiều ứng dụng (audiobook tự động, voiceover localization, accessibility cho người mất tiếng), đồng thời mở ra rủi ro về deepfake và misuse cần được nhìn nhận thẳng thắn.
+
+Chương này phân tích bốn họ kiến trúc chính: VITS (CVAE + adversarial), VALL-E (neural codec LM), NaturalSpeech 3 (factorized diffusion), và F5-TTS (flow matching cộng DiT).
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: từ pipeline hai giai đoạn đến end-to-end, động lực và trade-off.
+> - **Phần 2**: VITS, Conditional VAE cộng adversarial learning.
+> - **Phần 3**: VALL-E, neural codec language model cho zero-shot voice cloning.
+> - **Phần 4**: NaturalSpeech 3 và F5-TTS, diffusion và flow matching.
+> - **Phần 5**: voice cloning trong production, deepfake và considerations đạo đức.
+
+## Phần 1 — Từ Two-Stage đến End-to-End
+
+Chương trước đã trình bày pipeline **Text → Mel → Waveform** (FastSpeech 2 cộng HiFi-GAN). Chương này khám phá các model **end-to-end**, trực tiếp từ text sang waveform, và đặc biệt là **zero-shot voice cloning**.
 
 <figure id="fig-tts-evolution">
   <img src="fig-09-end-to-end-tts-08.png" alt="Tiến hóa của TTS: từ Two-Stage đến End-to-End" />
   <figcaption><strong>Hình:</strong> Tiến hóa của TTS: từ Two-Stage đến End-to-End</figcaption>
 </figure>
 
-## VITS  -  Variational Inference with Adversarial Learning
+## VITS, Variational Inference with Adversarial Learning
 
 ### Key Innovation
 
@@ -42,9 +58,9 @@ $$
 
 trong đó:
 
-- $p_\theta(\mathbf{x} \mid \mathbf{z})$: Decoder (HiFi-GAN)  -  reconstruct waveform từ latent
-- $q_\phi(\mathbf{z} \mid \mathbf{x})$: Posterior encoder  -  encode audio sang latent
-- $p_\theta(\mathbf{z} \mid c)$: Prior  -  text-conditioned prior distribution
+- $p_\theta(\mathbf{x} \mid \mathbf{z})$: Decoder (HiFi-GAN), reconstruct waveform từ latent.
+- $q_\phi(\mathbf{z} \mid \mathbf{x})$: Posterior encoder, encode audio sang latent.
+- $p_\theta(\mathbf{z} \mid c)$: Prior, text-conditioned prior distribution.
 
 ### Normalizing Flow
 
@@ -171,7 +187,7 @@ class PosteriorEncoder(nn.Module):
         return z, mu, log_sigma
 ```
 
-## VALL-E  -  Neural Codec Language Model for TTS
+## VALL-E, Neural Codec Language Model for TTS
 
 ### Paradigm Shift
 
@@ -189,7 +205,7 @@ $$
 
 > **💡 NLP Parallel: GPT for Speech**
 >
-> VALL-E là **GPT applied to speech**. Thay vì predict next BPE token, nó predict next audio codec token. 3-second audio prompt = **in-context learning**  -  giống few-shot prompting cho LLM.
+> VALL-E là **GPT applied to speech**. Thay vì predict next BPE token, nó predict next audio codec token. 3-second audio prompt đóng vai trò **in-context learning**, giống few-shot prompting cho LLM.
 
 
 
@@ -243,11 +259,11 @@ $$
 
 : VALL-E comparison <a id="tbl-valle-comparison"></a>
 
-## F5-TTS  -  Flow Matching + DiT
+## F5-TTS, Flow Matching + DiT
 
 ### Flow Matching
 
-F5-TTS [^chen2024f5tts] sử dụng **flow matching** [^lipman2023flow]  -  phương pháp mới hơn diffusion:
+F5-TTS [^chen2024f5tts] sử dụng **flow matching** [^lipman2023flow], phương pháp mới hơn diffusion:
 
 <a id="eq-flow-matching-ode"></a>
 
@@ -416,7 +432,7 @@ def flow_matching_sample(
 
 : End-to-end TTS summary <a id="tbl-e2e-summary"></a>
 
-Chương tiếp theo sẽ đi sâu vào **Audio Codecs**  -  EnCodec, DAC, và Mimi  -  nền tảng cho VALL-E và các Speech LLMs.
+Chương tiếp theo sẽ đi sâu vào **Audio Codecs** (EnCodec, DAC, và Mimi), nền tảng cho VALL-E và các Speech LLMs hiện đại.
 
 
 

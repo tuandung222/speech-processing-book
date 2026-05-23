@@ -1,6 +1,27 @@
-# TTS Foundations & Vocoders
+# Chương 8: TTS Foundations và Vocoders
 
-## Bài toán Text-to-Speech
+## Vì sao chương này quan trọng
+
+Text-to-Speech (TTS) là chiều ngược của ASR: input là text, output là waveform âm thanh giọng nói. Đối với người làm NLP/LLM, TTS là một ứng dụng generative quan trọng cùng họ với image generation và text generation, nhưng có ràng buộc riêng: đầu ra phải nghe tự nhiên, phù hợp văn hoá ngôn ngữ, và sinh được realtime cho voice agent.
+
+Chương này phát triển các thành phần cốt lõi của TTS pipeline cổ điển và hiện đại:
+
+- **Variance adaptor** cho duration, pitch, energy: dự đoán prosody trước khi sinh acoustic.
+- **Mel decoder**: sinh mel spectrogram từ text representation (Tacotron 2, FastSpeech 2).
+- **Vocoder**: chuyển mel spectrogram thành waveform (HiFi-GAN, BigVGAN, WaveNet legacy).
+- **Evaluation**: MOS (Mean Opinion Score), MUSHRA, các metric chủ quan và khách quan.
+
+Chương 9 sẽ tiếp tục với các mô hình end-to-end (VITS, F5-TTS, VALL-E) và Chương 10 với neural audio codec là nền tảng cho Speech LLM. Chương 8 đặt nền tảng cho cả hai bằng cách hiểu pipeline cổ điển hai giai đoạn (text → mel → waveform) trước khi compress nó vào một mô hình duy nhất.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: bài toán TTS và metric đánh giá (MOS, MUSHRA, các metric tự động).
+> - **Phần 2**: Tacotron 2, attention-based encoder-decoder cho TTS.
+> - **Phần 3**: FastSpeech 2, non-autoregressive với variance adaptor.
+> - **Phần 4**: vocoder (HiFi-GAN, BigVGAN), mel-to-wave.
+> - **Phần 5**: pipeline production và các trade-off giữa naturalness, latency, controllability.
+
+## Phần 1 — Bài toán Text-to-Speech
 
 Text-to-Speech (TTS) là bài toán ngược của ASR  -  chuyển text thành waveform:
 

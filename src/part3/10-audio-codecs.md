@@ -1,6 +1,26 @@
-# Audio Codecs & Neural Tokenization
+# Chương 10: Neural Audio Codecs và Speech Tokenization
 
-## Tại sao cần Neural Audio Codecs?
+## Vì sao chương này quan trọng
+
+Neural audio codec (EnCodec, DAC, Mimi, SpeechTokenizer) là thành phần engineering chủ chốt cho phép Speech LLM tồn tại. Bằng cách biến tín hiệu audio liên tục thành chuỗi token rời rạc cỡ 1k-8k vocabulary với bit-rate thấp (vài kbps), codec tạo ra "BPE cho audio" và cho phép áp dụng paradigm autoregressive LM trực tiếp lên speech.
+
+Chương này phát triển ba trục cốt lõi của codec:
+
+- **Vector quantization và residual VQ**: cơ chế biến embedding liên tục thành token rời rạc với ít distortion.
+- **Bit-rate và quality trade-off**: vì sao Mimi (1.1 kbps, 12.5 fps) lại là đột phá so với EnCodec (6 kbps, 75 fps).
+- **Streaming và causal architecture**: yêu cầu kỹ thuật để codec hoạt động realtime cho voice agent.
+
+Hiểu codec là điều kiện cần để đọc paper Speech LLM frontier (Moshi, VALL-E, Qwen3-Omni), và để thiết kế pipeline production voice agent có chi phí và latency hợp lý.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: tại sao cần neural audio codec, so sánh với codec cổ điển (MP3, Opus).
+> - **Phần 2**: Vector Quantization và Residual VQ, nền tảng toán học.
+> - **Phần 3**: EnCodec (Meta, 2022), kiến trúc và performance.
+> - **Phần 4**: DAC, Mimi, SpeechTokenizer, các thế hệ codec cải tiến.
+> - **Phần 5**: trade-off bit-rate, latency, quality và lựa chọn cho Speech LLM.
+
+## Phần 1 — Tại sao cần Neural Audio Codec
 
 Neural audio codecs giải quyết bài toán **nén audio thành discrete tokens**  -  cầu nối trực tiếp giữa speech và language modeling:
 
