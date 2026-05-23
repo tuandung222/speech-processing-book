@@ -1,0 +1,196 @@
+/* ===================================================
+   Speech AI Book — Material Theme Polish
+   =================================================== */
+
+/* Typography refinement */
+:root {
+  --md-text-font: "Inter", -apple-system, "Segoe UI", Roboto, "Noto Sans", sans-serif;
+  --md-code-font: "JetBrains Mono", "Fira Code", Menlo, Consolas, monospace;
+}
+
+/* Hero typography on content pages */
+.md-typeset h1 {
+  font-weight: 800;
+  font-size: 2.25rem;
+  letter-spacing: -0.025em;
+  line-height: 1.2;
+  margin-bottom: 1.2rem;
+}
+.md-typeset h2 {
+  font-weight: 700;
+  font-size: 1.6rem;
+  letter-spacing: -0.015em;
+  margin-top: 2.4rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--md-default-fg-color--lightest);
+}
+.md-typeset h3 {
+  font-weight: 600;
+  font-size: 1.25rem;
+  margin-top: 1.8rem;
+}
+.md-typeset h4 {
+  font-weight: 600;
+  font-size: 1.05rem;
+  margin-top: 1.4rem;
+}
+
+/* Body line-height for Vietnamese readability */
+.md-typeset {
+  font-size: 0.85rem;
+  line-height: 1.75;
+}
+
+/* Inline code: pill-shaped */
+.md-typeset code {
+  font-size: 0.85em;
+  padding: 0.12em 0.42em;
+  border-radius: 0.35em;
+  font-weight: 500;
+}
+
+/* Code blocks: rounded + subtle shadow */
+.md-typeset pre {
+  border-radius: 0.55rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+}
+.md-typeset .highlight code {
+  font-size: 0.78rem;
+  line-height: 1.6;
+}
+
+/* Admonition cards: extra polish */
+.md-typeset .admonition,
+.md-typeset details {
+  border-radius: 0.55rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  margin: 1.5rem 0;
+}
+.md-typeset .admonition-title,
+.md-typeset summary {
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+/* Tables: editorial polish */
+.md-typeset table:not([class]) {
+  border-radius: 0.4rem;
+  overflow: hidden;
+  font-size: 0.82rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.md-typeset table:not([class]) th {
+  background-color: var(--md-default-fg-color--lightest);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+.md-typeset table:not([class]) tr:hover {
+  background-color: var(--md-default-fg-color--lightest);
+  transition: background-color 0.15s;
+}
+
+/* Blockquotes: editorial pull-quote */
+.md-typeset blockquote {
+  border-left: 4px solid var(--md-primary-fg-color);
+  background-color: var(--md-default-fg-color--lightest);
+  padding: 0.6rem 1.2rem;
+  border-radius: 0 0.4rem 0.4rem 0;
+  font-style: italic;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Math equations: scroll on overflow */
+.md-typeset mjx-container {
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2rem 0;
+}
+.md-typeset mjx-container[display="true"] {
+  margin: 1rem 0;
+}
+
+/* Sidebar refinement */
+.md-nav__title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.md-nav__item .md-nav__link--active {
+  font-weight: 600;
+}
+
+/* TOC right sidebar */
+.md-nav--secondary .md-nav__title {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--md-default-fg-color--light);
+}
+
+/* Header polish */
+.md-header {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+}
+.md-header__title {
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Tabs underline accent */
+.md-tabs__link {
+  font-weight: 500;
+  opacity: 0.85;
+}
+.md-tabs__link--active {
+  opacity: 1;
+  font-weight: 600;
+}
+
+/* Search input */
+.md-search__input {
+  font-size: 0.85rem;
+}
+
+/* Footnotes — academic feel */
+.md-typeset .footnote ol li {
+  font-size: 0.85em;
+  line-height: 1.6;
+  margin: 0.4em 0;
+}
+.md-typeset .footnote-ref {
+  font-weight: 600;
+}
+
+/* Hero on landing index */
+.md-typeset .landing-hero {
+  text-align: center;
+  padding: 2.5rem 1rem 2rem;
+  border-radius: 0.8rem;
+  background: linear-gradient(135deg, var(--md-primary-fg-color--light) 0%, var(--md-accent-fg-color--transparent) 100%);
+  margin-bottom: 2rem;
+}
+.md-typeset .landing-hero h1 {
+  margin: 0 0 0.4rem;
+  border: none;
+  font-size: 2.6rem;
+}
+.md-typeset .landing-hero p {
+  font-size: 1.15rem;
+  color: var(--md-default-fg-color--light);
+  margin: 0;
+}
+
+/* Grid cards (Material's built-in) */
+.md-typeset .grid.cards > ul > li {
+  border-radius: 0.55rem;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.md-typeset .grid.cards > ul > li:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+
+/* Smaller screen tuning */
+@media (max-width: 76.1875em) {
+  .md-typeset h1 { font-size: 1.85rem; }
+  .md-typeset h2 { font-size: 1.4rem; }
+}

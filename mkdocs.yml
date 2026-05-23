@@ -1,0 +1,191 @@
+site_name: Speech AI
+site_description: "Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI tiếng Việt"
+site_url: https://tuandung222.github.io/speech-processing-book/
+site_author: tuandung222
+copyright: "&copy; 2026 Speech AI Book — MIT License"
+
+repo_name: tuandung222/speech-processing-book
+repo_url: https://github.com/tuandung222/speech-processing-book
+edit_uri: edit/main/docs/
+
+docs_dir: docs
+
+nav:
+  - Trang chủ: index.md
+  - Phần I — Nền tảng:
+    - part1/01-nlp-to-speech.md
+    - part1/02-audio-fundamentals.md
+    - part1/03-speech-representations.md
+  - Phần II — Nhận dạng Giọng nói (ASR):
+    - part2/04-asr-foundations.md
+    - part2/05-modern-asr.md
+    - part2/06-whisper-canary.md
+    - part2/07-streaming-asr.md
+  - Phần III — Tổng hợp Giọng nói (TTS):
+    - part3/08-tts-foundations.md
+    - part3/09-end-to-end-tts.md
+    - part3/10-audio-codecs.md
+  - Phần IV — Speech LLMs & Multimodal:
+    - part4/11-speech-llms.md
+    - part4/12-multimodal-omni.md
+    - part4/13-full-duplex.md
+  - Phần V — Understanding & Translation:
+    - part5/14-speech-classification.md
+    - part5/15-speech-translation.md
+  - Phần VI — Tiếng Việt:
+    - part6/16-vietnamese-speech.md
+    - part6/17-vietnamese-datasets.md
+  - Phần VII — Tools & Production:
+    - part7/18-training-frameworks.md
+    - part7/19-inference-engines.md
+    - part7/20-production-systems.md
+  - Phụ lục:
+    - appendices/appendix-a-notation.md
+    - appendices/appendix-b-proofs.md
+    - appendices/appendix-c-mapping.md
+    - appendices/appendix-d-code.md
+    - appendices/appendix-e-vietnamese-resources.md
+    - appendices/appendix-f-tool-comparison.md
+  - Tài liệu tham khảo: references.md
+
+theme:
+  name: material
+  language: vi
+  custom_dir: overrides
+  font:
+    text: Inter
+    code: JetBrains Mono
+  icon:
+    logo: material/waveform
+    repo: fontawesome/brands/github
+    edit: material/pencil
+    view: material/eye
+  favicon: assets/favicon.svg
+
+  palette:
+    # Light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: deep purple
+      toggle:
+        icon: material/weather-night
+        name: Chuyển sang dark mode
+    # Dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: light blue
+      toggle:
+        icon: material/weather-sunny
+        name: Chuyển sang light mode
+
+  features:
+    # Navigation
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.path
+    - navigation.indexes
+    - navigation.top
+    - navigation.footer
+    # TOC
+    - toc.follow
+    # Search
+    - search.suggest
+    - search.highlight
+    - search.share
+    # Header
+    - header.autohide
+    # Content
+    - content.code.copy
+    - content.code.annotate
+    - content.tabs.link
+    - content.tooltips
+    - content.action.edit
+    - content.action.view
+
+extra_css:
+  - assets/extra.css
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/tuandung222
+  generator: false
+
+plugins:
+  - search:
+      lang:
+        - vi
+        - en
+  - glightbox:
+      touchNavigation: true
+      loop: false
+      effect: zoom
+      slide_effect: slide
+      width: 100%
+      height: auto
+      zoomable: true
+      draggable: false
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+        remove_comments: true
+
+markdown_extensions:
+  # Python Markdown
+  - abbr
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - tables
+  - toc:
+      permalink: "¶"
+      permalink_title: "Liên kết tới mục này"
+      toc_depth: 4
+
+  # PyMdown Extensions
+  - pymdownx.arithmatex:
+      generic: true
+  - pymdownx.betterem:
+      smart_enable: all
+  - pymdownx.caret
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+      auto_title: false
+  - pymdownx.inlinehilite
+  - pymdownx.keys
+  - pymdownx.magiclink
+  - pymdownx.mark
+  - pymdownx.smartsymbols
+  - pymdownx.snippets:
+      check_paths: true
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.tilde
+
+extra_javascript:
+  - assets/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js

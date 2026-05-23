@@ -1,27 +1,34 @@
-name: Quarto Publish
+name: Deploy MkDocs Material
 
 on:
   workflow_dispatch:
   push:
     branches: [main]
 
+permissions:
+  contents: write
+
 jobs:
-  build-deploy:
+  deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v4
-
-      - name: Set up Quarto
-        uses: quarto-dev/quarto-actions/setup@v2
+      - uses: actions/checkout@v4
         with:
-          tinytex: true
+          fetch-depth: 0
 
-      - name: Publish to GitHub Pages
-        uses: quarto-dev/quarto-actions/publish@v2
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          target: gh-pages
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure git
+        run: |
+          git config --local user.email "75377334+tuandung222@users.noreply.github.com"
+          git config --local user.name "tuandung222"
+
+      - name: Deploy to gh-pages
+        run: mkdocs gh-deploy --force --clean --verbose
