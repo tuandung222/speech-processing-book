@@ -65,27 +65,46 @@ csl: ieee.csl
 format:
   html:
     theme:
-      light: cosmo
-      dark: darkly
-    code-fold: true
+      light: [litera, theme-light.scss]
+      dark: [darkly, theme-dark.scss]
+    code-fold: false
     code-tools: true
     code-line-numbers: true
+    code-copy: true
     toc: true
     toc-depth: 3
+    toc-expand: 2
     number-sections: true
-    highlight-style: github
-    mainfont: "Noto Serif"
+    highlight-style:
+      light: github
+      dark: github-dark
+    mainfont: "Inter"
     monofont: "JetBrains Mono"
+    fontsize: "1.05em"
+    linestretch: 1.7
+    max-width: 1080px
     css: styles.css
+    include-in-header:
+      text: |
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+        <meta name="theme-color" content="#1f2937">
+    page-layout: article
+    grid:
+      sidebar-width: 320px
+      body-width: 880px
+      margin-width: 280px
+      gutter-width: 1.5rem
   pdf:
     documentclass: scrbook
     classoption: [oneside]
     papersize: a4
+  enabled: false
     fontsize: 11pt
     toc: true
     toc-depth: 3
-    number-sections: true
-    colorlinks: true
+  colorlinks: true
     link-citations: true
     code-overflow: wrap
     code-block-font-size: "\\scriptsize"
