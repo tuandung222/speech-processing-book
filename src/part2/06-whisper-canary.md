@@ -1,12 +1,25 @@
-# Whisper & Modern ASR
+# Chương 6: Whisper, Canary và Large-Scale Weakly-Supervised ASR
 
-## Whisper: Weak Supervision at Scale
+## Vì sao chương này quan trọng
 
-Whisper [^radford2023robust] là ASR model của OpenAI, được train trên **680,000 giờ** audio với weak supervision  -  không cần human-annotated transcriptions.
+Whisper (OpenAI, 2022) là một dấu mốc quan trọng cho ngành ASR. Lần đầu tiên một mô hình open-source duy nhất, train trên 680,000 giờ audio đa ngôn ngữ với supervision yếu, đạt được hiệu suất gần ngang ASR thương mại trên nhiều domain, ngôn ngữ và mức nhiễu khác nhau. Sau Whisper là loạt mô hình kế tiếp đáng chú ý: Canary của NVIDIA (2024) bổ sung multitask cho cả ASR và translation, và một loạt Whisper-derivative cho ngôn ngữ ít tài nguyên trong đó có PhoWhisper cho tiếng Việt (VinAI, ICLR Tiny Papers 2024).
+
+Chương này không chỉ trình bày kiến trúc Whisper, mà còn phân tích vì sao công thức "Transformer encoder-decoder cộng weak supervision ở quy mô lớn" lại hiệu quả đến vậy, và mặt trái của nó (hallucination, drift trên silence, kém với tonal language nếu không fine-tune).
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: Whisper, weak supervision at scale, kiến trúc encoder-decoder, multitask format.
+> - **Phần 2**: phân tích thực nghiệm Whisper: hiệu suất theo ngôn ngữ, robustness, failure modes.
+> - **Phần 3**: Canary của NVIDIA, multitask ASR + AST + diarization.
+> - **Phần 4**: Whisper fine-tune cho ngôn ngữ ít tài nguyên, case study PhoWhisper cho tiếng Việt.
+
+## Phần 1 — Whisper: Weak Supervision at Scale
+
+Whisper [^radford2023robust] là ASR model của OpenAI, được train trên **680,000 giờ** audio với weak supervision, không cần human-annotated transcriptions.
 
 ### Key Insight
 
-Thay vì tự tạo labels (self-supervised) hay thuê người gán nhãn (supervised), Whisper thu thập **audio + transcript pairs từ internet**  -  noisy nhưng massive scale:
+Thay vì tự tạo labels (self-supervised) hay thuê người gán nhãn (supervised), Whisper thu thập **audio + transcript pairs từ internet**, noisy nhưng ở quy mô cực lớn:
 
 <a id="eq-whisper-scale"></a>
 

@@ -1,4 +1,24 @@
-# Streaming ASR
+# Chương 7: Streaming ASR
+
+## Vì sao chương này quan trọng
+
+Streaming ASR là điều kiện cần cho mọi voice product real-time: trợ lý ảo, voice agent, live captioning, in-car voice, dictation. Khác với offline ASR (đầu vào toàn bộ utterance trước khi sinh output), streaming ASR phải bắt đầu sinh transcript ngay khi audio bắt đầu chảy vào, với độ trễ chỉ vài trăm mili-giây.
+
+Yêu cầu này đặt ra ba ràng buộc kỹ thuật chính:
+
+- **Causal hoặc chunked attention**: không được nhìn vào frame tương lai vô hạn.
+- **Endpointing**: phát hiện khi nào người dùng kết thúc câu để chốt output.
+- **Partial hypotheses**: cập nhật transcript "đang nói" trong khi user vẫn đang nói.
+
+Chương này trình bày cả ba ràng buộc và các kiến trúc giải quyết chúng (RNN-T, streaming Conformer, chunk-based attention), kèm các trade-off thực tế giữa latency, accuracy, và compute.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: yêu cầu streaming, latency budget, partial vs final hypothesis.
+> - **Phần 2**: RNN-Transducer trong vai trò architecture chuẩn cho streaming.
+> - **Phần 3**: streaming Conformer và chunk-based attention.
+> - **Phần 4**: endpointing, VAD, và turn-taking.
+> - **Phần 5**: production patterns, latency optimization, integration với voice agent.
 
 ## Tổng quan
 

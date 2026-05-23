@@ -1,6 +1,26 @@
-# ASR Foundations
+# Chương 4: ASR Foundations
 
-## Bài toán ASR
+## Vì sao chương này quan trọng
+
+Automatic Speech Recognition (ASR) là bài toán Speech AI lâu đời nhất và có ứng dụng rộng nhất, từ trợ lý ảo (Siri, Google Assistant) tới transcription, voice search, và call center analytics. Đối với người làm NLP/LLM, ASR là điểm vào tự nhiên vào Speech AI: input là audio, output là text, pipeline mang nhiều cấu trúc quen thuộc của seq2seq translation.
+
+Tuy nhiên, ASR có một đặc trưng kỹ thuật khác hẳn machine translation: **input và output không có sẵn alignment một-một**. Một câu nói dài 3 giây tạo ra khoảng 300 mel frames, nhưng transcript có thể chỉ 20 ký tự. Làm sao train model học mapping này khi ta không biết frame nào sinh ký tự nào? Đây là câu hỏi trung tâm của ASR foundations, và ba paradigm chính trả lời câu hỏi đó là chủ đề của chương:
+
+- **CTC (Connectionist Temporal Classification)**: marginalize trên mọi alignment khả dĩ.
+- **Attention-based seq2seq**: học alignment implicit qua cross-attention.
+- **RNN-Transducer (RNN-T)**: streaming-friendly seq2seq với joint network.
+
+Sau khi đọc xong chương, bạn có thể đọc paper Whisper (attention seq2seq), Conformer (CTC + attention), và các paper streaming production-grade (RNN-T) mà không bị bí ở thuật ngữ alignment, blank token, joint network.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: bài toán ASR và metric đánh giá (WER, CER).
+> - **Phần 2**: CTC loss, forward-backward algorithm, blank token, decoding.
+> - **Phần 3**: attention-based seq2seq, listen-attend-spell, cross-attention.
+> - **Phần 4**: RNN-Transducer, joint network, streaming.
+> - **Phần 5**: so sánh ba paradigm và lựa chọn theo bài toán.
+
+## Phần 1 — Bài toán ASR
 
 Automatic Speech Recognition (ASR) là bài toán ánh xạ từ tín hiệu âm thanh sang chuỗi ký tự/từ:
 

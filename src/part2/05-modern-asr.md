@@ -1,4 +1,19 @@
-# Modern ASR Architectures
+# Chương 5: Modern ASR Architectures
+
+## Vì sao chương này quan trọng
+
+Chương 4 đã giới thiệu ba paradigm cốt lõi cho ASR (CTC, attention seq2seq, RNN-T). Chương này phát triển các **kiến trúc encoder hiện đại** đã định hình production ASR trong năm năm gần đây: **Conformer** (Gulati và cộng sự, 2020), **Zipformer** (Yao và cộng sự, 2023), **E-Branchformer** (Kim và cộng sự, 2022), và **Paraformer**.
+
+Lý do tách thành chương riêng: kiến trúc encoder quyết định 80% performance và compute của một hệ ASR. Cùng CTC loss và cùng data, Conformer thường cải thiện 15-30% WER so với Transformer thuần. Đó là vì encoder cần xử lý sequence audio dài (1000+ frames cho một câu 10 giây), với cả local pattern (acoustic phoneme) và global pattern (ngôn ngữ), và phải làm điều đó hiệu quả về compute.
+
+Đối với độc giả NLP/LLM, các kiến trúc trong chương này là tương đương Speech của các Transformer variants (Longformer, BigBird, FlashAttention-based models): cải tiến trên Transformer chuẩn để phù hợp với tính chất riêng của domain.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: vấn đề audio sequence dài và động lực cho hybrid CNN + attention.
+> - **Phần 2**: Conformer, kiến trúc encoder phổ biến nhất cho ASR hiện đại.
+> - **Phần 3**: Zipformer, E-Branchformer, Paraformer, các cải tiến gần đây.
+> - **Phần 4**: so sánh kiến trúc, lựa chọn theo budget compute và latency.
 
 ## Tổng quan
 
