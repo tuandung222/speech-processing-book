@@ -1,4 +1,24 @@
-# Training Frameworks
+# Chương 18: Training Frameworks cho Speech AI
+
+## Vì sao chương này quan trọng
+
+Speech AI có một hệ sinh thái framework training riêng, khác với hệ sinh thái NLP/LLM thuần (HuggingFace Transformers, PyTorch Lightning). Lý do là Speech AI có các yêu cầu đặc thù: data loading audio variable-length, mel feature extraction GPU-side, CTC loss, RNN-T loss, forced alignment, decoding với language model, augmentation chuyên cho audio. Các framework Speech AI đóng gói các thành phần này thành recipe có sẵn để team có thể train được model production-grade trong thời gian ngắn.
+
+Chương này khảo sát các framework chính, tổ chức theo độ phổ biến và độ phù hợp với từng loại task:
+
+- **WeNet (Mobvoi/Xiaomi, 2021+)**: U2 architecture, đặc biệt mạnh cho streaming ASR, được dùng trong nhiều sản phẩm tiếng Trung và châu Á.
+- **ESPnet (Watanabe và cộng sự, 2018)**: framework học thuật phổ biến nhất, hỗ trợ ASR, TTS, ST, SE, recipe đa dạng.
+- **NeMo (NVIDIA)**: optimised cho hardware NVIDIA, hỗ trợ ASR/TTS/LM, tích hợp tốt với TensorRT.
+- **SpeechBrain**: framework PyTorch hiện đại, dễ học, hỗ trợ nhiều task speech.
+- **K2/Icefall (Daniel Povey và cộng sự)**: kế thừa Kaldi, hỗ trợ FST decoding, mạnh cho production ASR.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: tổng quan landscape framework Speech AI và tiêu chí lựa chọn.
+> - **Phần 2**: WeNet, deep dive vì là framework streaming ASR phổ biến nhất.
+> - **Phần 3**: ESPnet, framework học thuật.
+> - **Phần 4**: NeMo, K2/Icefall, SpeechBrain.
+> - **Phần 5**: so sánh và khuyến nghị theo bài toán.
 
 ## Tổng quan
 

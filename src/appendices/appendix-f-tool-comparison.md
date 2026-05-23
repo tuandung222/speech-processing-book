@@ -1,4 +1,8 @@
-# Tool Comparison Matrix
+# Phụ lục F: Tool Comparison Matrix
+
+## Mục đích
+
+Phụ lục F tập hợp các ma trận so sánh nhanh cho công cụ và mô hình Speech AI. Đây là reference material cho engineer cần đưa ra quyết định nhanh: training framework nào phù hợp, inference engine nào tối ưu, model TTS nào cho voice agent, ASR API nào cho tiếng Việt. Các phần tích chi tiết về từng công cụ nằm trong các chương Phần VII.
 
 ## Ma trận So sánh Công cụ Speech AI
 

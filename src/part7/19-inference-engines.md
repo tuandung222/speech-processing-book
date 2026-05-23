@@ -1,4 +1,26 @@
-# Inference Engines
+# Chương 19: Inference Engines và Tooling
+
+## Vì sao chương này quan trọng
+
+Sau khi train được mô hình Speech AI chất lượng, bài toán tiếp theo là **deploy nó vào production với chi phí và latency hợp lý**. Đây là lúc inference engine, optimization toolkit, và data preprocessing/augmentation library trở nên quyết định. Khác biệt giữa naive PyTorch inference và pipeline tối ưu (TensorRT, vLLM, Triton) có thể là 5-10x throughput hoặc 3-5x giảm cost server.
+
+Chương này khảo sát hệ sinh thái inference cho Speech AI ở ba mức:
+
+- **Inference engines core**: TensorRT, ONNX Runtime, OpenVINO, CTranslate2 (faster-whisper), vLLM cho Speech LLM.
+- **Serving frameworks**: Triton Inference Server, BentoML, Ray Serve cho production pipeline phức tạp.
+- **Supporting libraries**: torchaudio, librosa, soundfile, audiomentations cho preprocessing và augmentation.
+
+Đặc biệt, chương dành một deep dive cho **WeNet** (kế thừa Phần 18 nhưng từ góc nhìn inference), trình bày cách export ONNX và LibTorch cho deployment.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: tổng quan inference engines, tiêu chí lựa chọn (latency, throughput, cost, cross-platform).
+> - **Phần 2**: TensorRT, ONNX Runtime, OpenVINO cho ASR và TTS.
+> - **Phần 3**: CTranslate2 và faster-whisper, optimization chuyên cho Whisper.
+> - **Phần 4**: vLLM cho Speech LLM (Qwen2-Audio, Qwen3-Omni, Moshi self-host).
+> - **Phần 5**: Triton, BentoML, Ray Serve cho serving pipeline.
+> - **Phần 6**: speech processing libraries ecosystem (preprocessing, augmentation, pretrained loader, quantization).
+> - **Phần 7**: WeNet deep guide cho production deployment.
 
 ## Tổng quan
 
