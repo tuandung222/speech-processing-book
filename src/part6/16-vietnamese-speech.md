@@ -343,6 +343,114 @@ Speaker encoder cần capture:
 - **Tone MOS**: Đánh giá riêng cho tone naturalness
 - **Speaker Similarity**: Cosine similarity of speaker embeddings
 
+## Phần Mở rộng — Vietnamese Speech AI Industry Landscape
+
+Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam, kèm honest assessment về quality.
+
+### VinAI (VinBigData) — Open-source leader
+
+**Sản phẩm chính**:
+
+- **PhoWhisper** (ICLR Tiny Papers 2024): Whisper fine-tuned trên 844h Vietnamese audio. Tác giả: Thanh-Thien Le, Linh The Nguyen, Dat Quoc Nguyen.
+- **ViVi**: voice assistant cho VinFast cars.
+- **PhoBERT, PhoGPT**: text-only Vietnamese language models.
+- **vinai/vibert-tts**: open-source Vietnamese TTS.
+
+**Datasets used**:
+
+| Dataset | Size | Source |
+|---|---|---|
+| CMV-Vi (Common Voice Vietnamese) | 14h | Mozilla |
+| VIVOS | 14h | UPHC |
+| VLSP 2020 Task-1 | 240h | VLSP |
+| VinAI private | 586h | Internal collection |
+| **Total** | **844h** | |
+
+**Performance** (per ICLR 2024 paper):
+
+| Model | CMV-Vi WER | VIVOS WER | VLSP-T1 WER |
+|---|---|---|---|
+| Whisper-medium (baseline) | 14.2% | 19.8% | 22.1% |
+| Whisper-large-v3 | 11.1% | 15.3% | 17.4% |
+| PhoWhisper-medium | 8.4% | 11.2% | 13.1% |
+| **PhoWhisper-large** | **6.9%** | **9.4%** | **10.8%** |
+
+**Honest assessment**: PhoWhisper-large là SOTA open-source cho Vietnamese ASR. Reduces WER by ~35% vs Whisper-large-v3. Available trên HuggingFace, easy to use.
+
+### ZaloAI — Consumer voice products
+
+**Sản phẩm**:
+
+- **KiKi assistant**: voice assistant trong app Zalo.
+- **ZaloPay voice**: voice commands cho ZaloPay payment app.
+- **Internal ASR/TTS**: Vietnamese-focused, not public.
+
+**Quality assessment**: Production-tested với hàng triệu Vietnamese users. Public benchmarks không có, nhưng UX feedback nhìn chung tốt cho domain commands (payment, navigation).
+
+**Limitations**: closed-source, không có public model weights.
+
+### FPT.AI — Commercial APIs
+
+**Sản phẩm**:
+
+- **FPT Speech ASR**: REST/streaming API cho Vietnamese speech-to-text.
+- **FPT Voice TTS**: multiple voices Vietnamese.
+- **FPT.AI Conversation**: chatbot platform với voice integration.
+
+**Pricing**: subscription-based, contact sales for enterprise.
+
+**Quality**: decent for clean Vietnamese, weaker for code-switching or noisy. Used by Vietnamese banks (VPBank, Sacombank chat).
+
+### VinFast (in-car voice)
+
+In-car voice assistant cho VinFast vehicles:
+
+- Wake-word: "Ok VinFast" (custom KWS).
+- ASR: in-house Vietnamese model (likely fine-tuned from VinAI base).
+- LLM: GPT-4 or in-house?
+- TTS: Vietnamese neural TTS, multiple voices.
+
+**Use cases**: navigation, climate control, music, calling.
+
+### Trusting Social — Voice biometrics
+
+Specialized in voice biometrics for KYC (Know Your Customer):
+
+- **Voice ID**: speaker verification cho banking, insurance.
+- **Multimodal KYC**: voice + face + ID document.
+
+Deployed cho major Vietnamese banks. Not a general voice AI company, but important player in voice-based identity.
+
+### Viettel AI — Telecom-focused
+
+Viettel (largest Vietnamese telco) has internal AI division:
+
+- ASR cho call center transcription.
+- TTS cho IVR systems.
+- Vietnamese-focused, but mostly internal use.
+
+### Honest assessment: Where Vietnamese voice AI stands in 2026
+
+| Capability | Status | Best option |
+|---|---|---|
+| Vietnamese ASR (clean) | Mature | PhoWhisper-large (open) or FPT (commercial) |
+| Vietnamese ASR (noisy) | Improving | PhoWhisper + noise augmentation, fine-tuning needed |
+| Vietnamese TTS (natural) | Decent | ElevenLabs Multilingual or VinAI vibert-tts |
+| Vietnamese voice cloning | Behind English | XTTS fine-tuned on Vi data, or wait for native VI voice cloning |
+| Vietnamese wake-word | Custom for each product | Picovoice Porcupine custom or DIY |
+| Vietnamese voice agent | Cascaded works, end-to-end emerging | Vapi.ai + PhoWhisper + GPT + ElevenLabs |
+| Vietnamese Speech LLM | Catching up | Qwen3-Omni supports Vi text input + audio understanding |
+
+### Major gaps and opportunities
+
+1. **Vietnamese-native voice cloning** với 3-sec sample (như VALL-E for English). Currently English-dominant.
+2. **Vietnamese TTS** với expressive emotion (cười, nghiêm trọng). Most Vi TTS sound flat.
+3. **Code-switching ASR benchmark** chính thức cho Vi-En. Industry needs one to compare models.
+4. **On-device Vietnamese ASR** under 50 MB cho mobile. PhoWhisper too large.
+5. **Vietnamese voice agent SDK** comprehensive (như LiveKit + Pipecat + Vapi.ai bundle).
+
+---
+
 ## Tóm tắt
 
 | Aspect | Challenge | Solution |
@@ -353,6 +461,8 @@ Speaker encoder cần capture:
 | Text normalization | Numbers, abbreviations | Rule-based + dictionary |
 | G2P | Mostly regular, some polyphones | Rule-based + exceptions |
 | Data scarcity | Limited labeled data | Transfer learning (Whisper, XLSR) |
+| Industry landscape | Multiple players (VinAI, ZaloAI, FPT, VinFast) | Mature for cascaded ASR, gaps in voice cloning and on-device |
+| Vietnamese voice agent | Cascaded works | PhoWhisper + GPT + ElevenLabs Multilingual stack |
 
 : Vietnamese speech processing summary <a id="tbl-vi-summary"></a>
 
