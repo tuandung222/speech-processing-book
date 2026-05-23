@@ -1,0 +1,160 @@
+---
+title: "Lời nói đầu"
+---
+
+## Tại sao cuốn sách này?
+
+Trong thập kỷ qua, cộng đồng NLP đã chứng kiến sự bùng nổ của Large Language Models (LLMs) - từ BERT [@devlin2019bert] đến GPT-4 [@openai2024gpt4o], từ text generation đến multimodal reasoning. Nhưng có một lĩnh vực mà ranh giới giữa "ngôn ngữ" và "tín hiệu vật lý" trở nên mờ nhạt: **Speech AI**.
+
+Speech AI không chỉ là "thêm một modality" vào LLM. Nó đòi hỏi sự hiểu biết sâu về:
+
+- **Signal processing**: Biến đổi Fourier, mel spectrogram, MFCC [@davis1980comparison; @oppenheim1999discrete]
+- **Sequence alignment**: CTC loss [@graves2006connectionist], attention-based alignment, transducers [@graves2012sequence]
+- **Generative modeling**: VAE [@kingma2014vae], normalizing flows [@rezende2015normalizing], flow matching [@lipman2023flow], GAN [@goodfellow2014generative]
+- **Neural audio compression**: Vector quantization [@oord2017vqvae], residual VQ, codec tokens [@defossez2022encodec]
+- **Self-supervised learning**: Wav2Vec 2.0 [@baevski2020wav2vec], HuBERT [@hsu2021hubert], WavLM [@chen2022wavlm]
+- **Real-time systems**: Streaming inference, latency optimization, voice pipelines
+
+Cuốn sách này được viết cho **CV/NLP data scientists** muốn trở thành **speech data scientists** chuyên nghiệp. Đây là tài liệu nội bộ toàn diện, bao quát từ nền tảng lý thuyết đến triển khai production.
+
+## Đối tượng Độc giả
+
+Cuốn sách được thiết kế cho:
+
+1. **CV/NLP Data Scientists** muốn chuyển sang speech modality
+2. **LLM Researchers** quan tâm đến multimodal models (Qwen2.5-Omni, Moshi, GPT-4o)
+3. **ML/AI Engineers** xây dựng voice AI pipelines cho production
+4. **Graduate students** nghiên cứu speech processing
+
+**Prerequisites:**
+
+- Transformer architecture [@vaswani2017attention] (self-attention, encoder-decoder)
+- LLM training basics (tokenization, pre-training, fine-tuning)
+- Python & PyTorch proficiency
+- Linear algebra & probability fundamentals
+
+## Cấu trúc Cuốn sách
+
+Cuốn sách gồm **20 chương** chia thành **7 phần** và **6 phụ lục**:
+
+```
+Speech AI: From Signal Processing to Full-Duplex Dialogue
+│
+├── Phần I: Nền tảng (Ch 1-3)
+│   ├── Ch 1: From NLP to Speech - The Conceptual Bridge
+│   ├── Ch 2: Audio Signal Fundamentals (DFT, STFT, Mel, MFCC)
+│   └── Ch 3: Speech Representations (SSL, Contrastive, Codecs)
+│
+├── Phần II: Nhận dạng Giọng nói - ASR (Ch 4-7)
+│   ├── Ch 4: ASR Foundations (CTC, Seq2Seq, RNN-T)
+│   ├── Ch 5: Modern ASR Architectures (Conformer, Zipformer, E-Branchformer)
+│   ├── Ch 6: Whisper & Canary
+│   └── Ch 7: Streaming ASR
+│
+├── Phần III: Tổng hợp Giọng nói - TTS & Audio Codecs (Ch 8-10)
+│   ├── Ch 8: TTS Foundations & Vocoders
+│   ├── Ch 9: End-to-End TTS & Zero-Shot Voice Cloning
+│   └── Ch 10: Audio Codecs & Neural Tokenization
+│
+├── Phần IV: Speech LLMs & Multimodal (Ch 11-13)
+│   ├── Ch 11: Speech Language Models (AudioLM, Qwen2-Audio, Moshi)
+│   ├── Ch 12: Multimodal Omni Models (Qwen2.5-Omni, Gemini, GPT-4o)
+│   └── Ch 13: Full-Duplex Dialogue
+│
+├── Phần V: Speech Understanding & Translation (Ch 14-15)
+│   ├── Ch 14: Speech Classification (SER, SID, LID, AED)
+│   └── Ch 15: Speech Translation (S2ST, S2TT, SeamlessM4T)
+│
+├── Phần VI: Tiếng Việt (Ch 16-17)
+│   ├── Ch 16: Vietnamese Speech Processing
+│   └── Ch 17: Vietnamese Datasets & Benchmarks
+│
+├── Phần VII: Tools & Production (Ch 18-20)
+│   ├── Ch 18: Training Frameworks (WeNet, ESPnet, NeMo, SpeechBrain)
+│   ├── Ch 19: Inference Engines (TensorRT, Triton, ONNX, CTranslate2)
+│   └── Ch 20: Production Speech Systems
+│
+└── Phụ lục A-F
+    ├── A: Notation Reference
+    ├── B: Mathematical Proofs
+    ├── C: NLP-Speech Mapping
+    ├── D: Code Listings
+    ├── E: Vietnamese Speech Resources
+    └── F: Tool Comparison Matrices
+```
+
+## Hướng dẫn Đọc
+
+### Đến từ LLM/GPT research:
+
+1. **Chương 1** (NLP-to-Speech Bridge) - bắt đầu từ đây
+2. **Chương 11-13** (Speech LLMs, Multimodal, Full-Duplex) - lãnh thổ quen thuộc nhất
+3. **Chương 2-3** (Audio Fundamentals, Representations) - bổ sung signal processing
+4. Các chương còn lại theo thứ tự
+
+### Đến từ NLP/BERT research:
+
+1. **Chương 1** - **Chương 2-3** - **Chương 4** (ASR ~ seq2seq translation)
+2. **Chương 5-7** (Modern ASR) - **Chương 8-10** (TTS & Codecs) - **Chương 11-13** (Speech LLMs)
+
+### Đến từ CV/Computer Vision:
+
+1. **Chương 2** (signal processing tuong tu image features)
+2. **Chương 14** (speech classification ~ image classification)
+3. **Chương 3** (self-supervised learning ~ SimCLR/DINO for audio)
+
+### Muốn triển khai production ngay:
+
+1. **Chương 18-20** (Training frameworks, Inference engines, Production systems)
+2. **Phụ lục F** (Tool comparison matrices)
+3. Quay lại lý thuyết khi cần
+
+### Đọc toàn bộ (comprehensive):
+
+Chương 1 - 2 - 3 - ... - 20, theo thứ tự. Đây là lộ trình được recommend.
+
+## Conventions
+
+Xuyên suốt cuốn sách, chúng tôi sử dụng các conventions sau:
+
+::: {.callout-note title="Intuition"}
+Giải thích trực giác về một khái niệm phức tạp.
+:::
+
+::: {.callout-warning title="Hardware/Latency Warning"}
+Cảnh báo về performance, latency, memory bottleneck, hoặc hardware constraints trong production.
+:::
+
+::: {.callout-tip title="NLP Parallel"}
+Mapping giữa khái niệm NLP quen thuộc và speech equivalent.
+:::
+
+**Code style:**
+
+```python
+# Mọi tensor operation đều có inline shape & dtype comments
+x: Tensor  # [batch, time, features] - torch.float32
+mel: Tensor  # [batch, n_mels, n_frames] - torch.float32
+codes: Tensor  # [batch, n_codebooks, T] - torch.int64
+```
+
+**Math notation:**
+
+- Tất cả display equations được đánh nhãn: `{#eq-label}`
+- Cross-references: `@eq-label`, `@fig-label`, `@tbl-label`
+- Xem **Phụ lục A** để biết đầy đủ notation conventions
+
+## Nguồn Tham khảo
+
+Cuốn sách được xây dựng dựa trên **190+ papers và tài liệu** quan trọng trong lĩnh vực Speech AI, bao gồm:
+
+- **ASR**: Whisper [@radford2023robust], Conformer [@gulati2020conformer], RNN-T [@graves2012sequence], Canary [@nvidia2024canary]
+- **TTS**: VITS [@kim2021conditional], VALL-E [@wang2023valle], F5-TTS [@chen2024f5tts], CosyVoice [@du2024cosyvoice]
+- **Audio Codecs**: EnCodec [@defossez2022encodec], DAC [@kumar2024dac], Mimi [@defossez2024mimi]
+- **Speech LLMs**: AudioLM [@borsos2023audiolm], Qwen2-Audio [@chu2023qwen2audio], Moshi [@defossez2024moshi]
+- **Multimodal**: Qwen2.5-Omni [@xu2025qwen25omni], Gemini [@team2024gemini]
+- **Self-Supervised**: Wav2Vec 2.0 [@baevski2020wav2vec], HuBERT [@hsu2021hubert], WavLM [@chen2022wavlm]
+- **Speech Translation**: SeamlessM4T [@communication2023seamlessm4t]
+- **Vietnamese**: PhoWhisper [@nguyen2024phowhisper], PhoBERT [@nguyen2020phobert]
+- **Textbooks**: SLP3 [@jurafsky2024speech], Spoken Language Processing [@huang2001spoken]
+- **Training Tools**: WeNet [@zhang2022wenet], ESPnet [@watanabe2018espnet], NeMo [@kuchaiev2019nemo], SpeechBrain [@ravanelli2021speechbrain]

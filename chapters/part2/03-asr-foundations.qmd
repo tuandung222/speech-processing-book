@@ -1,0 +1,511 @@
+---
+title: "ASR Foundations"
+---
+
+## 3.1 Bài toán ASR
+
+Automatic Speech Recognition (ASR) là bài toán ánh xạ từ tín hiệu âm thanh sang chuỗi ký tự/từ:
+
+$$
+\hat{Y} = \arg\max_{Y} P(Y \mid X)
+$$ {#eq-asr-objective}
+
+trong đó $X = (x_1, x_2, \ldots, x_T)$ là chuỗi acoustic frames và $Y = (y_1, y_2, \ldots, y_U)$ là chuỗi text tokens, với $T \gg U$ (audio dài hơn text rất nhiều).
+
+**Thách thức chính:** Alignment giữa $X$ và $Y$ không biết trước — không biết frame nào tương ứng với ký tự nào.
+
+::: {.callout-tip title="NLP Parallel"}
+ASR tương đương bài toán **sequence-to-sequence** trong NLP (machine translation), nhưng với input sequence dài hơn output 10–50×. Đây chính là lý do CTC và Transducers ra đời — giải quyết **monotonic alignment** mà standard seq2seq không xử lý tốt.
+:::
+
+## 3.2 CTC — Connectionist Temporal Classification
+
+### 3.2.1 Ý tưởng Cốt lõi
+
+CTC [@graves2006connectionist] giải quyết alignment problem bằng cách:
+
+1. **Thêm blank token** $\langle b \rangle$ vào vocabulary
+2. Cho phép model output blank hoặc repeated characters tại mỗi frame
+3. **Marginalize** trên tất cả valid alignments
+
+### 3.2.2 CTC Alignment
+
+Cho output vocabulary $\mathcal{V} = \{a, b, c, \ldots, z, \langle b \rangle\}$ và acoustic frames $X$ có $T$ frames:
+
+- Model outputs: $P(c_t \mid X)$ cho mỗi frame $t$ và mỗi character $c_t \in \mathcal{V} \cup \{\langle b \rangle\}$
+- Một **CTC path** $\pi = (\pi_1, \pi_2, \ldots, \pi_T)$ với $\pi_t \in \mathcal{V} \cup \{\langle b \rangle\}$
+
+**Collapsing function** $\mathcal{B}$: loại bỏ repeated characters và blanks:
+
+$$
+\mathcal{B}(\langle b \rangle h \langle b \rangle e \langle b \rangle l l \langle b \rangle l o \langle b \rangle) = \text{"hello"}
+$$ {#eq-ctc-collapse}
+
+### 3.2.3 CTC Loss
+
+CTC loss marginalize trên tất cả valid paths:
+
+$$
+P_{\text{CTC}}(Y \mid X) = \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t \mid X)
+$$ {#eq-ctc-prob}
+
+$$
+\mathcal{L}_{\text{CTC}} = -\log P_{\text{CTC}}(Y \mid X)
+$$ {#eq-ctc-loss}
+
+::: {.callout-note title="Tại sao cần Blank Token?"}
+Không có blank, model không thể phân biệt "hello" (1 chữ l) và "helllo" (2 chữ l liên tiếp). Blank cho phép "reset" — mỗi non-blank emission sau blank (hoặc khác character) là một ký tự mới.
+:::
+
+### 3.2.4 Forward-Backward Algorithm
+
+Tính $P_{\text{CTC}}(Y \mid X)$ bằng dynamic programming. Định nghĩa modified label sequence $Z$ bằng cách chèn blank giữa mỗi label:
+
+$$
+Z = (\langle b \rangle, y_1, \langle b \rangle, y_2, \langle b \rangle, \ldots, \langle b \rangle, y_U, \langle b \rangle)
+$$ {#eq-ctc-modified}
+
+có độ dài $|Z| = 2U + 1$.
+
+**Forward variable:**
+
+$$
+\alpha(t, s) = \sum_{\substack{\pi_{1:t}: \\ \mathcal{B}(\pi_{1:t}) = Z_{1:s}}} \prod_{t'=1}^{t} P(\pi_{t'} \mid X)
+$$ {#eq-ctc-forward}
+
+**Recurrence:**
+
+$$
+\alpha(t, s) = P(z_s \mid x_t) \times \begin{cases}
+\alpha(t-1, s) + \alpha(t-1, s-1) & \text{if } z_s = \langle b \rangle \text{ or } z_s = z_{s-2} \\
+\alpha(t-1, s) + \alpha(t-1, s-1) + \alpha(t-1, s-2) & \text{otherwise}
+\end{cases}
+$$ {#eq-ctc-recurrence}
+
+```{python}
+#| eval: false
+#| code-fold: true
+#| code-summary: "CTC Loss implementation"
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+
+class CTCModel(nn.Module):
+    """Minimal CTC-based ASR model.
+
+    Architecture: Mel → Linear Encoder → CTC Output
+    """
+
+    def __init__(
+        self,
+        n_mels: int = 80,
+        hidden_dim: int = 512,
+        vocab_size: int = 29,  # 26 letters + space + apostrophe + blank
+        n_layers: int = 4,
+    ) -> None:
+        super().__init__()
+        self.encoder = nn.Sequential(
+            nn.Linear(n_mels, hidden_dim),  # [B, T, n_mels] -> [B, T, hidden]
+            nn.ReLU(),
+            *[
+                nn.Sequential(
+                    nn.Linear(hidden_dim, hidden_dim),
+                    nn.ReLU(),
+                    nn.Dropout(0.1),
+                )
+                for _ in range(n_layers - 1)
+            ],
+        )
+        self.output_proj = nn.Linear(
+            hidden_dim, vocab_size
+        )  # [B, T, hidden] -> [B, T, vocab]
+        self.ctc_loss = nn.CTCLoss(blank=0, reduction="mean", zero_infinity=True)
+
+    def forward(
+        self,
+        mel: Tensor,          # [batch, n_mels, T_frames] - float32
+        targets: Tensor,      # [batch, U] - int64 (target text indices)
+        input_lengths: Tensor, # [batch] - int64
+        target_lengths: Tensor, # [batch] - int64
+    ) -> tuple[Tensor, Tensor]:
+        """Forward pass with CTC loss.
+
+        Args:
+            mel: Mel spectrogram [B, n_mels, T] - float32
+            targets: Target indices [B, U] - int64
+            input_lengths: Actual input lengths [B] - int64
+            target_lengths: Actual target lengths [B] - int64
+
+        Returns:
+            loss: CTC loss scalar - float32
+            log_probs: Log probabilities [T, B, vocab] - float32
+        """
+        # [B, n_mels, T] -> [B, T, n_mels]
+        x: Tensor = mel.transpose(1, 2)  # [B, T, n_mels] - float32
+
+        # Encode
+        h: Tensor = self.encoder(x)  # [B, T, hidden] - float32
+
+        # Project to vocab
+        logits: Tensor = self.output_proj(h)  # [B, T, vocab] - float32
+        log_probs: Tensor = logits.log_softmax(dim=-1)  # [B, T, vocab] - float32
+
+        # CTC loss expects [T, B, vocab]
+        log_probs_ctc: Tensor = log_probs.transpose(0, 1)  # [T, B, vocab] - float32
+
+        loss: Tensor = self.ctc_loss(
+            log_probs_ctc,    # [T, B, vocab]
+            targets,          # [B, U]
+            input_lengths,    # [B]
+            target_lengths,   # [B]
+        )  # scalar - float32
+
+        return loss, log_probs
+
+    @torch.no_grad()
+    def greedy_decode(self, mel: Tensor) -> list[list[int]]:
+        """Greedy CTC decoding.
+
+        Args:
+            mel: [batch, n_mels, T] - float32
+
+        Returns:
+            decoded: List of decoded token sequences (blanks removed)
+        """
+        x: Tensor = mel.transpose(1, 2)  # [B, T, n_mels]
+        h: Tensor = self.encoder(x)       # [B, T, hidden]
+        logits: Tensor = self.output_proj(h)  # [B, T, vocab]
+
+        # Argmax per frame
+        best_path: Tensor = logits.argmax(dim=-1)  # [B, T] - int64
+
+        # Collapse: remove blanks and repeated
+        decoded: list[list[int]] = []
+        for b in range(best_path.size(0)):
+            tokens: list[int] = []
+            prev: int = -1
+            for t in range(best_path.size(1)):
+                tok: int = best_path[b, t].item()
+                if tok != 0 and tok != prev:  # 0 = blank
+                    tokens.append(tok)
+                prev = tok
+            decoded.append(tokens)
+
+        return decoded
+```
+
+### 3.2.5 CTC Decoding
+
+**Greedy decoding:**
+
+$$
+\hat{\pi}_t = \arg\max_{c} P(c \mid x_t), \quad \hat{Y} = \mathcal{B}(\hat{\pi})
+$$ {#eq-ctc-greedy}
+
+**Beam search decoding** kết hợp language model:
+
+$$
+\hat{Y} = \arg\max_{Y} \left[\log P_{\text{CTC}}(Y \mid X) + \lambda \log P_{\text{LM}}(Y)\right]
+$$ {#eq-ctc-beam}
+
+### 3.2.6 Hạn chế của CTC
+
+1. **Conditional independence**: $P(\pi_t \mid X)$ được tính independent tại mỗi frame
+2. **Monotonic alignment only**: Không thể xử lý reordering (nhưng speech alignment luôn monotonic)
+3. **Output tokens ≤ input frames**: $U \leq T$ (mỗi non-blank phải có ít nhất 1 frame)
+4. **No implicit LM**: CTC không học language model — cần external LM rescoring
+
+## 3.3 Encoder-Decoder with Attention
+
+### 3.3.1 Architecture
+
+Kiến trúc seq2seq kinh điển cho ASR, tương tự machine translation:
+
+$$
+\begin{aligned}
+\mathbf{h} &= \text{Encoder}(X) \quad & \text{// } [\text{batch}, T, d_{\text{model}}] \\
+P(y_u \mid y_{<u}, X) &= \text{Decoder}(\mathbf{h}, y_{<u}) \quad & \text{// autoregressive}
+\end{aligned}
+$$ {#eq-enc-dec}
+
+### 3.3.2 Attention Mechanism cho ASR
+
+**Cross-attention** giữa decoder query và encoder keys:
+
+$$
+\text{Attention}(Q_{\text{dec}}, K_{\text{enc}}, V_{\text{enc}}) = \text{softmax}\left(\frac{Q_{\text{dec}} K_{\text{enc}}^\top}{\sqrt{d_k}}\right) V_{\text{enc}}
+$$ {#eq-asr-attention}
+
+::: {.callout-note title="Location-Sensitive Attention"}
+Standard attention có thể "nhảy" — không bảo đảm monotonic alignment. **Location-sensitive attention** (LAS, Listen Attend and Spell) thêm convolution trên attention weights trước đó để khuyến khích monotonic progression.
+:::
+
+### 3.3.3 So sánh CTC vs Encoder-Decoder
+
+| Tính chất | CTC | Encoder-Decoder |
+|-----------|-----|----------------|
+| Alignment | Learned (marginalized) | Learned (attention) |
+| Decoding | Greedy / beam + LM | Autoregressive beam search |
+| Dependencies | Conditional independence | Full output dependency |
+| Implicit LM | No | Yes (decoder = LM) |
+| Streaming | Easy (frame-by-frame) | Hard (needs full input) |
+| Speed | Fast (parallel) | Slow (sequential decoding) |
+
+: CTC vs Encoder-Decoder comparison {#tbl-ctc-vs-encdec}
+
+## 3.4 RNN-Transducer (RNN-T)
+
+### 3.4.1 Motivation
+
+RNN-T [@graves2012sequence] kết hợp ưu điểm của cả CTC (streaming) và Encoder-Decoder (output dependency):
+
+- **CTC**: Frame-level, không có output dependency → streaming nhưng kém chính xác
+- **Encoder-Decoder**: Output dependency nhưng không streaming
+- **RNN-T**: Cả hai — output dependency **và** streaming
+
+### 3.4.2 Components
+
+RNN-T gồm 3 thành phần:
+
+1. **Encoder** (transcription network): $\mathbf{h}_t = \text{Encoder}(x_{1:t})$
+2. **Prediction network** (label history): $\mathbf{g}_u = \text{PredNet}(y_{1:u-1})$
+3. **Joint network**: kết hợp encoder và prediction outputs
+
+$$
+\mathbf{z}_{t,u} = \text{Joint}(\mathbf{h}_t, \mathbf{g}_u) = \text{Linear}\left(\tanh(\mathbf{W}_h \mathbf{h}_t + \mathbf{W}_g \mathbf{g}_u + \mathbf{b})\right)
+$$ {#eq-rnnt-joint}
+
+$$
+P(k \mid t, u) = \text{softmax}(\mathbf{z}_{t,u})_k, \quad k \in \mathcal{V} \cup \{\langle b \rangle\}
+$$ {#eq-rnnt-output}
+
+### 3.4.3 Lattice & Forward-Backward
+
+RNN-T hoạt động trên **lattice** 2D $(T \times U)$:
+
+```
+    u=0     u=1     u=2     u=3  (output labels)
+t=0  ●───→───●───→───●───→───●
+     │       │       │       │
+     ↓       ↓       ↓       ↓
+t=1  ●───→───●───→───●───→───●
+     │       │       │       │
+     ↓       ↓       ↓       ↓
+t=2  ●───→───●───→───●───→───●
+     │       │       │       │
+     ↓       ↓       ↓       ↓
+t=3  ●───→───●───→───●───→───●
+
+→ = emit label (advance u)
+↓ = emit blank (advance t)
+```
+
+- Di chuyển **xuống** (↓): emit blank, advance frame $t \to t+1$
+- Di chuyển **phải** (→): emit label $y_u$, advance label $u \to u+1$
+
+**Forward variable:**
+
+$$
+\alpha(t, u) = \alpha(t-1, u) \cdot P(\langle b \rangle \mid t-1, u) + \alpha(t, u-1) \cdot P(y_u \mid t, u-1)
+$$ {#eq-rnnt-forward}
+
+**Loss:**
+
+$$
+\mathcal{L}_{\text{RNN-T}} = -\log \alpha(T, U)
+$$ {#eq-rnnt-loss}
+
+::: {.callout-warning title="Latency Warning"}
+RNN-T forward-backward trên lattice $(T \times U)$ yêu cầu memory $O(T \times U \times V)$ cho full lattice. Với $T=1000, U=100, V=5000$: cần ~2 GB per sample. Production systems sử dụng **pruned RNN-T** để giảm memory.
+:::
+
+```{python}
+#| eval: false
+#| code-fold: true
+#| code-summary: "RNN-Transducer architecture"
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+
+class RNNTransducer(nn.Module):
+    """Simplified RNN-Transducer for ASR.
+
+    Components: Encoder + Prediction Network + Joint Network
+    """
+
+    def __init__(
+        self,
+        n_mels: int = 80,
+        encoder_dim: int = 512,
+        predictor_dim: int = 256,
+        joint_dim: int = 512,
+        vocab_size: int = 29,  # includes blank at index 0
+        encoder_layers: int = 6,
+        predictor_layers: int = 2,
+    ) -> None:
+        super().__init__()
+
+        # Encoder (transcription network)
+        self.encoder_proj = nn.Linear(n_mels, encoder_dim)
+        self.encoder = nn.LSTM(
+            input_size=encoder_dim,
+            hidden_size=encoder_dim,
+            num_layers=encoder_layers,
+            batch_first=True,
+            dropout=0.1,
+        )
+
+        # Prediction network (label history)
+        self.embedding = nn.Embedding(
+            vocab_size, predictor_dim
+        )  # [vocab] -> [predictor_dim]
+        self.predictor = nn.LSTM(
+            input_size=predictor_dim,
+            hidden_size=predictor_dim,
+            num_layers=predictor_layers,
+            batch_first=True,
+            dropout=0.1,
+        )
+
+        # Joint network
+        self.joint_enc = nn.Linear(
+            encoder_dim, joint_dim, bias=False
+        )
+        self.joint_pred = nn.Linear(
+            predictor_dim, joint_dim, bias=True
+        )
+        self.joint_out = nn.Linear(
+            joint_dim, vocab_size
+        )
+
+    def encode(self, mel: Tensor) -> Tensor:
+        """Encode mel spectrogram.
+
+        Args:
+            mel: [batch, n_mels, T] - float32
+
+        Returns:
+            h: [batch, T, encoder_dim] - float32
+        """
+        x: Tensor = mel.transpose(1, 2)  # [B, T, n_mels] - float32
+        x = self.encoder_proj(x)  # [B, T, encoder_dim] - float32
+        h, _ = self.encoder(x)  # [B, T, encoder_dim] - float32
+        return h
+
+    def predict(self, targets: Tensor) -> Tensor:
+        """Run prediction network on target labels.
+
+        Args:
+            targets: [batch, U] - int64
+
+        Returns:
+            g: [batch, U, predictor_dim] - float32
+        """
+        emb: Tensor = self.embedding(targets)  # [B, U, predictor_dim] - float32
+        g, _ = self.predictor(emb)  # [B, U, predictor_dim] - float32
+        return g
+
+    def joint(self, h: Tensor, g: Tensor) -> Tensor:
+        """Joint network: combine encoder and predictor.
+
+        Args:
+            h: [batch, T, 1, encoder_dim] - float32
+            g: [batch, 1, U+1, predictor_dim] - float32
+
+        Returns:
+            logits: [batch, T, U+1, vocab_size] - float32
+        """
+        # Project and broadcast-add
+        h_proj: Tensor = self.joint_enc(h)   # [B, T, 1, joint_dim] - float32
+        g_proj: Tensor = self.joint_pred(g)  # [B, 1, U+1, joint_dim] - float32
+
+        z: Tensor = torch.tanh(h_proj + g_proj)  # [B, T, U+1, joint_dim] - float32
+        logits: Tensor = self.joint_out(z)  # [B, T, U+1, vocab] - float32
+        return logits
+
+    def forward(
+        self,
+        mel: Tensor,      # [B, n_mels, T] - float32
+        targets: Tensor,  # [B, U] - int64
+    ) -> Tensor:
+        """Compute joint logits for RNN-T loss.
+
+        Args:
+            mel: [B, n_mels, T] - float32
+            targets: [B, U] - int64
+
+        Returns:
+            logits: [B, T, U+1, vocab] - float32
+        """
+        h: Tensor = self.encode(mel)  # [B, T, enc_dim] - float32
+        h = h.unsqueeze(2)  # [B, T, 1, enc_dim] - float32
+
+        # Prepend blank (SOS) to targets
+        B, U = targets.shape
+        blank: Tensor = torch.zeros(
+            B, 1, dtype=torch.long, device=targets.device
+        )  # [B, 1]
+        targets_sos: Tensor = torch.cat(
+            [blank, targets], dim=1
+        )  # [B, U+1] - int64
+
+        g: Tensor = self.predict(targets_sos)  # [B, U+1, pred_dim] - float32
+        g = g.unsqueeze(1)  # [B, 1, U+1, pred_dim] - float32
+
+        logits: Tensor = self.joint(h, g)  # [B, T, U+1, vocab] - float32
+        return logits
+```
+
+## 3.5 So sánh Ba Paradigm
+
+| | CTC | Encoder-Decoder | RNN-T |
+|---|-----|----------------|-------|
+| **Alignment** | Monotonic (marginalized) | Soft (attention) | Monotonic (lattice) |
+| **Output dependency** | None (conditional indep.) | Full (autoregressive decoder) | Partial (prediction network) |
+| **Streaming** | ✓ (frame-by-frame) | ✗ (needs full input) | ✓ (frame-by-frame) |
+| **Training** | Forward-backward $O(TU)$ | Cross-entropy $O(U)$ per step | Forward-backward $O(TU)$ |
+| **Inference** | Greedy $O(T)$ / Beam $O(TB)$ | Beam $O(UB)$ | Beam $O((T+U)B)$ |
+| **External LM** | Required for good results | Optional (implicit LM) | Helpful |
+| **Typical use** | Offline ASR, simpler models | Whisper | Production streaming |
+| **Accuracy** | Good + LM | Best (offline) | Best (streaming) |
+
+: So sánh ba paradigm ASR {#tbl-asr-paradigms}
+
+::: {.callout-note title="Industry Trend (2024–2026)"}
+- **Google**: Conformer + RNN-T cho on-device streaming ASR
+- **OpenAI**: Whisper = Encoder-Decoder (offline)
+- **Meta**: Wav2Vec 2.0 + CTC fine-tuning
+- **Hybrid**: CTC/Attention joint training (kết hợp CTC loss + attention loss)
+:::
+
+## 3.6 Metrics
+
+### 3.6.1 Word Error Rate (WER)
+
+$$
+\text{WER} = \frac{S + D + I}{N} \times 100\%
+$$ {#eq-wer}
+
+trong đó $S$ = substitutions, $D$ = deletions, $I$ = insertions, $N$ = total words in reference.
+
+### 3.6.2 Character Error Rate (CER)
+
+$$
+\text{CER} = \frac{S_c + D_c + I_c}{N_c} \times 100\%
+$$ {#eq-cer}
+
+Tương tự WER nhưng ở character level — hữu ích cho ngôn ngữ không có word boundaries rõ ràng (tiếng Trung, tiếng Nhật).
+
+## 3.7 Tóm tắt
+
+| Phương pháp | Equation | Ưu điểm chính |
+|------------|----------|---------------|
+| CTC | $-\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod P(\pi_t \mid X)$ | Simple, parallel, streaming |
+| Enc-Dec | $-\sum_u \log P(y_u \mid y_{<u}, X)$ | Output dependency, high accuracy |
+| RNN-T | $-\log \alpha(T, U)$ trên lattice | Streaming + output dependency |
+
+: Tóm tắt ba paradigm ASR {#tbl-asr-summary}
+
+Chương tiếp theo sẽ khám phá **Self-Supervised Speech** — cách Wav2Vec 2.0 và HuBERT học representations mạnh mẽ từ unlabeled audio.

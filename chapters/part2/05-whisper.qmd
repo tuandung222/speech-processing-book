@@ -1,0 +1,368 @@
+---
+title: "Whisper & Modern ASR"
+---
+
+## 5.1 Whisper: Weak Supervision at Scale
+
+Whisper [@radford2023robust] là ASR model của OpenAI, được train trên **680,000 giờ** audio với weak supervision — không cần human-annotated transcriptions.
+
+### 5.1.1 Key Insight
+
+Thay vì tự tạo labels (self-supervised) hay thuê người gán nhãn (supervised), Whisper thu thập **audio + transcript pairs từ internet** — noisy nhưng massive scale:
+
+$$
+\underbrace{\text{680K hours}}_{\text{Whisper (weak supervision)}} \gg \underbrace{\text{60K hours}}_{\text{Wav2Vec 2.0 (self-supervised)}} \gg \underbrace{\text{960 hours}}_{\text{LibriSpeech (supervised)}}
+$$ {#eq-whisper-scale}
+
+::: {.callout-tip title="NLP Parallel"}
+Whisper's approach tương tự **GPT pre-training**: thu thập text từ internet (noisy, uncurated) nhưng massive scale → model tự học filtering noise. Trong speech: thu thập audio + subtitles từ YouTube/podcasts.
+:::
+
+## 5.2 Architecture
+
+### 5.2.1 Overview
+
+Whisper là **encoder-decoder Transformer** kinh điển:
+
+```
+Audio Waveform (16kHz, ≤30s)
+       │
+       ▼
+Log Mel Spectrogram (80 mels, 100 fps)
+[1, 80, 3000]  ← 30s × 100 fps
+       │
+       ▼
+┌─────────────────────────┐
+│    Audio Encoder         │
+│    (Transformer)         │
+│    - 2× Conv1d (stride 2)│  ← Downsampling: 3000 → 1500 frames
+│    - N transformer blocks│
+│    - Sinusoidal pos enc  │
+└──────────┬──────────────┘
+           │  [1, 1500, d_model]
+           ▼
+┌─────────────────────────┐
+│    Text Decoder          │
+│    (Transformer)         │
+│    - Learned pos enc     │
+│    - Causal self-attn    │
+│    - Cross-attention     │
+│    - Token prediction    │
+└──────────┬──────────────┘
+           │
+           ▼
+    Output Tokens
+    <|startoftranscript|> <|en|> <|transcribe|> ...text... <|endoftext|>
+```
+
+### 5.2.2 Audio Encoder
+
+$$
+\begin{aligned}
+\mathbf{x}_{\text{mel}} &\in \mathbb{R}^{80 \times 3000} & \text{// Log mel spectrogram} \\
+\mathbf{x}_1 &= \text{GELU}(\text{Conv1d}(\mathbf{x}_{\text{mel}}, k{=}3, s{=}1)) & \text{// [d, 3000]} \\
+\mathbf{x}_2 &= \text{GELU}(\text{Conv1d}(\mathbf{x}_1, k{=}3, s{=}2)) & \text{// [d, 1500] — 2× downsampling} \\
+\mathbf{h} &= \text{TransformerEncoder}(\mathbf{x}_2 + \mathbf{p}_{\text{sin}}) & \text{// [1500, d]}
+\end{aligned}
+$$ {#eq-whisper-encoder}
+
+### 5.2.3 Text Decoder
+
+Autoregressive decoder với **special tokens** cho multitask:
+
+$$
+P(y_u \mid y_{<u}, \mathbf{h}) = \text{softmax}(\mathbf{W}_o \cdot \text{TransformerDecoder}(y_{<u}, \mathbf{h}))
+$$ {#eq-whisper-decoder}
+
+### 5.2.4 Model Sizes
+
+| Model | Layers | Width | Heads | Params | English WER |
+|-------|--------|-------|-------|--------|-------------|
+| Tiny | 4+4 | 384 | 6 | 39M | 7.6% |
+| Base | 6+6 | 512 | 8 | 74M | 5.0% |
+| Small | 12+12 | 768 | 12 | 244M | 3.4% |
+| Medium | 24+24 | 1024 | 16 | 769M | 2.9% |
+| Large-v3 | 32+32 | 1280 | 20 | 1550M | **2.2%** |
+
+: Whisper model sizes {#tbl-whisper-sizes}
+
+## 5.3 Multitask Training Format
+
+### 5.3.1 Special Token Protocol
+
+Whisper sử dụng sequence of special tokens để chỉ định task:
+
+```
+<|startoftranscript|> <|lang|> <|task|> [<|notimestamps|>] ...text... <|endoftext|>
+```
+
+- `<|lang|>`: Language token (e.g., `<|en|>`, `<|vi|>`, `<|zh|>`)
+- `<|task|>`: `<|transcribe|>` hoặc `<|translate|>` (→ English)
+- `<|notimestamps|>`: Optional, nếu không cần word-level timestamps
+
+### 5.3.2 Tasks
+
+| Task | Input | Output | Token |
+|------|-------|--------|-------|
+| Transcription | Audio (any lang) | Text (same lang) | `<|transcribe|>` |
+| Translation | Audio (any lang) | Text (English) | `<|translate|>` |
+| Language ID | Audio | Language token | Predict `<|lang|>` |
+| VAD | Audio | Timestamps | `<|0.00|>` ... `<|30.00|>` |
+
+: Whisper multitask format {#tbl-whisper-tasks}
+
+::: {.callout-note title="Multitask = Prompt Engineering for ASR"}
+Whisper's special token system tương đương **prompt engineering** cho LLM. Thay vì train riêng models cho mỗi task, dùng prompt tokens để điều khiển behavior — giống GPT-3 instruction following.
+:::
+
+## 5.4 Training Details
+
+### 5.4.1 Data Distribution
+
+- **680K hours** total audio
+- **96 languages** (nhưng phân bố rất không đều)
+- English: ~438K hours (~65%)
+- Top 10 languages: ~90% tổng data
+- Vietnamese: ước tính ~2,000–5,000 hours
+
+### 5.4.2 Training Setup
+
+$$
+\begin{aligned}
+\text{Optimizer} &: \text{AdamW}, \quad \beta = (0.9, 0.98), \quad \epsilon = 10^{-6} \\
+\text{LR schedule} &: \text{Linear warmup (2048 steps)} \to \text{cosine decay} \\
+\text{Batch size} &: 256 \text{ segments} \times 30\text{s} = 2.13 \text{ hours/batch} \\
+\text{Total steps} &: \sim 2^{20} \approx 1{,}048{,}576 \\
+\text{Total compute} &: \sim 5{,}500 \text{ GPU-days (A100)}
+\end{aligned}
+$$ {#eq-whisper-training}
+
+### 5.4.3 Loss Function
+
+Standard cross-entropy trên text tokens:
+
+$$
+\mathcal{L} = -\frac{1}{U} \sum_{u=1}^{U} \log P(y_u \mid y_{<u}, \mathbf{h}_{\text{encoder}})
+$$ {#eq-whisper-loss}
+
+## 5.5 Inference & Decoding
+
+```{python}
+#| eval: false
+#| code-fold: true
+#| code-summary: "Whisper-style encoder-decoder"
+import torch
+import torch.nn as nn
+import math
+from torch import Tensor
+
+
+class WhisperEncoder(nn.Module):
+    """Simplified Whisper audio encoder.
+
+    Conv1d downsampling + Transformer encoder.
+    """
+
+    def __init__(
+        self,
+        n_mels: int = 80,
+        d_model: int = 512,
+        n_heads: int = 8,
+        n_layers: int = 6,
+        max_len: int = 1500,
+    ) -> None:
+        super().__init__()
+        # Two conv layers for downsampling
+        self.conv1 = nn.Conv1d(
+            n_mels, d_model, kernel_size=3, padding=1,
+        )  # [B, 80, T] -> [B, d, T]
+        self.conv2 = nn.Conv1d(
+            d_model, d_model, kernel_size=3, stride=2, padding=1,
+        )  # [B, d, T] -> [B, d, T//2]
+        self.gelu = nn.GELU()
+
+        # Sinusoidal positional encoding
+        pe: Tensor = torch.zeros(max_len, d_model)  # [max_len, d]
+        position: Tensor = torch.arange(0, max_len).unsqueeze(1).float()
+        div_term: Tensor = torch.exp(
+            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
+        )
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe)  # [max_len, d]
+
+        # Transformer encoder layers
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=n_heads,
+            dim_feedforward=d_model * 4,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=True,
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=n_layers,
+        )
+        self.ln = nn.LayerNorm(d_model)
+
+    def forward(self, mel: Tensor) -> Tensor:
+        """Encode mel spectrogram.
+
+        Args:
+            mel: [batch, n_mels, T_frames] - float32
+                 T_frames = 3000 for 30s audio at 100fps
+
+        Returns:
+            h: [batch, T_frames//2, d_model] - float32
+               T_frames//2 = 1500 for 30s audio
+        """
+        x: Tensor = self.gelu(self.conv1(mel))  # [B, d, T] - float32
+        x = self.gelu(self.conv2(x))  # [B, d, T//2] - float32
+        x = x.transpose(1, 2)  # [B, T//2, d] - float32
+
+        T: int = x.size(1)
+        x = x + self.pe[:T]  # [B, T//2, d] - float32
+
+        h: Tensor = self.transformer(x)  # [B, T//2, d] - float32
+        h = self.ln(h)  # [B, T//2, d] - float32
+        return h
+
+
+class WhisperDecoder(nn.Module):
+    """Simplified Whisper text decoder."""
+
+    def __init__(
+        self,
+        vocab_size: int = 51865,
+        d_model: int = 512,
+        n_heads: int = 8,
+        n_layers: int = 6,
+        max_len: int = 448,
+    ) -> None:
+        super().__init__()
+        self.token_emb = nn.Embedding(vocab_size, d_model)
+        self.pos_emb = nn.Embedding(max_len, d_model)
+
+        decoder_layer = nn.TransformerDecoderLayer(
+            d_model=d_model,
+            nhead=n_heads,
+            dim_feedforward=d_model * 4,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=True,
+        )
+        self.transformer = nn.TransformerDecoder(
+            decoder_layer, num_layers=n_layers,
+        )
+        self.ln = nn.LayerNorm(d_model)
+        self.proj = nn.Linear(d_model, vocab_size, bias=False)
+
+    def forward(
+        self,
+        tokens: Tensor,    # [batch, U] - int64
+        encoder_out: Tensor,  # [batch, T', d_model] - float32
+    ) -> Tensor:
+        """Decode tokens with encoder context.
+
+        Args:
+            tokens: Input token IDs [B, U] - int64
+            encoder_out: Encoder output [B, T', d] - float32
+
+        Returns:
+            logits: [B, U, vocab_size] - float32
+        """
+        U: int = tokens.size(1)
+        positions: Tensor = torch.arange(
+            U, device=tokens.device
+        )  # [U]
+
+        x: Tensor = self.token_emb(tokens) + self.pos_emb(positions)
+        # [B, U, d] - float32
+
+        # Causal mask
+        causal_mask: Tensor = nn.Transformer.generate_square_subsequent_mask(
+            U, device=tokens.device,
+        )  # [U, U] - float32
+
+        h: Tensor = self.transformer(
+            x, encoder_out, tgt_mask=causal_mask,
+        )  # [B, U, d] - float32
+
+        h = self.ln(h)  # [B, U, d] - float32
+        logits: Tensor = self.proj(h)  # [B, U, vocab] - float32
+        return logits
+```
+
+## 5.6 Faster Whisper & Optimizations
+
+### 5.6.1 Distil-Whisper
+
+Distil-Whisper [@gandhi2023distilwhisper] giảm size bằng knowledge distillation:
+
+$$
+\mathcal{L}_{\text{distil}} = \alpha \cdot \mathcal{L}_{\text{CE}}(y, \hat{y}_{\text{student}}) + (1-\alpha) \cdot \text{KL}(\hat{p}_{\text{teacher}} \| \hat{p}_{\text{student}})
+$$ {#eq-distil-whisper}
+
+| Model | Params | Speed (vs Large-v3) | WER (test-clean) |
+|-------|--------|---------------------|-------------------|
+| Whisper Large-v3 | 1550M | 1× | 2.2% |
+| Distil-Whisper Large-v3 | 756M | 6.3× | 2.5% |
+
+: Distil-Whisper performance {#tbl-distil-whisper}
+
+### 5.6.2 faster-whisper (CTranslate2)
+
+Tối ưu inference bằng:
+
+- **INT8 quantization**: Giảm memory 2–4×
+- **KV-cache optimization**: Reuse computed attention keys/values
+- **Batched beam search**: Parallel decoding
+- **VAD-based chunking**: Chỉ process segments có speech
+
+::: {.callout-warning title="Latency Warning"}
+| Configuration | RTF (Real-Time Factor) | Latency (30s audio) | VRAM |
+|--------------|----------------------|---------------------|------|
+| Whisper Large-v3 (FP16, A100) | 0.03 | ~1s | 6 GB |
+| Whisper Large-v3 (INT8, T4) | 0.15 | ~4.5s | 3 GB |
+| faster-whisper Large-v3 (INT8, T4) | 0.05 | ~1.5s | 2 GB |
+| Distil-Whisper (INT8, T4) | 0.02 | ~0.6s | 1.5 GB |
+:::
+
+### 5.6.3 Whisper cho Tiếng Việt
+
+| Model | Vietnamese WER (FLEURS) | Ghi chú |
+|-------|------------------------|---------|
+| Whisper Tiny | ~35% | Quá nhỏ cho tonal language |
+| Whisper Small | ~18% | Acceptable cho demo |
+| Whisper Medium | ~12% | Good cho production |
+| Whisper Large-v3 | ~8% | Best, nhưng heavy |
+
+: Whisper Vietnamese performance {#tbl-whisper-vi}
+
+::: {.callout-note title="Vietnamese Challenges"}
+Tiếng Việt là tonal language (6 tones) — Whisper thường gặp lỗi với:
+
+- **Hỏi vs Ngã** tone confusion (Southern dialect merger)
+- **Regional accents**: Bắc/Trung/Nam rất khác biệt
+- **Code-switching**: Vietnamese + English trong business contexts
+- **Proper nouns**: Tên riêng Việt Nam thường bị sai
+
+Fine-tuning trên Vietnamese data cải thiện đáng kể — xem Chương 10.
+:::
+
+## 5.7 Tóm tắt
+
+| Aspect | Whisper |
+|--------|---------|
+| Architecture | Encoder-decoder Transformer |
+| Pre-training | 680K hours weak supervision |
+| Input | 30s mel spectrogram (80, 3000) |
+| Tasks | Transcription, translation, VAD, language ID |
+| Multilingual | 96 languages |
+| Best WER | 2.2% (Large-v3, LibriSpeech test-clean) |
+| Vietnamese | ~8% WER (FLEURS) |
+| Optimization | Distil-Whisper, faster-whisper, INT8 |
+
+: Whisper summary {#tbl-whisper-summary}
+
+Chương tiếp theo chuyển sang **Text-to-Speech (TTS)** — chiều ngược lại: từ text sang audio.

@@ -1,0 +1,111 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "Speech AI"
+  subtitle: "From Signal Processing to Full-Duplex Dialogue"
+  author: "Anonymous"
+  date: "2026-05-09"
+  language: vi
+  repo-url: https://github.com/tuandung222/speech-processing-book
+  repo-actions: [edit, issue]
+  sharing: [twitter, linkedin]
+  sidebar:
+    style: docked
+    search: true
+  chapters:
+    - index.qmd
+    - part: "Phần I: Nền tảng"
+      chapters:
+        - chapters/part1/01-nlp-to-speech.qmd
+        - chapters/part1/02-audio-fundamentals.qmd
+        - chapters/part1/03-speech-representations.qmd
+    - part: "Phần II: Nhận dạng Giọng nói (ASR)"
+      chapters:
+        - chapters/part2/04-asr-foundations.qmd
+        - chapters/part2/05-modern-asr.qmd
+        - chapters/part2/06-whisper-canary.qmd
+        - chapters/part2/07-streaming-asr.qmd
+    - part: "Phần III: Tổng hợp Giọng nói (TTS) & Audio Codecs"
+      chapters:
+        - chapters/part3/08-tts-foundations.qmd
+        - chapters/part3/09-end-to-end-tts.qmd
+        - chapters/part3/10-audio-codecs.qmd
+    - part: "Phần IV: Speech LLMs & Multimodal"
+      chapters:
+        - chapters/part4/11-speech-llms.qmd
+        - chapters/part4/12-multimodal-omni.qmd
+        - chapters/part4/13-full-duplex.qmd
+    - part: "Phần V: Speech Understanding & Translation"
+      chapters:
+        - chapters/part5/14-speech-classification.qmd
+        - chapters/part5/15-speech-translation.qmd
+    - part: "Phần VI: Tiếng Việt"
+      chapters:
+        - chapters/part6/16-vietnamese-speech.qmd
+        - chapters/part6/17-vietnamese-datasets.qmd
+    - part: "Phần VII: Tools & Production"
+      chapters:
+        - chapters/part7/18-training-frameworks.qmd
+        - chapters/part7/19-inference-engines.qmd
+        - chapters/part7/20-production-systems.qmd
+  appendices:
+    - chapters/appendices/appendix-a-notation.qmd
+    - chapters/appendices/appendix-b-proofs.qmd
+    - chapters/appendices/appendix-c-mapping.qmd
+    - chapters/appendices/appendix-d-code.qmd
+    - chapters/appendices/appendix-e-vietnamese-resources.qmd
+    - chapters/appendices/appendix-f-tool-comparison.qmd
+    - references.qmd
+
+bibliography: references.bib
+csl: ieee.csl
+
+format:
+  html:
+    theme:
+      light: cosmo
+      dark: darkly
+    code-fold: true
+    code-tools: true
+    code-line-numbers: true
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    highlight-style: github
+    mainfont: "Noto Serif"
+    monofont: "JetBrains Mono"
+    css: styles.css
+  pdf:
+    documentclass: scrbook
+    classoption: [oneside]
+    papersize: a4
+    fontsize: 11pt
+    toc: true
+    toc-depth: 3
+    number-sections: true
+    colorlinks: true
+    link-citations: true
+    code-overflow: wrap
+    code-block-font-size: "\\scriptsize"
+    include-in-header:
+      text: |
+        \usepackage{fvextra}
+        \fvset{breaklines=true,breaksymbol={}}
+        \setmonofont[Scale=0.78]{DejaVu Sans Mono}
+        \usepackage{longtable}
+        \usepackage{booktabs}
+        \usepackage{array}
+        \renewcommand{\arraystretch}{1.3}
+
+execute:
+  freeze: auto
+  echo: true
+  warning: false
+
+crossref:
+  eq-prefix: "Phương trình"
+  fig-prefix: "Hình"
+  tbl-prefix: "Bảng"
+  sec-prefix: "Mục"

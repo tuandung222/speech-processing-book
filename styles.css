@@ -1,0 +1,42 @@
+/* Speech AI Book — Custom Styles */
+
+/* Code blocks */
+div.sourceCode {
+  border-left: 3px solid #2196F3;
+  background-color: #f8f9fa;
+}
+
+.dark div.sourceCode {
+  background-color: #1a1a2e;
+}
+
+/* Callout styling */
+.callout-note {
+  border-left-color: #2196F3 !important;
+}
+
+.callout-warning {
+  border-left-color: #ff9800 !important;
+}
+
+.callout-tip {
+  border-left-color: #4caf50 !important;
+}
+
+/* Tables */
+table {
+  font-size: 0.9em;
+}
+
+/* Math equations */
+.math.display {
+  overflow-x: auto;
+  padding: 0.5em 0;
+}
+
+/* Architecture diagrams in code blocks */
+pre.ascii-art {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.85em;
+  line-height: 1.3;
+}
