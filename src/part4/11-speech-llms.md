@@ -1,6 +1,27 @@
-# Speech Language Models
+# Chương 11: Speech Language Models
 
-## Từ Text LLM đến Speech LLM
+## Vì sao chương này quan trọng
+
+Speech Language Models là điểm hội tụ giữa Speech AI và LLM revolution. Đối với người làm NLP/LLM, đây là lãnh thổ quen thuộc nhất: autoregressive Transformer trên discrete token, KV cache, in-context learning, function calling. Nhưng "token" ở đây không phải BPE text, mà là codec token sinh từ neural audio codec (Chương 10). Hiểu Speech LLM là điều kiện cần để đọc và xây dựng các sản phẩm voice AI hiện đại như Moshi (Kyutai), Qwen3-Omni (Alibaba), GPT-Realtime (OpenAI), Gemini Live (Google).
+
+Chương này phát triển bốn họ kiến trúc theo trình tự lịch sử và độ phức tạp:
+
+- **AudioLM**: hierarchical audio LM, đặt nền móng cho paradigm "audio as language".
+- **Qwen2-Audio**: speech-aware LLM với Whisper encoder cộng adapter, ASR + understanding + reasoning.
+- **Moshi**: full-duplex dual-stream Speech LLM, end-to-end speech-to-speech với latency dưới 300 ms.
+- **Qwen3-Omni và Qwen3.5-Omni**: MoE Thinker-Talker, open-source SOTA năm 2025-2026.
+
+Đồng thời chương cập nhật các release frontier trong Q4 2025 và năm 2026 (GPT-Realtime, MoshiRAG, Gemini 3 Live), để người đọc có bức tranh đầy đủ về landscape tại thời điểm viết.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: ba cấp độ tích hợp Speech vào LLM (cascaded, speech-aware, end-to-end).
+> - **Phần 2**: AudioLM, hierarchical audio language model.
+> - **Phần 3**: Qwen2-Audio, kiến trúc Whisper encoder cộng adapter cộng LLM.
+> - **Phần 4**: Moshi, full-duplex dual-stream và Depth Transformer.
+> - **Phần 5**: Q4 2025 và 2026 updates (Qwen3-Omni family, GPT-Realtime, MoshiRAG, Gemini Live).
+
+## Phần 1 — Từ Text LLM đến Speech LLM
 
 Speech Language Models mở rộng paradigm LLM sang audio modality. Có 3 cấp độ tích hợp:
 

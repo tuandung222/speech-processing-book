@@ -1,8 +1,25 @@
-# Multimodal Omni Models
+# Chương 12: Multimodal Omni Models
+
+## Vì sao chương này quan trọng
+
+Multimodal Omni models là một trong các xu hướng lớn nhất của AI giai đoạn 2024-2026: một model duy nhất xử lý đồng thời **text, audio, image, video**, vừa hiểu vừa sinh ở cả bốn modality. Khác với cascaded pipeline truyền thống (ASR → LLM → TTS) hay multimodal LLM thế hệ đầu (chỉ hỗ trợ một-hai modality), Omni models hợp nhất mọi modality vào một forward pass duy nhất, với latency thấp và khả năng cross-modal reasoning sâu hơn.
+
+Đối với người làm NLP/LLM, Omni model là "GPT-4 nhưng với speech và video native". Đối với engineer voice AI, Omni model thay thế nhiều thành phần của pipeline cascaded bằng một mô hình duy nhất, đơn giản hoá triển khai nhưng đặt ra thách thức mới về cost, observability, và customization.
+
+Chương này phân tích các kiến trúc tiêu biểu theo dòng thời gian: Qwen2.5-Omni (Thinker-Talker pattern), GPT-Realtime (OpenAI, GA tháng 8/2025), Gemini Live (Google), Qwen3-Omni (Alibaba, MoE Thinker-Talker, tháng 10/2025), và Qwen3.5-Omni Plus (tháng 3/2026, được công bố là vượt Gemini 3.1 Pro trên một số benchmark).
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: phân loại kiến trúc multimodal: cascaded, early fusion, omni.
+> - **Phần 2**: bốn cách encode audio cho LLM (spectrogram + adapter, codec tokens, SSL features, Thinker-Talker).
+> - **Phần 3**: Qwen2-Audio và Qwen2.5-Omni, Thinker-Talker pattern.
+> - **Phần 4**: GPT-Realtime, Gemini Live, các Omni model closed-source SOTA.
+> - **Phần 5**: Qwen3-Omni và Qwen3.5-Omni, open-source frontier 2025-2026.
+> - **Phần 6**: so sánh tổng hợp và xu hướng 2026-2027.
 
 ## Tổng quan
 
-Multimodal Omni models là xu hướng lớn nhất trong AI 2024-2026: một model duy nhất xử lý **text, audio, image, video** đồng thời. Chương này phân tích các kiến trúc tiêu biểu: **Qwen2.5-Omni**, **GPT-4o**, **Gemini**, và **Qwen3-Omni**.
+Multimodal Omni models là xu hướng lớn nhất trong AI 2024-2026: một model duy nhất xử lý **text, audio, image, video** đồng thời. Chương này phân tích các kiến trúc tiêu biểu: **Qwen2.5-Omni**, **GPT-Realtime**, **Gemini Live**, **Qwen3-Omni**, và **Qwen3.5-Omni**.
 
 > **📝 Omni = Tất cả trong Một**
 >
@@ -168,58 +185,127 @@ class ThinkerTalker(nn.Module):
         return text_logits, speech_logits
 ```
 
-## GPT-4o Voice Mode
+## GPT-Realtime (GA August 2025)
 
-GPT-4o [^openai2024gpt4o] từ OpenAI (2024):
+GPT-Realtime là model speech-to-speech tiên tiến nhất của OpenAI tại thời điểm GA tháng 8/2025, kế thừa GPT-4o Voice Mode (2024) và Advanced Voice Mode. Khác với pipeline cascaded, GPT-Realtime là một model duy nhất xử lý audio in và audio out trong cùng forward pass.
+
+### Đặc điểm chính (theo public docs OpenAI tháng 8/2025)
+
+- **Native multimodal**: audio input và output tích hợp trong cùng model, không qua bước transcription rõ ràng.
+- **Real-time voice**: target sub-500 ms first-byte latency trên mạng tốt.
+- **MCP server support**: tích hợp tool calling qua Model Context Protocol.
+- **Image input**: nhận hình ảnh kèm voice trong cuộc hội thoại.
+- **SIP phone calling**: cho phép trigger qua telephony stack tiêu chuẩn.
+- **Code-switching và multilingual**: chuyển ngôn ngữ tự nhiên trong cùng câu trả lời.
+
+### Pricing (tham khảo public pricing OpenAI tháng 8/2025)
+
+- Audio input: khoảng 0.03 USD per minute.
+- Audio output: khoảng 0.06 USD per minute.
+- Tổng cho voice agent điển hình: 0.05-0.10 USD per minute conversation, phụ thuộc tỷ lệ user nói và AI nói.
+
+### Hạn chế công khai
+
+- Kiến trúc chi tiết và số tham số không được công bố.
+- Không open-source.
+- Một số báo cáo cộng đồng cho thấy voice output đôi khi "too expressive" hoặc hallucinate âm thanh không phải lời nói trong audio output.
+
+### Basic Voice Mode retirement
+
+Tháng 9/2025, OpenAI sunset Basic Voice Mode (cascaded ASR + LLM + TTS), thống nhất mọi voice feature dưới Realtime API.
+
+## Gemini Live (Google)
+
+Gemini Live là dòng multimodal omni của Google, kế thừa Gemini multimodal:
+
+- **Gemini 2.0 Live (2025)**: streaming voice và video, tích hợp với Google Workspace và Vertex AI.
+- **Gemini 3 Live (2026)**: cải tiến translation, multi-speaker handling, latency thấp hơn.
+
+Đặc điểm chung:
+
+- Native multimodal from scratch (train đồng thời trên text, images, audio, video).
+- Long context: xử lý audio và video hàng giờ.
+- Closed-source, available qua Vertex AI và Gemini API.
+
+## Qwen3-Omni (October 2025)
+
+Qwen3-Omni là milestone quan trọng của open-source Speech LLM. Đây là Omni model dựa trên **MoE (Mixture-of-Experts) Thinker-Talker**, kế thừa và mở rộng pattern Thinker-Talker của Qwen2.5-Omni với capacity và đa ngôn ngữ lớn hơn nhiều.
+
+### Variants
+
+- **Qwen3-Omni-30B-A3B-Instruct**: text + audio + video input, text + audio output. Tổng 30B parameters với 3B active per forward pass (MoE).
+- **Qwen3-Omni-30B-A3B-Thinking**: hỗ trợ chain-of-thought reasoning trên multimodal input.
+- **Qwen3-Omni-30B-A3B-Captioner**: chuyên cho audio captioning.
+
+### Capabilities
+
+- 119 ngôn ngữ text input.
+- 19 ngôn ngữ speech input.
+- 10 ngôn ngữ speech output.
+- Apache 2.0 license, fully open-source.
+
+### Performance (theo Qwen3-Omni Technical Report, tháng 10/2025)
+
+- SOTA trên 22 trong 36 audio và audio-video benchmarks.
+- Open-source SOTA trên 32 trong 36 benchmark.
+- ASR, audio understanding, và voice conversation comparable với Gemini 2.5 Pro trên nhiều benchmark.
+
+### Qwen3-Omni-Flash (December 2025)
+
+Variant optimised cho inference latency, hướng tới production voice agent.
+
+## Qwen3.5-Omni (March 2026)
+
+Qwen3.5-Omni Plus (release tháng 3/2026) là phiên bản kế thừa Qwen3-Omni với capacity lớn hơn và benchmark cao hơn.
 
 ### Đặc điểm
 
-- **Native multimodal**: Audio input/output tích hợp trong model, không phải pipeline
-- **Real-time voice**: Latency ~320ms (trung bình)
-- **Emotion-aware**: Nhận biết và thể hiện cảm xúc trong giọng nói
-- **Code-switching**: Chuyển ngôn ngữ tự nhiên trong cùng response
+- Native multimodal: text, image, audio, video xử lý trong single forward pass.
+- Streaming speech output realtime.
+- Hỗ trợ chain-of-thought reasoning trên multimodal input.
 
-### Hạn chế (public knowledge)
+### Performance (theo Qwen3.5-Omni Technical Report, tháng 3/2026)
 
-- Kiến trúc chi tiết chưa được công bố
-- Không open-source
-- Voice output đôi khi "too expressive" hoặc hallucinate sounds
+- Đạt 215 SOTA results trên các benchmark audio, audio-video understanding, reasoning, và interaction.
+- Theo công bố chính thức, Qwen3.5-Omni Plus vượt Gemini 3.1 Pro trên general audio understanding, reasoning, và translation. Đây là cột mốc đáng chú ý vì lần đầu một open-source Omni model vượt closed-source SOTA trên các benchmark này.
 
-## Gemini Multimodal
+## So sánh tổng hợp (mid-2026)
 
-Gemini [^team2024gemini] từ Google:
-
-- **Native multimodal from scratch**: Train trên text, images, audio, video đồng thời
-- **Long context**: Xử lý audio/video hàng giờ
-- **Gemini 2.0 Flash**: Optimized cho real-time applications
-
-## So sánh Tổng hợp
-
-| Model | Tổ chức | Audio In | Audio Out | Real-time | Open-source |
-|-------|---------|----------|-----------|-----------|-------------|
-| Qwen2-Audio | Alibaba | Có | Không | Không | Có |
-| Qwen2.5-Omni | Alibaba | Có | Có | Có | Có |
-| GPT-4o | OpenAI | Có | Có | Có | Không |
-| Gemini 2.0 | Google | Có | Có | Có | Không |
-| SALMONN | ByteDance | Có | Không | Không | Có |
-| Moshi | Kyutai | Có | Có | Có | Có |
+| Model | Tổ chức | Năm | Audio In | Audio Out | Real-time | Open-source |
+|---|---|---|---|---|---|---|
+| Qwen2-Audio | Alibaba | 2024 | Có | Không | Không | Có |
+| Qwen2.5-Omni | Alibaba | 2025 | Có | Có | Có | Có |
+| Qwen3-Omni 30B-A3B | Alibaba | Oct 2025 | Có | Có | Có | Có |
+| Qwen3-Omni-Flash | Alibaba | Dec 2025 | Có | Có | Có | Có |
+| Qwen3.5-Omni Plus | Alibaba | Mar 2026 | Có | Có | Có | Có |
+| GPT-4o Voice Mode | OpenAI | 2024 | Có | Có | Có | Không |
+| GPT-Realtime | OpenAI | Aug 2025 | Có | Có | Có | Không |
+| Gemini 2.0 Live | Google | 2025 | Có | Có | Có | Không |
+| Gemini 3 Live | Google | 2026 | Có | Có | Có | Không |
+| SALMONN | ByteDance | 2024 | Có | Không | Không | Có |
+| Moshi | Kyutai | Sep 2024 | Có | Có | Có | Có |
+| Moshi v2 + MoshiRAG | Kyutai | Apr 2026 | Có | Có | Có | Có |
 
 : So sánh các Multimodal Omni Models <a id="tbl-omni-comparison"></a>
 
 ## Xu hướng 2025-2027
 
-1. **Thinker-Talker separation** trở thành pattern phổ biến
-2. **Streaming generation** - output speech trong khi vẫn đang reasoning
-3. **Multi-turn voice dialogue** với memory và context dài
-4. **Emotion control** và **style transfer** tích hợp trong Omni models
-5. **Open-source Omni** models ngày càng mạnh (Qwen, Moshi)
+Dựa trên các release giữa 2024 và đầu 2026, có thể nhận diện sáu xu hướng chính:
+
+1. **MoE Thinker-Talker** trở thành kiến trúc phổ biến nhất cho Omni model quy mô lớn, cho phép cân bằng giữa capacity và inference cost.
+2. **Native multimodal converging**: các bộ encoder riêng cho audio, image, video dần được thay bằng unified transformer xử lý cùng lúc.
+3. **Open-source bắt kịp closed-source**: Qwen3.5-Omni Plus được công bố vượt Gemini 3.1 Pro trên một số benchmark là một cột mốc đáng kể.
+4. **Latency target sub-300 ms first byte**: tất cả các Omni model production đều nhắm mức này để đối thoại tự nhiên.
+5. **Tool calling tích hợp**: GPT-Realtime hỗ trợ MCP, Qwen3-Omni hỗ trợ function calling natively, cho phép Omni model điều khiển hành động thực tế.
+6. **RAG cho speech**: MoshiRAG (tháng 4/2026) cho thấy retrieval-augmented speech LM trở thành paradigm mới, giải quyết hạn chế về kiến thức của Speech LLM thuần.
 
 ## Tóm tắt
 
-1. **Omni models** xử lý mọi modality trong một model duy nhất
-2. **Qwen2.5-Omni** với kiến trúc **Thinker-Talker** là SOTA open-source
-3. **GPT-4o** và **Gemini** dẫn đầu về chất lượng nhưng không open-source
-4. Xu hướng: streaming generation, emotion-aware, long context
+1. **Omni models** xử lý nhiều modality trong một model duy nhất, từ understanding đến generation.
+2. **Thinker-Talker pattern** (Qwen2.5-Omni, Qwen3-Omni) cho phép tách reasoning và speech generation, giảm latency.
+3. **GPT-Realtime** (Aug 2025) và **Gemini 3 Live** (2026) là closed-source SOTA cho voice agent production.
+4. **Qwen3-Omni** và **Qwen3.5-Omni Plus** là open-source SOTA hiện tại, với Qwen3.5-Omni Plus được công bố vượt Gemini 3.1 Pro trên một số benchmark.
+5. **Xu hướng**: MoE, streaming, tool calling, RAG, multilingual.
 
 
 
