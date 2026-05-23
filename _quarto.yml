@@ -2,9 +2,6 @@ project:
   type: book
   output-dir: _book
 
-execute:
-  enabled: false
-
 book:
   title: "Speech AI"
   subtitle: "From Signal Processing to Full-Duplex Dialogue"
@@ -106,7 +103,8 @@ execute:
   freeze: auto
   echo: true
   warning: false
-
+enabled: false
+  
 crossref:
   eq-prefix: "Phương trình"
   fig-prefix: "Hình"
