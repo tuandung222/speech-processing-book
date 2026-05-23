@@ -59,7 +59,105 @@ Mỗi concept abstract nên có **ít nhất 1 analogy** từ NLP, daily life, h
 | **CS** | "Beam search giống DFS với pruning" |
 | **Linear algebra** | "Mel filterbank là ma trận triangular weights" |
 
-### 1.5 Flowing prose, không bullet-dump
+### 1.5 GIỌNG VĂN NATURAL — Giảng viên Việt nói chuyện, không robot
+
+**ĐÂY LÀ NGUYÊN TẮC QUAN TRỌNG NHẤT.** Văn phong phải nghe như một giảng viên Việt đang đứng lớp, nhiệt huyết, đôi khi vui đùa, đôi khi nghiêm túc, KHÔNG phải textbook đều đều khô khan.
+
+#### Patterns natural lecturer Việt
+
+✅ **Bắt đầu paragraph với rhetorical question**:
+
+> "Bạn có để ý điều gì lạ ở đây không?"
+> "Đến đây bạn chắc đang nghĩ: vậy tại sao không dùng X?"
+> "Hãy thử nghĩ thử một chút — nếu bỏ bước này thì sẽ ra sao?"
+
+✅ **Surprise/excitement ở các điểm thú vị**:
+
+> "Và đây mới là chỗ hay nhất:"
+> "Bùm! Đó chính là lý do."
+> "Cực kỳ elegant phải không?"
+
+✅ **Acknowledge difficulty / pause**:
+
+> "Phần này hơi khó nhằn một chút, mình đi từ từ nhé."
+> "Đoạn formula này khó đọc, nhưng đừng lo — mình sẽ dịch ra plain English ngay."
+> "Hồi mình mới đọc paper này, cũng phải đọc lại 3 lần mới hiểu."
+
+✅ **Personal touches, dùng "mình" hoặc "tôi"**:
+
+> "Mình thường khuyên junior nên đọc paper này trước."
+> "Tôi từng deploy thử và thấy..."
+
+✅ **Conversational connectors**:
+
+> "OK giờ qua phần tiếp theo nhé."
+> "Anyway, quay lại câu hỏi cũ..."
+> "Alright, đến đây chắc bạn đã nắm cơ bản rồi."
+> "Nói thật là..."
+
+✅ **Mix Vietnamese-English natural như dev VN nói chuyện**:
+
+> "Pipeline này có 3 stages: encoder, decoder, vocoder. Mỗi stage có thể train độc lập, swap independently."
+> "Cái này gọi là 'in-context learning' — bạn show vài examples, model tự generalize."
+> "OK so giờ ta cần handle case khi user nói code-switched."
+
+❌ **TUYỆT ĐỐI TRÁNH**:
+
+> ❌ "Phần này thảo luận về..." (đều đều, textbook)
+> ❌ "Chương này tổng hợp..." (impersonal)
+> ❌ "Ta sẽ xem xét..." (anonymous voice)
+> ❌ "Trong phần này, ta sẽ nghiên cứu..." (cold academic)
+> ❌ "Cần lưu ý rằng..." (textbook-y)
+
+#### Compare bad vs good
+
+❌ **BAD** (robotic, even-tone, textbook):
+> Phần này thảo luận về CTC loss. CTC loss được định nghĩa là âm log của tổng xác suất trên tất cả các paths có thể collapse về target. Cần lưu ý rằng CTC giả định các output tại các time steps là độc lập có điều kiện.
+
+✅ **GOOD** (natural Vietnamese lecturer):
+> OK giờ ta vào phần thú vị nhất của CTC: cái loss function. Nhìn vào công thức bên dưới đừng hoảng nhé:
+>
+> $$\mathcal{L}_{CTC} = -\log \sum_{\pi \in \mathcal{B}^{-1}(Y)} \prod_{t=1}^{T} P(\pi_t | X)$$
+>
+> Dịch ra plain English: "tổng xác suất trên TẤT CẢ các paths khả dĩ mà collapse về đúng target Y, lấy log âm". Nghe phức tạp, nhưng intuition rất đẹp.
+>
+> Bạn đã thấy seq2seq dùng cross-entropy đúng không? Mỗi step decoder có 1 target token cụ thể, model học predict đúng cái đó. CTC khác: model không biết "frame nào tương ứng với character nào", nên thay vì pick 1 alignment, nó **marginalize** trên TẤT CẢ alignment khả dĩ. Bùm, đó là toàn bộ idea.
+>
+> Có một subtle assumption ở đây: CTC giả định các output tại mỗi time step độc lập có điều kiện cho input. Đây là điểm yếu mà RNN-T sau này khắc phục. Mình sẽ quay lại lúc nói về RNN-T.
+
+Thấy sự khác biệt chứ? Bản GOOD có:
+- Câu mở rhetorical/casual ("OK giờ ta vào phần thú vị nhất...")
+- Acknowledge difficulty ("đừng hoảng nhé")
+- Dịch math ra plain English ngay sau công thức
+- Bridge sang concept đã quen (seq2seq cross-entropy)
+- Excitement đánh dấu insight ("Bùm, đó là toàn bộ idea")
+- Personal voice ("Mình sẽ quay lại lúc nói về...")
+- Tự nhiên mix Vi-En ("marginalize", "alignment", "subtle assumption", "code-switched", "swap independently")
+
+#### Quy tắc về mix Vi-En
+
+- ✅ Dùng English cho **technical terms ngắn và rõ**: encoder, decoder, pipeline, latency, throughput, fine-tune, deploy, baseline, mainstream, etc.
+- ✅ Dùng English cho **acronyms**: ASR, TTS, NLP, LLM, MoE, KV cache, etc.
+- ✅ Dùng English cho **modern jargon**: code-switching, hallucination, prompt engineering, function calling, in-context learning, etc.
+- ✅ Dùng Vietnamese cho **concepts có translation rõ và phổ biến**: âm thanh, tần số, giọng nói, ngữ nghĩa, tín hiệu.
+- ❌ KHÔNG cố ép translate mọi thuật ngữ ("siêu tham số" thay "hyperparameter" → tệ).
+- ❌ KHÔNG dùng English chỗ không cần (đừng nói "I think rằng..." khi "Mình nghĩ rằng..." đẹp hơn).
+
+#### Pacing — đừng đều đều
+
+Pacing biến đổi giữa các đoạn:
+
+- **Đoạn nặng kỹ thuật** (formula, math): chậm, careful, giải thích từng dòng.
+- **Đoạn intuition**: nhanh, animated, dùng analogy ngay.
+- **Đoạn transition**: ngắn gọn, conversational ("OK giờ ta thử thực tế hơn...").
+- **Đoạn summary**: structured nhưng vẫn có personality.
+
+Tránh:
+- Mọi paragraph cùng độ dài.
+- Mọi câu cùng cấu trúc.
+- Không bao giờ có short punchy sentence ("Đúng vậy." "Chính xác." "Đó là điểm cốt lõi.").
+
+### 1.6 Flowing prose, không bullet-dump
 
 ❌ **BAD** (bullet dump):
 > CTC có 3 đặc điểm:
