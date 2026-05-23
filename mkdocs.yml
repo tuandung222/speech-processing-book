@@ -51,7 +51,6 @@ nav:
 theme:
   name: material
   language: vi
-  custom_dir: overrides
   font:
     text: Inter
     code: JetBrains Mono
