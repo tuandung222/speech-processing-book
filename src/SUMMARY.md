@@ -42,6 +42,7 @@
 - [Chương 18: Training Frameworks](./part7/18-training-frameworks.md)
 - [Chương 19: Inference Engines](./part7/19-inference-engines.md)
 - [Chương 20: Production Systems](./part7/20-production-systems.md)
+- [Chương 21: Wake-Word Detection (KWS)](./part7/21-wake-word-detection.md)
 
 # Phụ lục
 
