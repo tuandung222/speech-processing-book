@@ -14,18 +14,18 @@ Updated continuously during autonomous A-Z rewrite session.
 | Phase | Description | Status | Notes |
 |---|---|---|---|
 | 0 | Baseline + tracker | done | This file. |
-| 1 | STYLE_GUIDE.md professional rewrite | pending | |
-| 2 | SUMMARY/index/book.toml/README sync | pending | |
-| 3 | Part 0 + Part I (Ch0-Ch3) | pending | Ch0 new file. |
-| 4 | Part II ASR (Ch4-Ch7) | pending | |
-| 5 | Part III TTS+codecs (Ch8-Ch10) | pending | |
-| 6 | Part IV Speech LLM (Ch11-Ch13) | pending | |
-| 7 | Part V app layer (Ch14, Ch15, Ch21) | pending | Ch15 + Ch21 already expanded, audit tone. |
-| 8 | Part VI Vietnamese (Ch16-Ch17 + App E) | pending | Ch16 already has industry section. |
-| 9 | Part VII production (Ch18-Ch20 + App F) | pending | Ch19/Ch20 already expanded, audit tone. |
-| 10 | Appendices A-D + references.md | pending | |
-| 11 | Repo docs + theme polish | pending | |
-| 12 | Final QA + SESSION_REPORT | pending | |
+| 1 | STYLE_GUIDE.md professional rewrite | done | Section 1.5 rewritten, duplicate 1.6 fixed. |
+| 2 | SUMMARY/index/book.toml/README sync | done | Phần 0 added; README later set to empty per user. |
+| 3 | Part 0 + Part I (Ch0-Ch3) | done | Ch0 new 510 lines; Ch1 tone audit; Ch2/Ch3 intros. |
+| 4 | Part II ASR (Ch4-Ch7) | done | Intros for Ch4-Ch7; Ch6 em-dash fix. |
+| 5 | Part III TTS+codecs (Ch8-Ch10) | done | Intros for Ch8-Ch10; Ch9 em-dash fix. |
+| 6 | Part IV Speech LLM (Ch11-Ch13) | done | Ch11 intro; Ch12 + Ch13 intros and expansions (Q4 2025/2026). |
+| 7 | Part V app layer (Ch14, Ch15, Ch21) | done | Ch14 intro; Ch15/Ch21 already had intros. |
+| 8 | Part VI Vietnamese (Ch16-Ch17 + App E) | done | Ch16/Ch17 intros; App E reorganized; typos fixed. |
+| 9 | Part VII production (Ch18-Ch20 + App F) | done | Ch18/Ch19 intros; Ch20 already had intro; App F reorganized. |
+| 10 | Appendices A-D + references.md | done | App A-D add Phụ lục N: prefix; references.md rewritten. |
+| 11 | Repo docs + theme polish | done | Theme already good; docs updated. |
+| 12 | Final QA + SESSION_REPORT | done | Build clean, 0 KaTeX errors, 0 forbidden phrases. |
 
 ## File-level tracking
 
