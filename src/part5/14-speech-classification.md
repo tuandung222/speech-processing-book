@@ -1,4 +1,25 @@
-# Speech Classification
+# Chương 14: Speech Classification
+
+## Vì sao chương này quan trọng
+
+Speech classification là một họ bài toán không sinh text như ASR mà sinh **nhãn** từ audio: đây là ai (speaker identification), người này có phải là chủ tài khoản (speaker verification), giọng nói có cảm xúc gì (emotion recognition), tiếng nào (language identification), âm thanh nào ngoài tiếng nói (audio event classification). Đối với ML engineer NLP/LLM, nhóm bài toán này tương đương image classification trong CV: kiến trúc encoder cộng classification head, đánh giá bằng accuracy hoặc EER, và thường dễ deploy hơn ASR vì output đơn giản hơn.
+
+Trong production, các bài toán này xuất hiện ở nhiều ngữ cảnh thực tế:
+
+- **Speaker verification**: voice biometrics cho ngân hàng và KYC (Trusting Social đang triển khai tại Việt Nam).
+- **Speaker diarization**: tách cuộc họp thành các đoạn của từng người nói, cần cho transcription analytics.
+- **Emotion recognition**: call center analytics, customer satisfaction prediction.
+- **Language identification**: routing đa ngôn ngữ cho voice agent.
+- **Audio event detection**: smart home (phát hiện kính vỡ, em bé khóc), safety (gunshot detection), môi trường công nghiệp.
+
+> **Cấu trúc chương**
+>
+> - **Phần 1**: tổng quan, vị trí của speech classification trong pipeline Speech AI.
+> - **Phần 2**: speaker recognition (identification, verification, diarization), kiến trúc x-vector và ECAPA-TDNN.
+> - **Phần 3**: emotion recognition, dimensional vs categorical, các benchmark IEMOCAP và MELD.
+> - **Phần 4**: language identification, đặc biệt cho code-switching.
+> - **Phần 5**: audio event classification, AudioSet và các kiến trúc PANN, AST.
+> - **Phần 6**: metrics và evaluation, lựa chọn loss function.
 
 ## Tổng quan
 
