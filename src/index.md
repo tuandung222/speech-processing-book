@@ -33,9 +33,9 @@ Cuốn sách được thiết kế cho:
 
 ## Cấu trúc Cuốn sách
 
-Cuốn sách được thiết kế **không phải để đọc tuyến tính từ đầu đến cuối** cho mọi người. Mỗi phần phục vụ một mục đích sư phạm khác nhau, và bạn nên đọc theo lộ trình phù hợp với background của bạn (xem mục **Hướng dẫn Đọc** ngay sau đây).
+Cuốn sách được thiết kế để đọc theo lộ trình phù hợp với background của bạn, không nhất thiết phải đọc tuyến tính từ đầu đến cuối. Mỗi phần phục vụ một mục đích sư phạm riêng. Xem mục **Hướng dẫn Đọc** ngay sau đây để chọn lộ trình.
 
-Cuốn sách có **8 phần** (bao gồm Phần 0 nền tảng mới thêm) và **6 phụ lục**, với khoảng **22 chương** và đang được mở rộng dần.
+Cuốn sách gồm **8 phần** (bao gồm Phần 0 nền tảng cổ điển) và **6 phụ lục**, tổng cộng **22 chương** (Chương 0 đến Chương 21), đang được mở rộng dần.
 
 ### Phần 0 — Nền tảng cổ điển (mới)
 
@@ -53,7 +53,7 @@ Phần quan trọng nhất để định hướng tư duy. Phần I xây dựng 
 
 ### Phần II — Nhận dạng giọng nói (ASR) (Chương 4-7)
 
-Bài toán Speech-to-Text — bài toán Speech AI lâu đời nhất, có nhiều thành tựu nhất, và là cửa ngõ thực tiễn vào ngành.
+Bài toán Speech-to-Text, bài toán Speech AI lâu đời nhất, có nhiều thành tựu nhất, và là cửa ngõ thực tiễn vào ngành.
 
 - **Chương 4**: ASR Foundations — CTC, Sequence-to-Sequence with Attention, RNN-Transducer
 - **Chương 5**: Modern ASR Architectures — Conformer, Zipformer, E-Branchformer
@@ -101,7 +101,7 @@ Phần dành cho engineer triển khai thực tế. Khác Phần I-IV (focus lý
 
 ### Phụ lục (Appendices A-F)
 
-Reference material — tra cứu khi cần, không cần đọc tuần tự.
+Reference material để tra cứu khi cần, không cần đọc tuần tự.
 
 - **A**: Notation Reference — quy ước ký hiệu toán học
 - **B**: Mathematical Proofs — chứng minh chi tiết cho CTC forward-backward, mel filterbank, etc.
@@ -131,33 +131,37 @@ Phần I là **prerequisite cho tất cả** (trừ Phần 0). Phần II-IV có 
 
 ## Hướng dẫn Đọc
 
-### Đến từ LLM/GPT research:
+### Đến từ LLM/GPT research
 
-1. **Chương 1** (NLP-to-Speech Bridge) - bắt đầu từ đây
-2. **Chương 11-13** (Speech LLMs, Multimodal, Full-Duplex) - lãnh thổ quen thuộc nhất
-3. **Chương 2-3** (Audio Fundamentals, Representations) - bổ sung signal processing
-4. Các chương còn lại theo thứ tự
+1. **Chương 1** (NLP-to-Speech Bridge): bắt đầu từ đây.
+2. **Chương 11-13** (Speech LLMs, Multimodal, Full-Duplex): lãnh thổ quen thuộc nhất.
+3. **Chương 2-3** (Audio Fundamentals, Representations): bổ sung signal processing.
+4. Các chương còn lại theo thứ tự.
 
-### Đến từ NLP/BERT research:
+### Đến từ NLP/BERT research
 
-1. **Chương 1** - **Chương 2-3** - **Chương 4** (ASR ~ seq2seq translation)
-2. **Chương 5-7** (Modern ASR) - **Chương 8-10** (TTS & Codecs) - **Chương 11-13** (Speech LLMs)
+1. **Chương 1**, **Chương 2-3**, **Chương 4** (ASR ~ seq2seq translation).
+2. **Chương 5-7** (Modern ASR), **Chương 8-10** (TTS & Codecs), **Chương 11-13** (Speech LLMs).
 
-### Đến từ CV/Computer Vision:
+### Đến từ CV/Computer Vision
 
-1. **Chương 2** (signal processing tuong tu image features)
-2. **Chương 14** (speech classification ~ image classification)
-3. **Chương 3** (self-supervised learning ~ SimCLR/DINO for audio)
+1. **Chương 2** (signal processing tương tự image features).
+2. **Chương 14** (speech classification tương tự image classification).
+3. **Chương 3** (self-supervised learning, tương đương SimCLR/DINO cho audio).
 
-### Muốn triển khai production ngay:
+### Cần triển khai production ngay
 
-1. **Chương 18-20** (Training frameworks, Inference engines, Production systems)
-2. **Phụ lục F** (Tool comparison matrices)
-3. Quay lại lý thuyết khi cần
+1. **Chương 18-20** (Training frameworks, Inference engines, Production systems).
+2. **Phụ lục F** (Tool comparison matrices).
+3. Quay lại lý thuyết khi cần.
 
-### Đọc toàn bộ (comprehensive):
+### Đọc toàn bộ (comprehensive)
 
-Chương 1 - 2 - 3 - ... - 20, theo thứ tự. Đây là lộ trình được recommend.
+Chương 0 đến Chương 21 theo thứ tự. Đây là lộ trình được khuyến nghị cho người đọc lần đầu tiếp cận Speech AI một cách hệ thống.
+
+### Thiếu nền tảng signal processing hoặc HMM-GMM
+
+Đọc **Chương 0** trước. Chương 0 cung cấp linguistics, acoustics, DSP và ML cổ điển ở mức ôn tập, đủ để hiểu các chương sau mà không cần đi quá sâu vào textbook truyền thống.
 
 ## Conventions
 

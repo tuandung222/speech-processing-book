@@ -2,7 +2,11 @@
 
 [Trang chủ](./index.md)
 
-# Phần I — Nền tảng
+# Phần 0 — Nền tảng cổ điển
+
+- [Chương 0: Linguistics, Acoustics, DSP, Traditional ML](./part0/00-foundations-review.md)
+
+# Phần I — Cầu nối khái niệm
 
 - [Chương 1: Từ NLP đến Speech](./part1/01-nlp-to-speech.md)
 - [Chương 2: Audio Signal Fundamentals](./part1/02-audio-fundamentals.md)
