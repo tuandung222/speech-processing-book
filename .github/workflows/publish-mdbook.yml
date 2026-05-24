@@ -11,6 +11,7 @@ permissions:
 env:
   MDBOOK_VERSION: 0.4.40
   MDBOOK_KATEX_VERSION: 0.9.4
+  MDBOOK_MERMAID_VERSION: 0.13.0
 
 jobs:
   deploy:
@@ -27,7 +28,7 @@ jobs:
             ~/.cargo/registry/cache
           key: cargo-${{ runner.os }}-mdbook-${{ env.MDBOOK_VERSION }}-katex-${{ env.MDBOOK_KATEX_VERSION }}
 
-      - name: Install mdBook + mdbook-katex
+      - name: Install mdBook preprocessors
         run: |
           if ! command -v mdbook >/dev/null 2>&1; then
             cargo install --version ${{ env.MDBOOK_VERSION }} mdbook
@@ -35,8 +36,12 @@ jobs:
           if ! command -v mdbook-katex >/dev/null 2>&1; then
             cargo install --version ${{ env.MDBOOK_KATEX_VERSION }} mdbook-katex
           fi
+          if ! command -v mdbook-mermaid >/dev/null 2>&1; then
+            cargo install --version ${{ env.MDBOOK_MERMAID_VERSION }} --locked mdbook-mermaid
+          fi
           mdbook --version
           mdbook-katex --version
+          mdbook-mermaid --version
 
       - name: Build book
         run: mdbook build
