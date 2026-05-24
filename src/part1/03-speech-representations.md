@@ -37,7 +37,7 @@ flowchart LR
     CLAP --> RET["Retrieval / zero-shot classification"]
 ```
 
-**Hình:** Bốn hướng biểu diễn audio. Điểm cần nhớ là không có representation “tốt nhất” cho mọi bài toán. Representation tốt là representation giữ đúng thông tin cần cho task và loại bỏ thông tin gây nhiễu.
+**Hình:** Bốn hướng biểu diễn audio. Điểm cần nhớ là không có representation phù hợp tuyệt đối cho mọi bài toán. Representation tốt là representation giữ đúng thông tin cần cho task và loại bỏ thông tin gây nhiễu.
 
 ### Từ feature engineering tới representation learning
 

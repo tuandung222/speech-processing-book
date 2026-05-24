@@ -943,7 +943,7 @@ Trước khi sang Chương 2, hãy tự trả lời ngắn gọn:
 3. Wav2Vec/HuBERT khác BPE ở điểm nào?
 4. Vì sao codec tokens là điều kiện quan trọng cho Speech LLM generative?
 5. Nếu xây dựng voice agent tiếng Việt, bạn chọn cascaded pipeline hay native Speech LLM trước? Vì sao?
-6. Với một hệ thống realtime, representation nào làm giảm token rate tốt nhất?
+6. Với một hệ thống realtime, representation nào làm giảm token rate hiệu quả nhất trong các lựa chọn đã học?
 
 Nếu chưa trả lời được, hãy quay lại Phần 2 và bảng mapping ở Phần 3. Các chương sau sẽ dùng lại những khái niệm này liên tục.
 
