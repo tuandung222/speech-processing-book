@@ -22,6 +22,33 @@ Ba phần còn lại của Part I (Chương 2-3) sẽ đi sâu vào hai bước 
 >
 > Mỗi khi gặp một khái niệm Speech mới, chương sẽ dừng lại và bắc cầu sang NLP equivalent. Người đọc sẽ thấy rằng "thư viện trực giác" được xây dựng từ NLP không hề bị vứt bỏ, nó chỉ cần được mở rộng.
 
+### Bản đồ cầu nối NLP → Speech
+
+Để đọc chương này hiệu quả, hãy giữ một bảng ánh xạ rất đơn giản trong đầu:
+
+```mermaid
+flowchart LR
+    TEXT["Text string"] --> BPE["BPE / SentencePiece"]
+    BPE --> TID["Token IDs"]
+    TID --> TEMB["Token embeddings"]
+    TEMB --> TR["Transformer"]
+
+    WAV["Waveform"] --> FEAT["Mel / SSL / Codec"]
+    FEAT --> AID["Frames or audio tokens"]
+    AID --> AEMB["Audio embeddings"]
+    AEMB --> TR
+```
+
+Chương này không yêu cầu bạn quên NLP. Ngược lại, nó yêu cầu bạn hỏi cùng một câu cho audio: “tokenizer là gì, sequence dài bao nhiêu, embedding được tạo ra thế nào, và output được decode ra sao?”
+
+| Câu hỏi quen thuộc trong NLP | Phiên bản tương ứng trong Speech |
+|---|---|
+| Tokenizer chia text thế nào? | Feature extractor/codec chia waveform thế nào? |
+| Vocabulary size bao nhiêu? | Codebook size hoặc frame dimension bao nhiêu? |
+| Sequence length có vượt context không? | Audio frame/token rate có quá dài không? |
+| Positional encoding dùng gì? | Time encoding và chunking xử lý ra sao? |
+| Decode bằng greedy/beam/sampling? | ASR decode text hay codec LM decode audio token? |
+
 ## Phần 1 — Vấn đề cốt lõi: Discrete vs Continuous
 
 ### 1.1 Thế giới NLP: bạn đã quen thuộc với gì?
@@ -48,6 +75,20 @@ Pipeline này có vài đặc điểm đáng để gọi tên rõ ràng:
 - **Information density cao**. Mỗi token mang nhiều thông tin ngữ nghĩa, không có token nào "redundant" theo nghĩa lý thuyết thông tin.
 
 Hãy giữ những đặc điểm này trong đầu khi ta nhìn sang thế giới speech.
+
+### 1.1.1 Điều gì “dễ” trong NLP mà Speech không có?
+
+Text đã được con người chuẩn hóa trước khi vào model. Một câu văn đã loại bỏ phần lớn biến thiên vật lý: ai nói, micro nào, phòng vang ra sao, người nói mệt hay khỏe, tốc độ nói nhanh hay chậm. Speech thì giữ tất cả những biến thiên đó.
+
+| Trong NLP | Trong Speech |
+|---|---|
+| Text gần như không phụ thuộc người viết ở mức ký tự | Waveform phụ thuộc speaker, microphone, room, emotion |
+| Token boundary thường rõ sau tokenizer | Phoneme boundary không quan sát trực tiếp |
+| Input ít noise vật lý | Input có background noise, clipping, reverberation |
+| Alignment token-token trong MT tương đối mềm | Alignment audio-text monotonic nhưng không biết trước |
+| Evaluation có thể nhìn text output | Evaluation TTS cần human perception hoặc proxy metric |
+
+Đây là lý do Speech AI luôn có thêm một lớp “data engineering vật lý” mà NLP thuần thường ít gặp.
 
 ### 1.2 Thế giới Speech: vấn đề là gì?
 
@@ -78,6 +119,18 @@ Hậu quả là:
 - **Sequence length của audio cực dài**. 10 giây audio = 160,000 samples. So với 10 giây speech được transcribe ra text khoảng 40 tokens. Tỉ lệ 4000:1.
 - **Self-attention $O(L^2)$ trở thành thảm hoạ**. Nếu cứ vô tư embedding 160K samples rồi cho qua transformer, FLOPs sẽ vượt cả LLM training. Đây là lý do mọi kiến trúc Speech AI đều có bước **downsampling** trước transformer.
 - **Mỗi sample không có ngữ nghĩa riêng**. Không thể "embedding lookup" giống NLP vì không có vocabulary cố định.
+
+Một phép tính nhỏ giúp thấy vấn đề rõ hơn:
+
+| Biểu diễn 10 giây speech | Sequence length xấp xỉ | Có thể đưa thẳng vào Transformer không? |
+|---|---:|---|
+| Raw waveform 16 kHz | 160,000 samples | Không thực tế với attention chuẩn |
+| Log-mel 10 ms hop | 1,000 frames | Có thể, sau projection/downsampling |
+| Wav2Vec latent | khoảng 500 frames | Có thể, phù hợp encoder |
+| Mimi codec token rate | khoảng 125 time steps | Rất phù hợp cho Speech LLM |
+| Transcript text | 30-50 tokens | Rất ngắn, nhưng mất prosody/audio |
+
+Bài học: không phải mọi “tokenization” đều tương đương nhau. Tokenizer tốt cho speech phải vừa nén mạnh, vừa giữ đúng thông tin cần cho task.
 
 ### 1.3 Câu hỏi trung tâm của Speech AI
 
@@ -316,6 +369,19 @@ Một xu hướng quan trọng năm 2024-2026: nhiều system "lai" dùng cả 3
 - Mel spectrogram cho training vocoder side.
 
 Hiểu rõ ưu nhược điểm của từng con đường giúp bạn đọc paper modern một cách thông thái.
+
+### 2.5 Ví dụ chọn biểu diễn theo sản phẩm
+
+| Sản phẩm | Biểu diễn nên bắt đầu | Lý do |
+|---|---|---|
+| Transcribe meeting offline | log-mel + Whisper/Conformer | robust, dễ triển khai, output text |
+| ASR tiếng Việt low-resource | Whisper/PhoWhisper hoặc SSL fine-tune | tận dụng pretraining multilingual |
+| Voice agent realtime | streaming ASR hoặc codec-based speech model | latency và partial hypothesis quan trọng |
+| TTS đọc sách | mel + diffusion/flow hoặc codec TTS | cần naturalness và ổn định long-form |
+| Full-duplex dialogue | Mimi/codec tokens + streaming LM | cần audio in/out liên tục |
+| Audio event retrieval | CLAP/audio-text embedding | query bằng text, không cần transcript |
+
+Nếu chưa chắc chọn gì, hãy hỏi: output cuối cùng là text hay audio? Có cần realtime không? Có cần giữ giọng/speaker/prosody không? Có cần chạy on-prem không? Câu trả lời sẽ quyết định representation.
 
 ## Phần 3 — NLP↔Speech Concept Mapping (Big picture)
 
@@ -559,7 +625,7 @@ Pipeline:
 2. Fine-tune với CTC loss trên 100 giờ labeled (LibriSpeech).
 3. Đạt WER rất cạnh tranh trên LibriSpeech trong thiết lập được công bố, dù dùng ít labeled data hơn nhiều so với các hệ thống supervised quy mô lớn.
 
-Đây là minh chứng rằng **self-supervised + ít labeled data > nhiều labeled data**, ít nhất với English.
+Đây là minh chứng rằng **self-supervised pretraining + một lượng labeled data nhỏ** có thể cạnh tranh rất mạnh với supervised training truyền thống trong một số benchmark tiếng Anh. Không nên đọc câu này như một định luật tuyệt đối cho mọi ngôn ngữ và domain.
 
 Whisper (2022) là counterexample: train hoàn toàn supervised trên 680K giờ. Performance rất mạnh, đặc biệt zero-shot multilingual. Cho thấy "data scaling" cũng có giá trị riêng.
 
@@ -579,12 +645,13 @@ Codec tokens (EnCodec, Mimi) làm "tokenizer", một Transformer LM (GPT-style) 
 - AudioLM (2023): audio continuation (cho 3 giây speech, sinh 30 giây tiếp).
 - Moshi (2024): full-duplex dialogue (nghe + nói đồng thời).
 
-**5.4.2 Embedding-based Multimodal LLM (Qwen2-Audio, Qwen2.5-Omni, Gemini)**
+**5.4.2 Embedding/Omni-based Multimodal LLM (Qwen2-Audio, Qwen2.5-Omni, Qwen3-Omni, Gemini)**
 
 Audio encoder (Wav2Vec, Whisper encoder, hoặc dedicated) → continuous embeddings → adapter (linear) → LLM (frozen hoặc fine-tune). Output là text.
 
 - Qwen2-Audio (2024): understanding audio (caption, QA, classification).
-- Qwen2.5-Omni (2025): unified text + audio + image + video in single transformer.
+- Qwen2.5-Omni (2025): unified text + audio + image + video trong kiến trúc Thinker-Talker.
+- Qwen3-Omni (2025): MoE Thinker-Talker, hỗ trợ Vietnamese speech input theo README chính thức, speech output tiếng Việt chưa nằm trong danh sách chính thức.
 - Gemini 2.0 (2025): native multimodal, streaming.
 
 **5.4.3 Hybrid (Whisper + LLM)**
@@ -599,40 +666,28 @@ Whisper transcribe → text → LLM xử lý → text output → TTS. Pipeline c
 
 ### 5.5 Cây taxonomy tổng hợp
 
-```
-Speech AI Models
-│
-├── Era 1: Hybrid (HMM-DNN)        [legacy, 2010-2015]
-│   ├── Kaldi-style
-│   └── DNN-HMM hybrid
-│
-├── Era 2: End-to-End                [2015-2020]
-│   ├── CTC (DeepSpeech 2, Jasper)
-│   ├── Attention (LAS)
-│   └── RNN-T (Google Streaming ASR)
-│
-├── Era 3: Self-supervised           [2020-2023]
-│   ├── Wav2Vec 2.0
-│   ├── HuBERT
-│   ├── WavLM
-│   └── XLS-R (multilingual)
-│
-└── Era 4: Speech LLMs               [2023+]
-    ├── Codec-based
-    │   ├── AudioLM
-    │   ├── VALL-E
-    │   ├── Moshi
-    │   └── Qwen2.5-Omni
-    ├── Embedding-based
-    │   ├── Qwen2-Audio
-    │   ├── Gemini 2.0
-    │   └── GPT-4o (partial speculation)
-    └── Hybrid pipeline
-        ├── Whisper + LLM + TTS
-        └── ASR + Function calling agents
+```mermaid
+flowchart TD
+    ROOT["Speech AI Models"]
+    ROOT --> E1["Era 1: Hybrid HMM-DNN<br>2010-2015"]
+    ROOT --> E2["Era 2: End-to-End ASR<br>2015-2020"]
+    ROOT --> E3["Era 3: Self-supervised Speech<br>2020-2023"]
+    ROOT --> E4["Era 4: Speech LLMs / Omni<br>2023+"]
+
+    E1 --> KALDI["Kaldi-style pipelines"]
+    E1 --> HMM["DNN-HMM hybrid"]
+    E2 --> CTC["CTC: DeepSpeech, Jasper"]
+    E2 --> LAS["Attention: LAS"]
+    E2 --> RNNT["RNN-T: streaming ASR"]
+    E3 --> W2V["Wav2Vec 2.0"]
+    E3 --> HUB["HuBERT / WavLM"]
+    E3 --> XLS["XLS-R multilingual"]
+    E4 --> CODEC["Codec-based: AudioLM, VALL-E, Moshi"]
+    E4 --> EMB["Embedding/Omni: Qwen2-Audio, Qwen3-Omni, Gemini"]
+    E4 --> HYB["Hybrid: Whisper + LLM + TTS"]
 ```
 
-Cuốn sách này sẽ đi qua tất cả các era, nhưng nhấn mạnh Era 4 (Speech LLMs) vì đó là frontier hiện tại và cũng là điểm mà audience NLP của bạn quan tâm nhất.
+Cuốn sách này sẽ đi qua tất cả các era, nhưng nhấn mạnh Era 4 (Speech LLMs) vì đây là nhóm mô hình đang phát triển nhanh và cũng là điểm mà độc giả nền tảng NLP/LLM thường quan tâm nhất.
 
 ## Phần 6 — Code: So sánh ba biểu diễn cụ thể
 
@@ -841,11 +896,11 @@ Speech LLMs (Qwen2-Audio, GPT-4o) học audio + text trong cùng model, nhưng a
 
 ### 7.5 Compute / cost
 
-Một số hệ thống streaming TTS frontier năm 2026 công bố latency khoảng vài trăm mili-giây, nhưng chi phí theo ký tự hoặc theo phút vẫn có thể lớn khi nhân lên quy mô call center. Với 1 triệu cuộc hội thoại, khác biệt nhỏ ở cost per turn có thể chuyển thành hàng nghìn USD mỗi ngày.
+Một số hệ thống streaming TTS hiện đại công bố latency khoảng vài trăm mili-giây, nhưng chi phí theo ký tự hoặc theo phút vẫn có thể lớn khi nhân lên quy mô call center. Với 1 triệu cuộc hội thoại, khác biệt nhỏ ở cost per turn có thể chuyển thành hàng nghìn USD mỗi ngày.
 
 So sánh với text LLM (khoảng 0.0001 USD per token, generate vài trăm token per response), audio interaction đắt hơn khoảng 10-100 lần. Đây là rào cản kinh tế cho widespread deployment.
 
-Mimi 1.1 kbps cộng Moshi giúp giảm đáng kể (toàn bộ codec inference cho 1 giây chi phí khoảng 0.00001 USD). Nhưng vẫn cần thêm improvements để cạnh tranh với text-only chatbots về cost.
+Các codec tốc độ thấp như Mimi giúp giảm đáng kể lượng token/audio cần xử lý, nhưng chi phí thực tế còn phụ thuộc hardware, batching, latency target và orchestration. Vì vậy, mọi ước lượng cost cho voice agent cần được benchmark lại trên workload cụ thể.
 
 ## Phần 8 — Tóm tắt & Hướng đi tiếp theo
 
@@ -874,10 +929,23 @@ Bây giờ bạn có thể trả lời cụ thể hơn:
 
 - Vì cùng paradigm Transformer, kiến thức không bị vứt bỏ.
 - Vì các kỹ thuật của bạn (fine-tuning, RLHF, LoRA, quantization) áp dụng trực tiếp.
-- Vì Speech LLM là frontier hiện tại, và career-wise đây là skill cao giá trị.
+- Vì Speech LLM và voice-first AI đang phát triển nhanh, nên năng lực này có giá trị nghề nghiệp cao.
 - Vì các sản phẩm voice-first (Moshi, GPT-4o) đang là wave mới của UX.
 
 Mọi chương tiếp theo của cuốn sách sẽ đào sâu chi tiết cụ thể, nhưng bạn đã có "map" để định hướng. Bookmark Bảng 3.1 — đó là tham chiếu chính khi bạn đọc các chương sau và gặp thuật ngữ lạ.
+
+### 8.2.1 Checklist tự kiểm tra sau Chương 1
+
+Trước khi sang Chương 2, hãy tự trả lời ngắn gọn:
+
+1. Vì sao raw waveform không thể được xem như token sequence kiểu NLP?
+2. Mel spectrogram giữ thông tin gì và bỏ thông tin gì?
+3. Wav2Vec/HuBERT khác BPE ở điểm nào?
+4. Vì sao codec tokens là điều kiện quan trọng cho Speech LLM generative?
+5. Nếu xây dựng voice agent tiếng Việt, bạn chọn cascaded pipeline hay native Speech LLM trước? Vì sao?
+6. Với một hệ thống realtime, representation nào làm giảm token rate tốt nhất?
+
+Nếu chưa trả lời được, hãy quay lại Phần 2 và bảng mapping ở Phần 3. Các chương sau sẽ dùng lại những khái niệm này liên tục.
 
 ### 8.3 Lộ trình đọc tiếp
 
@@ -899,7 +967,7 @@ Tuỳ background và mục tiêu của bạn:
 
 - Đọc Chương 2 kỹ (audio fundamentals tương tự image processing).
 - Skim Chương 3 (representations).
-- Đào sâu Chương 12 (Multimodal Omni — Qwen2.5-Omni, Gemini).
+- Đào sâu Chương 12 (Multimodal Omni — Qwen3-Omni, GPT-Realtime, Gemini Live).
 
 **Nếu bạn cần triển khai production ngay**:
 
@@ -928,11 +996,12 @@ Mục tiêu Chương 2: sau khi đọc xong, bạn có thể nhìn vào một me
 1. Défossez, A. et al. (2024). "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue". arXiv:2410.00037.
 2. Chu, Y. et al. (2023). "Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models". arXiv:2311.07919.
 3. Xu, J. et al. (2025). "Qwen2.5-Omni Technical Report". arXiv:2503.20215.
-4. Baevski, A. et al. (2020). "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations". NeurIPS 2020.
-5. Hsu, W. et al. (2021). "HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units". IEEE/ACM TASLP.
-6. Wang, C. et al. (2023). "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers". arXiv:2301.02111 (VALL-E).
-7. Borsos, Z. et al. (2023). "AudioLM: A Language Modeling Approach to Audio Generation". IEEE/ACM TASLP.
-8. Défossez, A. et al. (2022). "High Fidelity Neural Audio Compression". arXiv:2210.13438 (EnCodec).
-9. Gulati, A. et al. (2020). "Conformer: Convolution-augmented Transformer for Speech Recognition". Interspeech 2020.
-10. Radford, A. et al. (2022). "Robust Speech Recognition via Large-Scale Weak Supervision". OpenAI Whisper.
-11. Nguyen, T. et al. (2024). "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition". arXiv preprint.
+4. Qwen Team (2025). "Qwen3-Omni Technical Report". arXiv:2509.17765; GitHub QwenLM/Qwen3-Omni.
+5. Baevski, A. et al. (2020). "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations". NeurIPS 2020.
+6. Hsu, W. et al. (2021). "HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units". IEEE/ACM TASLP.
+7. Wang, C. et al. (2023). "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers". arXiv:2301.02111 (VALL-E).
+8. Borsos, Z. et al. (2023). "AudioLM: A Language Modeling Approach to Audio Generation". IEEE/ACM TASLP.
+9. Défossez, A. et al. (2022). "High Fidelity Neural Audio Compression". arXiv:2210.13438 (EnCodec).
+10. Gulati, A. et al. (2020). "Conformer: Convolution-augmented Transformer for Speech Recognition". Interspeech 2020.
+11. Radford, A. et al. (2022). "Robust Speech Recognition via Large-Scale Weak Supervision". OpenAI Whisper.
+12. Nguyen, T. et al. (2024). "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition". arXiv preprint.
