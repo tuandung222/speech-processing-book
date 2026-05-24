@@ -109,7 +109,7 @@ Compiled from Tavily web search during autonomous rewrite session 2.
 - Fine-tuned Whisper on 844 hours Vietnamese ASR
 - Datasets: CMV-Vi (14h), VIVOS (14h), VLSP 2020 (240h), VinAI private (586h)
 - 5 model sizes (tiny → large)
-- SOTA on VLSP 2020 Task-1, Task-2, CMV-Vi, VIVOS benchmarks
+- Reported leading results on VLSP 2020 Task-1, Task-2, CMV-Vi, and VIVOS in the authors' evaluation setup
 - Repo: <https://github.com/VinAIResearch/PhoWhisper>
 - HF: <https://huggingface.co/vinai/PhoWhisper-base>
 

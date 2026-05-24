@@ -20,7 +20,7 @@ Cuốn sách này được viết cho **CV/NLP data scientists** muốn trở th
 Cuốn sách được thiết kế cho:
 
 1. **CV/NLP Data Scientists** muốn chuyển sang speech modality
-2. **LLM Researchers** quan tâm đến multimodal models (Qwen2.5-Omni, Moshi, GPT-4o)
+2. **LLM Researchers** quan tâm đến multimodal models (Qwen2.5-Omni, Qwen3-Omni, Moshi, GPT-4o)
 3. **ML/AI Engineers** xây dựng voice AI pipelines cho production
 4. **Graduate students** nghiên cứu speech processing
 
@@ -73,7 +73,7 @@ Bài toán Text-to-Speech và các neural audio codec, là nền tảng cho voic
 Phần "frontier" nhất, là điểm gặp gỡ giữa Speech AI và LLM revolution. Nếu bạn từ NLP/LLM, đây là phần bạn sẽ thấy quen thuộc và thú vị nhất.
 
 - **Chương 11**: Speech Language Models — AudioLM, VALL-E, Moshi, Qwen2-Audio, Qwen3-Omni
-- **Chương 12**: Multimodal Omni Models — Qwen3.5-Omni, Gemini 3, GPT-Realtime, native multimodal
+- **Chương 12**: Multimodal Omni Models — Qwen3-Omni, GPT-Realtime, Gemini Live, native multimodal
 - **Chương 13**: Full-Duplex Dialogue — Moshi architecture, conversational dynamics
 
 ### Phần V — Speech Understanding, Translation, và Wake-word (Chương 14-15, 21)
@@ -222,8 +222,8 @@ Cuốn sách được xây dựng dựa trên **190+ papers và tài liệu** qu
 - **ASR**: Whisper [^radford2023robust], Conformer [^gulati2020conformer], RNN-T [^graves2012sequence], Canary [^nvidia2024canary]
 - **TTS**: VITS [^kim2021conditional], VALL-E [^wang2023valle], F5-TTS [^chen2024f5tts], CosyVoice [^du2024cosyvoice]
 - **Audio Codecs**: EnCodec [^defossez2022encodec], DAC [^kumar2024dac], Mimi [^defossez2024mimi]
-- **Speech LLMs**: AudioLM [^borsos2023audiolm], Qwen2-Audio [^chu2023qwen2audio], Moshi [^defossez2024moshi]
-- **Multimodal**: Qwen2.5-Omni [^xu2025qwen25omni], Gemini [^team2024gemini]
+- **Speech LLMs**: AudioLM [^borsos2023audiolm], Qwen2-Audio [^chu2023qwen2audio], Moshi [^defossez2024moshi], Qwen3-Omni [^qwen2025qwen3omni]
+- **Multimodal**: Qwen2.5-Omni [^xu2025qwen25omni], Qwen3-Omni [^qwen2025qwen3omni], Gemini [^team2024gemini]
 - **Self-Supervised**: Wav2Vec 2.0 [^baevski2020wav2vec], HuBERT [^hsu2021hubert], WavLM [^chen2022wavlm]
 - **Speech Translation**: SeamlessM4T [^communication2023seamlessm4t]
 - **Vietnamese**: PhoWhisper [^nguyen2024phowhisper], PhoBERT [^nguyen2020phobert]
@@ -265,6 +265,7 @@ Cuốn sách được xây dựng dựa trên **190+ papers và tài liệu** qu
 [^defossez2024moshi]: D{\'e}fossez, Alexandre and Musicant, Laurent and others, "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue", arXiv preprint arXiv:2410.00037
 [^xu2025qwen25omni]: Xu, Jin and Chu, Yunfei and others, "Qwen2.5-Omni Technical Report", arXiv preprint arXiv:2503.20215
 [^team2024gemini]: {Gemini Team}, "Gemini: A Family of Highly Capable Multimodal Models", arXiv preprint arXiv:2312.11805
+[^qwen2025qwen3omni]: {Qwen Team}, "Qwen3-Omni Technical Report", arXiv preprint arXiv:2509.17765
 [^communication2023seamlessm4t]: {Seamless Communication}, "SeamlessM4T: Massively Multilingual and Multimodal Machine Translation", arXiv preprint arXiv:2308.11596
 [^nguyen2024phowhisper]: Nguyen, Thanh-Nhi and Nguyen, Dat Quoc, "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition", arXiv preprint
 [^nguyen2020phobert]: Nguyen, Dat Quoc and Nguyen, Anh Tuan, "PhoBERT: Pre-trained Language Models for Vietnamese", Findings of the Association for Computational Linguistics: EMNLP

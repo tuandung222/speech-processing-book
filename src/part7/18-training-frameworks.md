@@ -482,11 +482,11 @@ fairseq [^ott2019fairseq] từ Meta:
 
 ## Tóm tắt
 
-1. **WeNet**: Best cho production streaming ASR - C++ runtime, ONNX export, dynamic chunk
-2. **ESPnet**: Best cho research - 200+ recipes, multi-task, E-Branchformer
-3. **SpeechBrain**: Best cho beginners - dễ học, HuggingFace integration
-4. **NeMo**: Best cho NVIDIA stack - FastConformer, TensorRT, multi-node
-5. **k2/icefall**: Best performance - Zipformer, pruned RNN-T
+1. **WeNet**: phù hợp mạnh cho production streaming ASR nhờ C++ runtime, ONNX export, dynamic chunk
+2. **ESPnet**: phù hợp mạnh cho research nhờ 200+ recipes, multi-task, E-Branchformer
+3. **SpeechBrain**: phù hợp cho người mới bắt đầu nhờ API dễ học và HuggingFace integration
+4. **NeMo**: phù hợp với NVIDIA stack nhờ FastConformer, TensorRT và multi-node training
+5. **k2/icefall**: phù hợp khi cần tối ưu hiệu năng ASR nâng cao, đặc biệt với Zipformer và pruned RNN-T
 6. **HF Trainer**: Phù hợp fine-tune pretrained models, không cho from-scratch training
 
 
