@@ -1,22 +1,22 @@
 # Chương 15: Speech Translation
 
-## Mở đầu: Tại sao Speech Translation là frontier hot nhất 2024-2026
+## Mở đầu: Vì sao Speech Translation trở thành một frontier quan trọng giai đoạn 2024-2026
 
-Năm 2024, Meta công bố SeamlessM4T v2 trên tạp chí **Nature**, một sự công nhận khoa học hiếm hoi cho công trình AI. Cùng năm, Google demo Gemini 2.0 dịch live qua video call. Kyutai phát hành Hibiki có thể dịch song song trong khi người nói còn đang nói. OpenAI bổ sung "realtime translation" vào API tháng 8/2025. Năm 2026, Qwen3.5-Omni vượt Gemini 3.1 Pro trên benchmark dịch tổng quát.
+Giai đoạn 2024-2026 chứng kiến nhiều bước tiến quan trọng trong Speech Translation: Meta công bố SeamlessM4T v2 trên **Nature**, Google trình diễn dịch live trong video call, Kyutai phát hành Hibiki cho simultaneous speech-to-speech translation, OpenAI bổ sung realtime translation vào Realtime API, và các model Omni open-source công bố kết quả mạnh trên nhiều benchmark dịch đa phương thức.
 
-Tại sao Speech Translation đột nhiên trở thành research frontier? Ba lý do hội tụ:
+Vì sao Speech Translation trở thành một hướng nghiên cứu và triển khai quan trọng? Có ba lý do hội tụ:
 
-1. **Speech LLMs trưởng thành**: codec tokens (Mimi, EnCodec) + multilingual self-supervised encoder (w2v-BERT 2.0) + LLM scaling cho phép end-to-end speech translation với chất lượng vượt cascaded.
+1. **Speech LLMs trưởng thành**: codec tokens (Mimi, EnCodec), multilingual self-supervised encoders và LLM scaling giúp end-to-end speech translation tiến gần hơn hoặc vượt cascaded pipeline trong một số benchmark.
 2. **Real-time deployment requirements**: video calling, hội nghị quốc tế, giáo dục online cần dịch <500ms latency, vượt khả năng của cascaded pipeline truyền thống.
 3. **Low-resource language coverage**: 7,000+ ngôn ngữ trên thế giới, hơn 3,000 không có chữ viết. Speech-to-speech translation textless là cách duy nhất phục vụ những cộng đồng này.
 
-Cuốn sách trước đây có chương về Speech Translation rất sơ sài. Chương này được rewrite hoàn toàn theo chuẩn mục đích: cho một data scientist NLP/LLM hiểu sâu, từ bài toán cơ bản đến SOTA năm 2026, đến deployment thực tế.
+Chương này được viết với mục tiêu giúp data scientist nền NLP/LLM hiểu Speech Translation từ taxonomy, metrics, architectures đến deployment thực tế và các frontier model ở thời điểm viết.
 
 > **📝 Cấu trúc chương**
 >
-> 12 phần, từ taxonomy bài toán → metrics → datasets → cascaded → end-to-end → simultaneous → SOTA 2024-2026 → production → Vietnamese-specific → limitations → roadmap.
+> 12 phần, từ taxonomy bài toán → metrics → datasets → cascaded → end-to-end → simultaneous → frontier models 2024-2026 → production → Vietnamese-specific → limitations → roadmap.
 >
-> Nếu bạn vội, đọc Phần 1 + Phần 8 (SOTA models) + Phần 9 (production). Nếu bạn nghiên cứu academic, đọc Phần 2 (metrics), Phần 4-6 (architectures), Phần 11 (open problems).
+> Nếu cần đọc nhanh, hãy đọc Phần 1 + Phần 8 (frontier models) + Phần 9 (production). Nếu làm nghiên cứu, hãy đọc Phần 2 (metrics), Phần 4-6 (architectures), Phần 11 (open problems).
 
 ---
 
@@ -65,7 +65,7 @@ Ba chiều phân loại trên cho ta một không gian 2D × 3D × 2 = 16 combin
 >
 > - **Offline S2TT text-required**: Whisper + NLLB. Production-ready, accuracy cao.
 > - **Streaming S2TT text-required**: SeamlessStreaming, Hibiki (Kyutai). Cutting edge 2024-2025.
-> - **Offline S2ST text-required**: SeamlessM4T v2. SOTA cho high-resource pairs.
+> - **Offline S2ST text-required**: SeamlessM4T v2, một baseline mạnh cho high-resource pairs.
 > - **Simultaneous S2ST textless**: AudioPaLM 2, Translatotron 3. Frontier research.
 > - **Streaming T2ST text-required**: ElevenLabs Multilingual, voice agent đa ngôn ngữ.
 
@@ -313,7 +313,7 @@ Lựa chọn typical:
 
 - **VITS** open source, multi-speaker.
 - **XTTS v2** (Coqui): zero-shot voice cloning với 3-sec sample.
-- **ElevenLabs Multilingual v2**: commercial SOTA cho voice quality.
+- **ElevenLabs Multilingual v2**: commercial frontier cho voice quality trong nhiều ngôn ngữ được hỗ trợ.
 - **F5-TTS** (2024): flow matching, zero-shot.
 - **Cartesia Sonic 2**: streaming TTS với 75ms first byte latency.
 
@@ -418,7 +418,7 @@ mBART, mT5 pre-trained trên parallel text → init decoder của ST model. Enco
 
 ### 5.4 Architecture cụ thể: SeamlessM4T v2 deep dive
 
-SeamlessM4T v2 (Meta, 2023, Nature 2024) là SOTA open-source cho multilingual ST. Architecture:
+SeamlessM4T v2 (Meta, 2023, Nature 2024) là một baseline open-source mạnh cho multilingual ST. Architecture:
 
 ```
 [Speech Input]
@@ -473,12 +473,12 @@ Google approach hơi khác: thay vì encoder-decoder, dùng single decoder-only 
 
 Advantages: simpler architecture, scaling laws giống LLM. Cũng support T2T, S2T, S2S trong cùng một model.
 
-### 5.6 Q4 2025 / 2026 SOTA updates
+### 5.6 Q4 2025 / 2026 frontier updates
 
 Year 2025-2026 mang lại major improvements:
 
-- **Qwen3-Omni (Oct 2025)**: Open source, MoE Thinker-Talker, comparable to Gemini 2.5 Pro on voice translation.
-- **Qwen3.5-Omni (Mar 2026)**: Plus variant outperforms Gemini 3.1 Pro on translation benchmarks.
+- **Qwen3-Omni (Oct 2025)**: open-source, MoE Thinker-Talker, được báo cáo có kết quả cạnh tranh với Gemini 2.5 Pro trên một số tác vụ voice translation.
+- **Qwen3.5-Omni (Mar 2026)**: Plus variant được công bố có kết quả mạnh trên một số translation benchmarks; cần đọc theo protocol benchmark cụ thể.
 - **GPT-Realtime (Aug 2025)**: OpenAI Realtime API có realtime translation feature, MCP server support.
 - **Gemini 3 multimodal Live**: Google streaming translation trong video call.
 - **Hibiki (Kyutai, 2025)**: Simultaneous S2ST, open source, low latency.
@@ -622,7 +622,7 @@ EMMA cho phép SeamlessStreaming đạt BLEU 26.8 với AL ~3 (so với offline 
 
 ### 7.6 Hibiki (Kyutai, 2025)
 
-Latest SOTA cho simultaneous S2ST. Kiến trúc:
+Một trong các model open-source đáng chú ý cho simultaneous S2ST. Kiến trúc:
 
 - Mimi codec (12.5 Hz) cho both source và target.
 - Dual-stream Transformer như Moshi, nhưng cho translation context.
@@ -649,9 +649,9 @@ Cách typical đạt được: lookahead 200-500ms + Wait-k với $k$ adaptive t
 
 ---
 
-## Phần 8 — SOTA Models 2024-2026 (Comprehensive Survey)
+## Phần 8 — Frontier Models 2024-2026 (Comprehensive Survey)
 
-Phần này tổng hợp các mô hình SOTA mới nhất, với chú trọng Q4 2025 và 2026 releases. Mỗi mô hình include architecture, benchmarks, deployment notes.
+Phần này tổng hợp các frontier models mới, với chú trọng Q4 2025 và 2026 releases. Mỗi mô hình được đặt trong bối cảnh architecture, benchmark và deployment notes.
 
 ### 8.1 SeamlessM4T v2 (Meta, Nov 2023 → ongoing)
 
@@ -698,10 +698,10 @@ Pros: Stable, well-tested, open. Cons: Slow, error propagation.
 - Optimized for latency.
 - Real-time streaming speech output.
 
-### 8.8 Qwen3.5-Omni (Mar 2026) ⭐⭐ Latest SOTA
+### 8.8 Qwen3.5-Omni (Mar 2026) — frontier open-source report
 
-- **215 SOTA results** trên các benchmark âm thanh, video, reasoning.
-- **Outperforms Gemini 3.1 Pro** trên general audio understanding, reasoning, translation.
+- Theo technical report, đạt nhiều kết quả dẫn đầu trên các benchmark âm thanh, video và reasoning.
+- Theo công bố của nhóm tác giả, so sánh thuận lợi với Gemini 3.1 Pro trên một số benchmark general audio understanding, reasoning và translation.
 - Plus variant native multimodal (text+image+audio+video single pass).
 - Streaming speech output realtime.
 
@@ -752,7 +752,7 @@ Pros: Stable, well-tested, open. Cons: Slow, error propagation.
 
 ## Phần 9 — Production Considerations
 
-Biết rõ SOTA paper không đồng nghĩa với build được production system. Phần này về những điểm mà paper không nhắc đến nhưng bạn sẽ đụng phải ngay ngày đầu triển khai: latency budget, cost economics, code-switching, hallucination, observability. Đúc kết từ public docs của ElevenLabs Conversational AI, Vapi.ai, LiveKit, và Cartesia.
+Biết rõ frontier papers không đồng nghĩa với xây dựng được production system. Phần này tập trung vào những điểm thường xuất hiện ngay khi triển khai: latency budget, cost economics, code-switching, hallucination và observability, dựa trên public docs của ElevenLabs Conversational AI, Vapi.ai, LiveKit và Cartesia.
 
 ### 9.1 Latency budget
 
@@ -789,7 +789,7 @@ Audio output streaming
 
 ### 9.3 Cost economics
 
-Honest numbers based on public pricing (verify before quoting):
+Các con số dưới đây dựa trên public pricing và cần được kiểm tra lại trước khi dùng trong budget:
 
 | Component | Provider | Cost (per pricing page tháng 11/2025) |
 |---|---|---|
@@ -839,7 +839,7 @@ Track production metrics:
 
 ## Phần 10 — Speech Translation cho Tiếng Việt
 
-Nếu bạn đang ở Việt Nam hoặc phục vụ user Việt, phần này là quan trọng nhất. Đây là honest assessment về state-of-the-art và industry landscape cho Vietnamese ST năm 2026.
+Nếu phục vụ người dùng Việt Nam, phần này đặc biệt quan trọng. Đây là đánh giá thận trọng về landscape Vietnamese ST ở thời điểm 2026 dựa trên dữ liệu công khai.
 
 ### 10.1 Data scarcity reality
 
@@ -863,7 +863,7 @@ Solution: train ASR trên code-switched data (CMC challenge có dataset này), h
 
 #### 10.3.1 VinAI (VinBigData)
 
-- **PhoWhisper** (2024): Whisper fine-tuned trên 844h Vi data, SOTA trên VLSP.
+- **PhoWhisper** (2024): Whisper fine-tuned trên 844h Vietnamese data, đạt kết quả mạnh trên các split VLSP được báo cáo.
 - **ViBERT**, **PhoGPT**: text LMs cho Vietnamese.
 - **ViVi assistant**: in-car voice cho VinFast.
 - Open source nhiều mô hình.
@@ -894,14 +894,14 @@ Solution: train ASR trên code-switched data (CMC challenge có dataset này), h
 
 ### 10.4 Realistic assessment of Vietnamese ST quality
 
-Honest pinion based on public benchmarks và personal testing:
+Đánh giá thận trọng dựa trên public benchmarks và kinh nghiệm kiểm thử cần được xem như định hướng, không phải leaderboard chính thức:
 
 - **Vi → En S2TT**: PhoWhisper + NLLB đạt ~25-28 BLEU trên CMV-Vi test (estimate). Adequate cho most use cases.
 - **En → Vi S2TT**: Whisper + NLLB → Vi text, quality decent nhưng có issues với:
   - Vietnamese tones not captured properly trong some MT outputs.
   - Foreign name transliteration (tên người nước ngoài chuyển sang Vi inconsistent).
   - Vietnamese accent variations (Bắc/Trung/Nam) gây WER variation.
-- **Vi → En S2ST**: chưa có public model SOTA, hầu hết cascaded với TTS Vi → MT En → TTS En.
+- **Vi → En S2ST**: chưa có public model native đủ mạnh và được benchmark rộng; hầu hết hệ thống thực dụng vẫn dùng cascaded TTS Vi → MT En → TTS En.
 
 ### 10.5 Khuyến nghị cho Vietnamese ST production
 
@@ -942,7 +942,7 @@ ST trained on TED talks fails on legal proceedings, medical conversations, techn
 
 ### 11.7 Real-time TTS cho mọi ngôn ngữ
 
-TTS streaming SOTA (Cartesia, ElevenLabs) hỗ trợ ~50-100 languages. Còn 7,000+ ngôn ngữ chưa có streaming TTS. Bottleneck cho ST end-to-end ở low-resource.
+Các hệ thống TTS streaming thương mại hỗ trợ khoảng 50-100 ngôn ngữ, trong khi thế giới có hơn 7,000 ngôn ngữ. Đây là bottleneck lớn cho ST end-to-end ở low-resource settings.
 
 ---
 
@@ -956,9 +956,9 @@ TTS streaming SOTA (Cartesia, ElevenLabs) hỗ trợ ~50-100 languages. Còn 7,0
 
 3. **Cascaded (Whisper + NLLB + TTS) vẫn dominant production 2026** vì modularity, debuggability, mature tooling. End-to-end win về quality nhưng harder to deploy.
 
-4. **SeamlessM4T v2** vẫn là baseline open-source. **Qwen3.5-Omni (Mar 2026)** là current SOTA, vượt cả Gemini 3.1 Pro trên benchmarks.
+4. **SeamlessM4T v2** vẫn là baseline open-source quan trọng. **Qwen3.5-Omni (Mar 2026)** là một frontier open-source report đáng chú ý, với nhiều kết quả mạnh trên benchmark công khai.
 
-5. **Simultaneous translation** là hardest sub-problem, requires architectural innovation (EMMA, monotonic attention). Best open: **Hibiki** (Kyutai 2025).
+5. **Simultaneous translation** là sub-problem rất khó, đòi hỏi architectural innovation như EMMA và monotonic attention. Hibiki (Kyutai 2025) là một baseline open-source đáng chú ý.
 
 6. **Textless / unit-based S2ST** mở khả năng phục vụ ngôn ngữ không có chữ viết, đặc biệt quan trọng cho social impact.
 

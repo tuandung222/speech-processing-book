@@ -259,7 +259,7 @@ Modern relevance: DTW vẫn dùng cho speaker verification / user-personalized w
 
 ### 4.3 Why classical approaches failed
 
-By 2015, accuracy gap between classical và DL too large. DL approaches:
+Đến khoảng năm 2015, khoảng cách accuracy giữa phương pháp cổ điển và deep learning trở nên đủ lớn để các hệ thống mới chuyển dần sang neural approaches:
 
 - Capture complex acoustic patterns automatically.
 - Robust to speaker, environment variations với augmentation.

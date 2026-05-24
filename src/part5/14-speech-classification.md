@@ -203,7 +203,7 @@ $$
 
 > **📝 LID cho Vietnamese**
 >
-> Vietnamese LID cần phân biệt 3 phương ngữ (Bắc, Trung, Nam) - khó hơn nhiều so với language-level ID. SSL models (XLSR) cho kết quả tốt nhất.
+> Vietnamese LID cần phân biệt 3 phương ngữ (Bắc, Trung, Nam), thường khó hơn language-level ID. SSL models như XLSR hoặc WavLM là baseline mạnh, nhưng cần đánh giá theo tập phương ngữ cụ thể.
 
 
 
@@ -280,20 +280,20 @@ SUPERB [^yang2021superb] đánh giá SSL models trên 10 speech tasks:
 
 : SUPERB Benchmark results (WavLM dominates) <a id="tbl-superb-results"></a>
 
-> **📝 WavLM là SSL model tốt nhất cho classification tasks**
+> **📝 WavLM là một baseline SSL rất mạnh cho classification tasks**
 >
-> Nhờ denoising objective, WavLM học được representations robust cho noise và speaker variations - rất quan trọng cho SV, ER, SD.
+> Nhờ denoising objective, WavLM học được representations khá robust trước noise và speaker variations, đặc biệt hữu ích cho SV, ER và SD trong nhiều benchmark công khai.
 
 
 
 ## Tóm tắt
 
-1. **SER**: SSL backbone + attention pooling + classifier. WavLM cho best results.
+1. **SER**: SSL backbone + attention pooling + classifier. WavLM là baseline mạnh trong nhiều thiết lập công khai.
 2. **Speaker Verification**: ECAPA-TDNN + AAM-Softmax loss. Cosine similarity scoring.
 3. **LID**: SSL fine-tuning (XLSR) hoặc Whisper language detection.
 4. **Audio Event Detection**: PANNs/BEATs cho audio tagging, frame-level models cho SED.
 5. **Keyword Spotting**: Tiny models (< 500KB) cho edge deployment.
-6. **SUPERB**: WavLM Large là SSL model tốt nhất overall cho speech classification tasks.
+6. **SUPERB**: WavLM Large là một baseline rất mạnh trên nhiều speech classification tasks, nhưng không nên thay thế đánh giá domain-specific.
 
 
 

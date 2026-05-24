@@ -214,7 +214,7 @@ MoshiRAG giữ nguyên kiến trúc dual-stream của Moshi nhưng bổ sung **a
 
 Kyutai cũng release:
 
-- **Pocket TTS**: TTS chỉ 100M parameter, đạt chất lượng comparable với các SOTA model lớn hơn 10 lần, hỗ trợ voice cloning và streaming realtime.
+- **Pocket TTS**: TTS khoảng 100M parameters, được báo cáo có chất lượng cạnh tranh với một số model lớn hơn trong thiết lập đánh giá công khai, hỗ trợ voice cloning và streaming realtime.
 - **MoshiVis**: Moshi với image input support, giữ nguyên latency realtime.
 
 ## Đánh giá full-duplex dialogue
