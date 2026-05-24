@@ -20,6 +20,35 @@ Sau khi đọc xong chương, bạn có thể đọc paper Whisper (attention se
 > - **Phần 4**: RNN-Transducer, joint network, streaming.
 > - **Phần 5**: so sánh ba paradigm và lựa chọn theo bài toán.
 
+### Bản đồ tư duy của chương
+
+Ba họ mô hình ASR trong chương này khác nhau chủ yếu ở cách xử lý **alignment** giữa acoustic frames và text tokens:
+
+```mermaid
+flowchart LR
+    X["Acoustic frames X<br>T frames"] --> CTC["CTC<br>sum over monotonic paths"]
+    X --> ATT["Attention seq2seq<br>decoder attends to encoder"]
+    X --> RNNT["RNN-T<br>2D lattice time x label"]
+    CTC --> TXT["Text output"]
+    ATT --> TXT
+    RNNT --> TXT
+```
+
+Nếu chỉ nhớ một câu: **ASR không khó vì input là audio; ASR khó vì ta không biết frame nào tương ứng với token nào.** CTC, attention và RNN-T là ba cách trả lời câu hỏi alignment này.
+
+### Ví dụ xuyên suốt
+
+Giả sử người dùng nói “mở app”. Sau feature extraction, ta có khoảng 100 frames cho 1 giây audio. Transcript chỉ có vài ký tự hoặc subword tokens. Model phải học rằng nhiều frame liên tiếp cùng phục vụ một âm tiết, có frame im lặng, có frame chuyển tiếp giữa âm, và có frame không nên phát token nào.
+
+| Thành phần | Ví dụ |
+|---|---|
+| Audio frames | `x1, x2, ..., x100` |
+| Character target | `m ở _ a p p` hoặc dạng chuẩn hóa tương ứng |
+| Subword target | `mở`, ` app` |
+| Alignment | không có trong dataset, model phải tự học |
+
+Trong dataset ASR thông thường, ta chỉ có cặp `(audio, transcript)`. Không có nhãn “frame 37 là âm /a/”. Đây là lý do loss function của ASR quan trọng hơn nhiều so với classification thông thường.
+
 ## Phần 1 — Bài toán ASR
 
 Automatic Speech Recognition (ASR) là bài toán ánh xạ từ tín hiệu âm thanh sang chuỗi ký tự/từ:
@@ -32,7 +61,28 @@ $$
 
 trong đó $X = (x_1, x_2, \ldots, x_T)$ là chuỗi acoustic frames và $Y = (y_1, y_2, \ldots, y_U)$ là chuỗi text tokens, với $T \gg U$ (audio dài hơn text rất nhiều).
 
-**Thách thức chính:** Alignment giữa $X$ và $Y$ không biết trước  -  không biết frame nào tương ứng với ký tự nào.
+Trong thực tế, $Y$ có thể là ký tự, byte, wordpiece, BPE token hoặc phoneme. Mỗi lựa chọn tạo ra trade-off khác nhau:
+
+| Output unit | Ưu điểm | Nhược điểm | Khi nào dùng |
+|---|---|---|---|
+| Character | vocabulary nhỏ, không OOV | sequence dài hơn subword | CTC đơn giản, low-resource |
+| Byte | xử lý mọi Unicode | khó học ngôn ngữ hơn | multilingual robust systems |
+| BPE/subword | sequence ngắn, gần NLP | cần tokenizer tốt | Whisper-style ASR |
+| Word | sequence rất ngắn | OOV, khó với tên riêng | ASR cổ điển kèm lexicon |
+| Phoneme | gần âm học | cần G2P/lexicon | TTS, forced alignment |
+
+Với tiếng Việt, character và syllable/subword đều đáng cân nhắc. Character-level giúp tránh OOV; syllable/subword tận dụng đặc điểm chữ viết có khoảng trắng giữa âm tiết, nhưng cần xử lý dấu thanh và code-switching cẩn thận.
+
+**Thách thức chính:** Alignment giữa $X$ và $Y$ không biết trước, nghĩa là ta không biết frame nào tương ứng với ký tự nào.
+
+```mermaid
+sequenceDiagram
+    participant A as Audio frames
+    participant T as Text tokens
+    A->>A: x1 x2 x3 ... xT
+    T->>T: y1 y2 ... yU
+    Note over A,T: Dataset chỉ cho cặp audio-transcript, không cho alignment frame-token
+```
 
 > **💡 NLP Parallel**
 >
@@ -49,6 +99,29 @@ CTC [^graves2006connectionist] giải quyết alignment problem bằng cách:
 1. **Thêm blank token** $\langle b \rangle$ vào vocabulary
 2. Cho phép model output blank hoặc repeated characters tại mỗi frame
 3. **Marginalize** trên tất cả valid alignments
+
+### Ví dụ CTC chạy tay: target “an”
+
+Giả sử target là `an` và ta có 4 acoustic frames. CTC thêm blank `_` vào vocabulary. Một số path hợp lệ collapse thành `an`:
+
+| Path theo frame | Bỏ lặp | Bỏ blank | Kết quả |
+|---|---|---|---|
+| `_ a n _` | `_ a n _` | `a n` | `an` |
+| `a a n _` | `a n _` | `a n` | `an` |
+| `_ a _ n` | `_ a _ n` | `a n` | `an` |
+| `a _ n n` | `a _ n` | `a n` | `an` |
+| `a n n n` | `a n` | `a n` | `an` |
+
+Một số path không hợp lệ:
+
+| Path | Collapse | Vì sao sai |
+|---|---|---|
+| `a a _ n` | `an` | hợp lệ, vì lặp `a` được gộp trước khi bỏ blank |
+| `a _ a n` | `aan` | blank tách hai chữ `a`, nên sinh thêm token |
+| `_ n a _` | `na` | sai thứ tự |
+| `_ a _ _` | `a` | thiếu `n` |
+
+Điểm quan trọng: CTC không chọn một alignment duy nhất khi train. Nó cộng xác suất của **tất cả** path hợp lệ. Đây là điểm làm CTC phù hợp với dữ liệu không có frame-level labels.
 
 ### CTC Alignment
 
@@ -83,7 +156,9 @@ $$
 
 > **📝 Tại sao cần Blank Token?**
 >
-> Không có blank, model không thể phân biệt "hello" (1 chữ l) và "helllo" (2 chữ l liên tiếp). Blank cho phép "reset"  -  mỗi non-blank emission sau blank (hoặc khác character) là một ký tự mới.
+> Không có blank, model không thể phân biệt các token lặp liên tiếp. Blank cho phép “reset”: mỗi non-blank emission sau blank hoặc sau token khác có thể được hiểu là token mới.
+
+Ví dụ với target `aa`: path `a a` collapse thành `a`, không phải `aa`, vì CTC gộp lặp trước. Muốn sinh `aa`, path cần có blank tách giữa hai `a`, chẳng hạn `a _ a`. Đây là chi tiết nhỏ nhưng rất quan trọng khi debug CTC output.
 
 
 
@@ -231,6 +306,17 @@ class CTCModel(nn.Module):
         return decoded
 ```
 
+### CTC trong thực tế: greedy không phải lúc nào tối ưu
+
+CTC training cộng xác suất của nhiều path, nhưng greedy decoding chỉ lấy token xác suất cao nhất ở từng frame. Hai thao tác này không tương đương. Một transcript có thể có tổng xác suất cao nhờ nhiều path vừa phải, dù không phải path greedy.
+
+| Decoding | Ý tưởng | Ưu điểm | Hạn chế |
+|---|---|---|---|
+| Greedy | argmax từng frame rồi collapse | nhanh, đơn giản | bỏ qua LM và tổng xác suất nhiều path |
+| Prefix beam search | giữ nhiều prefix ứng viên | tốt hơn greedy | tốn compute hơn |
+| CTC + external LM | cộng điểm acoustic và LM | sửa lỗi ngôn ngữ | cần LM và tuning weight |
+| Rescoring | ASR sinh N-best, LM chấm lại | linh hoạt | pipeline phức tạp hơn |
+
 ### CTC Decoding
 
 **Greedy decoding:**
@@ -249,6 +335,18 @@ $$
 \hat{Y} = \arg\max_{Y} \left[\log P_{\text{CTC}}(Y \mid X) + \lambda \log P_{\text{LM}}(Y)\right]
 $$
 
+### Khi nào CTC rất phù hợp?
+
+CTC phù hợp khi alignment gần như monotonic và output không cần reorder. Speech-to-text là bài toán như vậy: người nói phát âm theo thứ tự transcript. CTC cũng rất hữu ích khi cần train model đơn giản, inference nhanh, hoặc thêm auxiliary loss để ổn định encoder.
+
+| Use case | CTC có phù hợp không? | Lý do |
+|---|---|---|
+| Offline ASR đơn giản | Có | training/inference tương đối gọn |
+| Streaming ASR latency thấp | Có, nếu encoder causal | frame-level output |
+| Forced alignment | Có | blank/path giúp align text với audio |
+| Speech translation trực tiếp | Hạn chế | output có thể reorder theo ngôn ngữ đích |
+| TTS | Không trực tiếp | TTS cần text→audio, alignment chiều ngược |
+
 ### Hạn chế của CTC
 
 1. **Conditional independence**: $P(\pi_t \mid X)$ được tính independent tại mỗi frame
@@ -262,6 +360,17 @@ $$
 
 Kiến trúc seq2seq kinh điển cho ASR, tương tự machine translation:
 
+```mermaid
+flowchart LR
+    MEL["Mel frames"] --> ENC["Audio encoder"]
+    ENC --> H["Encoder states"]
+    TOK["Previous text tokens"] --> DEC["Autoregressive decoder"]
+    H --> DEC
+    DEC --> OUT["Next token distribution"]
+```
+
+Điểm khác biệt với machine translation là encoder input rất dài và liên tục theo thời gian. Vì vậy, ASR encoder thường có convolution/subsampling trước Transformer để giảm frame rate.
+
 <a id="eq-enc-dec"></a>
 
 $$
@@ -270,6 +379,17 @@ $$
 P(y_u \mid y_{<u}, X) &= \text{Decoder}(\mathbf{h}, y_{<u}) \quad & \text{// autoregressive}
 \end{aligned}
 $$
+
+### Attention và alignment trực quan
+
+Trong encoder-decoder ASR, decoder sinh token thứ $u$ bằng cách nhìn vào toàn bộ encoder states. Attention weight cho biết token đó đang “nghe” đoạn audio nào. Nếu visualize attention tốt, ta thường thấy một đường chéo đi từ trái sang phải: token sau nhìn frame muộn hơn token trước.
+
+| Hiện tượng attention | Diễn giải |
+|---|---|
+| Đường chéo mượt | alignment tốt, monotonic |
+| Nhảy ngược | nguy cơ lặp từ hoặc hallucination |
+| Attention quá rộng | model không chắc đoạn audio nào liên quan |
+| Attention bỏ qua đoạn dài | nguy cơ deletion trong transcript |
 
 ### Attention Mechanism cho ASR
 
@@ -302,6 +422,20 @@ $$
 
 ## RNN-Transducer (RNN-T)
 
+### Vì sao RNN-T quan trọng cho production?
+
+Trong voice assistant và call center realtime, hệ thống không thể chờ người dùng nói xong toàn bộ câu rồi mới transcribe. Nó phải phát partial hypothesis liên tục, ví dụ:
+
+| Thời điểm | Partial hypothesis |
+|---:|---|
+| 300 ms | “m...” |
+| 700 ms | “mở” |
+| 1200 ms | “mở app” |
+| 1600 ms | “mở app ngân...” |
+| endpoint | “mở app ngân hàng” |
+
+RNN-T được thiết kế cho kiểu inference này: encoder đọc audio theo thời gian, prediction network giữ lịch sử token đã sinh, joint network quyết định emit blank hay token tiếp theo.
+
 ### Motivation
 
 RNN-T [^graves2012sequence] kết hợp ưu điểm của cả CTC (streaming) và Encoder-Decoder (output dependency):
@@ -313,6 +447,17 @@ RNN-T [^graves2012sequence] kết hợp ưu điểm của cả CTC (streaming) v
 ### Components
 
 RNN-T gồm 3 thành phần:
+
+```mermaid
+flowchart LR
+    X["Audio frames x1...xt"] --> ENC["Encoder / transcription network"]
+    Y["Previous labels y1...y(u-1)"] --> PRED["Prediction network"]
+    ENC --> JOINT["Joint network"]
+    PRED --> JOINT
+    JOINT --> DIST["Distribution over vocab + blank"]
+```
+
+Bạn có thể xem encoder như “tai”, prediction network như “language context”, và joint network như nơi hai nguồn thông tin gặp nhau để quyết định bước tiếp theo.
 
 1. **Encoder** (transcription network): $\mathbf{h}_t = \text{Encoder}(x_{1:t})$
 2. **Prediction network** (label history): $\mathbf{g}_u = \text{PredNet}(y_{1:u-1})$
@@ -522,16 +667,16 @@ class RNNTransducer(nn.Module):
 | **Inference** | Greedy $O(T)$ / Beam $O(TB)$ | Beam $O(UB)$ | Beam $O((T+U)B)$ |
 | **External LM** | Required for good results | Optional (implicit LM) | Helpful |
 | **Typical use** | Offline ASR, simpler models | Whisper | Production streaming |
-| **Accuracy** | Good + LM | Best (offline) | Best (streaming) |
+| **Accuracy** | Tốt khi có LM/rescoring | Rất mạnh cho offline | Rất mạnh cho streaming |
 
 : So sánh ba paradigm ASR <a id="tbl-asr-paradigms"></a>
 
-> **📝 Industry Trend (2024–2026)**
+> **📝 Xu hướng triển khai**
 >
-> - **Google**: Conformer + RNN-T cho on-device streaming ASR
-> - **OpenAI**: Whisper = Encoder-Decoder (offline)
-> - **Meta**: Wav2Vec 2.0 + CTC fine-tuning
-> - **Hybrid**: CTC/Attention joint training (kết hợp CTC loss + attention loss)
+> - **Streaming/on-device**: encoder causal hoặc chunked + RNN-T/CTC.
+> - **Offline transcription**: encoder-decoder kiểu Whisper hoặc Conformer/CTC có rescoring.
+> - **Low-resource adaptation**: SSL encoder + CTC fine-tuning hoặc Whisper/PhoWhisper fine-tune.
+> - **Hybrid training**: CTC/attention joint loss để ổn định alignment và tăng chất lượng decoding.
 
 
 
@@ -547,6 +692,22 @@ $$
 
 trong đó $S$ = substitutions, $D$ = deletions, $I$ = insertions, $N$ = total words in reference.
 
+Ví dụ:
+
+| Reference | Hypothesis |
+|---|---|
+| “tôi muốn mở tài khoản” | “tôi muốn mở tài khoảng” |
+
+Nếu tính theo word, có 1 substitution (`khoản` → `khoảng`) trên 5 words, nên WER = 20%. Nhưng lỗi này có thể nhỏ về mặt nghe-nhìn vì chỉ sai dấu/âm cuối. Với tiếng Việt, nên xem cả WER và CER để hiểu lỗi dấu, lỗi âm tiết và lỗi tokenization.
+
+| Loại lỗi | Ví dụ | Hệ quả sản phẩm |
+|---|---|---|
+| Substitution | “bảy” → “ba” | sai thông tin quan trọng |
+| Deletion | bỏ mất “không” | đảo nghĩa câu |
+| Insertion | thêm “ạ” không có | thường ít nghiêm trọng hơn |
+| Punctuation/casing | thiếu dấu câu | ảnh hưởng readability |
+| Diacritics | “ma” vs “má” | rất quan trọng với tiếng Việt |
+
 ### Character Error Rate (CER)
 
 <a id="eq-cer"></a>
@@ -555,7 +716,19 @@ $$
 \text{CER} = \frac{S_c + D_c + I_c}{N_c} \times 100\%
 $$
 
-Tương tự WER nhưng ở character level  -  hữu ích cho ngôn ngữ không có word boundaries rõ ràng (tiếng Trung, tiếng Nhật).
+Tương tự WER nhưng ở character level, hữu ích cho ngôn ngữ không có word boundaries rõ ràng như tiếng Trung, tiếng Nhật, và cũng hữu ích với tiếng Việt khi muốn đo lỗi dấu/âm tiết chi tiết hơn.
+
+### Metric không thay thế human review
+
+WER/CER là cần thiết nhưng không đủ. Hai transcript có cùng WER có thể khác nhau rất lớn về tác động sản phẩm. Lỗi tên thuốc, số tài khoản, phủ định (“không”), ngày giờ hoặc số tiền nguy hiểm hơn nhiều so với lỗi filler word.
+
+Với hệ thống production, nên phân rã evaluation theo:
+
+- **Domain**: call center, meeting, y tế, pháp lý, giáo dục.
+- **Speaker group**: vùng miền, giới tính, tuổi, accent.
+- **Acoustic condition**: studio, điện thoại, noise, reverberation.
+- **Utterance type**: lệnh ngắn, hội thoại dài, code-switching.
+- **Entity sensitivity**: số, tên riêng, địa chỉ, mã đơn hàng.
 
 ## Tóm tắt
 
@@ -567,7 +740,18 @@ Tương tự WER nhưng ở character level  -  hữu ích cho ngôn ngữ khôn
 
 : Tóm tắt ba paradigm ASR <a id="tbl-asr-summary"></a>
 
-Chương tiếp theo sẽ khám phá **Self-Supervised Speech**  -  cách Wav2Vec 2.0 và HuBERT học representations mạnh mẽ từ unlabeled audio.
+Chương tiếp theo sẽ khám phá các **kiến trúc ASR hiện đại**, đặc biệt là Conformer, Zipformer và các encoder tối ưu cho sequence audio dài.
+
+### Checklist tự kiểm
+
+Trước khi sang Chương 5, hãy tự trả lời:
+
+1. Vì sao ASR cần giải bài toán alignment?
+2. Blank token trong CTC giải quyết vấn đề gì?
+3. Vì sao CTC train bằng tổng xác suất nhiều path thay vì một path duy nhất?
+4. Encoder-decoder attention mạnh hơn CTC ở đâu và yếu hơn ở đâu?
+5. RNN-T khác CTC ở prediction network và joint network như thế nào?
+6. Với tiếng Việt, vì sao CER đôi khi hữu ích hơn chỉ nhìn WER?
 
 
 
