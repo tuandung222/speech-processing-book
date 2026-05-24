@@ -20,10 +20,15 @@ Chương này phân tích bốn họ kiến trúc chính: VITS (CVAE + adversari
 
 Chương trước đã trình bày pipeline **Text → Mel → Waveform** (FastSpeech 2 cộng HiFi-GAN). Chương này khám phá các model **end-to-end**, trực tiếp từ text sang waveform, và đặc biệt là **zero-shot voice cloning**.
 
-<figure id="fig-tts-evolution">
-  <img src="fig-09-end-to-end-tts-08.png" alt="Tiến hóa của TTS: từ Two-Stage đến End-to-End" />
-  <figcaption><strong>Hình:</strong> Tiến hóa của TTS: từ Two-Stage đến End-to-End</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    A["Tacotron / FastSpeech<br>Text to mel"] --> B["Neural vocoder<br>mel to waveform"]
+    B --> C["VITS<br>joint text-to-waveform training"]
+    C --> D["Codec LM<br>VALL-E-style audio tokens"]
+    D --> E["Flow matching / DiT<br>F5-TTS-style generation"]
+```
+
+**Hình:** TTS hiện đại đi từ pipeline hai giai đoạn sang các mô hình học trực tiếp hơn giữa text, latent/audio tokens và waveform. Mỗi bước giảm một phần mismatch giữa training objective và tín hiệu nghe cuối cùng.
 
 ## VITS, Variational Inference with Adversarial Learning
 
@@ -43,10 +48,22 @@ $$
 
 ### Architecture Overview
 
-<figure id="fig-vits-arch">
-  <img src="fig-09-end-to-end-tts-09.png" alt="Kiến trúc VITS: VAE + Normalizing Flow + GAN (Training)" />
-  <figcaption><strong>Hình:</strong> Kiến trúc VITS: VAE + Normalizing Flow + GAN (Training)</figcaption>
-</figure>
+```mermaid
+flowchart TD
+    TXT["Text / phonemes"] --> PRIOR["Text prior encoder"]
+    WAV["Ground-truth audio"] --> POST["Posterior encoder"]
+    POST --> Z["Latent z"]
+    PRIOR --> FLOW["Normalizing flow"]
+    Z --> FLOW
+    Z --> DEC["HiFi-GAN-style decoder"]
+    DEC --> SYN["Generated waveform"]
+    WAV --> DISC["Discriminator"]
+    SYN --> DISC
+    PRIOR --> MAS["Monotonic alignment search"]
+    POST --> MAS
+```
+
+**Hình:** VITS kết hợp prior từ text, posterior từ audio, normalizing flow, MAS và adversarial decoder. Đây là lý do VITS vừa học alignment vừa sinh waveform trong một objective thống nhất.
 
 ### ELBO Objective
 
@@ -213,10 +230,19 @@ $$
 
 VALL-E sử dụng EnCodec (8 RVQ codebooks) và chia thành 2 stages:
 
-<figure id="fig-valle-arch">
-  <img src="fig-09-end-to-end-tts-10.png" alt="Kiến trúc VALL-E: AR (codebook 1) + NAR (codebooks 2-8)" />
-  <figcaption><strong>Hình:</strong> Kiến trúc VALL-E: AR (codebook 1) + NAR (codebooks 2-8)</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    TXT["Text / phonemes"] --> AR["AR codec LM<br>predict codebook 1"]
+    PROMPT["3s audio prompt<br>codec tokens"] --> AR
+    AR --> C1["Coarse codebook 1"]
+    C1 --> NAR["NAR codec LM<br>predict codebooks 2..8"]
+    TXT --> NAR
+    NAR --> CALL["Full codec token stack"]
+    CALL --> DEC["EnCodec decoder"]
+    DEC --> WAV["Cloned voice waveform"]
+```
+
+**Hình:** VALL-E biến TTS thành language modeling trên codec tokens. Prompt audio ngắn đóng vai trò điều kiện in-context để giữ speaker identity.
 
 ### AR Model (Codebook 1)
 
@@ -310,10 +336,20 @@ $$
 
 F5-TTS sử dụng **DiT** (Diffusion Transformer) thay vì U-Net:
 
-<figure id="fig-f5tts-dit">
-  <img src="fig-09-end-to-end-tts-11.png" alt="F5-TTS: DiT Block architecture" />
-  <figcaption><strong>Hình:</strong> F5-TTS: DiT Block architecture</figcaption>
-</figure>
+```mermaid
+flowchart TD
+    NOISE["Initial noise / latent"] --> DIT["Diffusion Transformer block"]
+    TXT["Text condition"] --> DIT
+    SPK["Speaker prompt / style"] --> DIT
+    TIME["Flow time embedding"] --> DIT
+    DIT --> VEL["Predicted velocity field"]
+    VEL --> ODE["ODE solver steps"]
+    ODE --> MEL["Generated mel / acoustic representation"]
+    MEL --> VOC["Vocoder"]
+    VOC --> WAV["Waveform"]
+```
+
+**Hình:** F5-TTS dùng DiT để dự đoán velocity field trong flow matching. So với diffusion cổ điển, flow matching thường cần ít bước sampling hơn và có công thức huấn luyện trực tiếp hơn.
 
 **Adaptive Layer Normalization (AdaLN):**
 

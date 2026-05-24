@@ -677,10 +677,10 @@ Total cost: ~0.10-0.15 USD/min. Acceptable cho B2B use case (banking customer se
 
 ### 9.4 Open challenges for Vietnamese voice AI
 
-- **Better TTS Vi**: ElevenLabs Vi voices are decent but not native quality. Opportunity for Vi-native TTS company.
-- **On-device Vi ASR**: PhoWhisper too large for mobile. Need distilled Vi ASR <50MB.
-- **Code-switching benchmark**: no public benchmark cho Vi-En code-switched speech. Industry needs one.
-- **Vietnamese voice cloning**: voice cloning for Vi celebrities, brands. Currently English-dominant.
+- **Vietnamese-native TTS**: cần voice quality, prosody và emotion tự nhiên hơn cho từng phương ngữ, thay vì chỉ dựa vào model multilingual tổng quát.
+- **On-device Vietnamese ASR**: cần model distilled dưới khoảng 50 MB cho mobile và embedded devices, vì các biến thể Whisper/PhoWhisper còn quá lớn cho nhiều thiết bị biên.
+- **Code-switching benchmark**: hiện chưa có benchmark công khai mạnh cho Vi-En code-switched speech, trong khi nhu cầu production rất rõ ở call center, giáo dục và fintech.
+- **Vietnamese voice cloning**: cần benchmark, consent workflow và abuse prevention nghiêm túc trước khi đưa vào sản phẩm cho celebrity voice, brand voice hoặc customer support voice.
 
 ---
 

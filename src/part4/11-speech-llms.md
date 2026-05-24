@@ -425,12 +425,21 @@ GPT-4o voice mode từ OpenAI là first commercial full-duplex Speech LLM:
 
 ### Kiến trúc (suy đoán)
 
-Dựa trên published information, GPT-4o voice likely uses:
+Dựa trên thông tin công khai, không nên khẳng định chi tiết nội bộ của GPT-4o Voice như một kiến trúc đã được công bố đầy đủ. Cách diễn giải an toàn hơn là xem hệ thống này như một unified multimodal model có các nhánh encode/decode cho audio và text, được tối ưu cho tương tác thời gian thực.
 
-<figure id="fig-gpt4o-arch">
-  <img src="fig-11-speech-llms-20.png" alt="GPT-4o Voice (suy đoán): Unified Multimodal Transformer" />
-  <figcaption><strong>Hình:</strong> GPT-4o Voice (suy đoán): Unified Multimodal Transformer</figcaption>
-</figure>
+```mermaid
+flowchart TD
+    AIN["Audio input"] --> AE["Audio encoder"]
+    TIN["Text / system context"] --> TE["Text encoder / tokenizer"]
+    AE --> CORE["Unified multimodal core<br>architecture not fully public"]
+    TE --> CORE
+    CORE --> TD["Text decoder"]
+    CORE --> AD["Audio decoder"]
+    TD --> TEXT["Text tokens / tool calls"]
+    AD --> AOUT["Streaming speech output"]
+```
+
+**Hình:** Sơ đồ khái niệm cho mô hình voice multimodal thống nhất. Đây không phải reverse engineering chi tiết, mà là cách biểu diễn thận trọng từ các năng lực công khai: audio input, reasoning, tool use và speech output realtime.
 
 ## Comparison of Speech LLMs
 

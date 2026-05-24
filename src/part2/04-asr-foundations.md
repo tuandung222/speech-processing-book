@@ -334,10 +334,19 @@ $$
 
 RNN-T hoạt động trên **lattice** 2D $(T \times U)$:
 
-<figure id="fig-rnnt-lattice">
-  <img src="fig-04-asr-foundations-02.png" alt="RNN-T Lattice: → = emit label (advance u), ↓ = emit blank (advance t)" />
-  <figcaption><strong>Hình:</strong> RNN-T Lattice: → = emit label (advance u), ↓ = emit blank (advance t)</figcaption>
-</figure>
+```mermaid
+flowchart TD
+    S00["(t=0, u=0)"] -->|"blank: advance time"| S10["(t=1, u=0)"]
+    S00 -->|"emit y1: advance label"| S01["(t=0, u=1)"]
+    S10 -->|"blank"| S20["(t=2, u=0)"]
+    S10 -->|"emit y1"| S11["(t=1, u=1)"]
+    S01 -->|"blank"| S11
+    S01 -->|"emit y2"| S02["(t=0, u=2)"]
+    S11 -->|"blank"| S21["(t=2, u=1)"]
+    S11 -->|"emit y2"| S12["(t=1, u=2)"]
+```
+
+**Hình:** Lattice RNN-T. Đi xuống nghĩa là emit blank và tiến theo time frame; đi sang phải nghĩa là emit label và tiến theo output sequence.
 
 - Di chuyển **xuống** (↓): emit blank, advance frame $t \to t+1$
 - Di chuyển **phải** (→): emit label $y_u$, advance label $u \to u+1$
