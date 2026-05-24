@@ -101,10 +101,26 @@ Bảng ánh xạ đầy đủ giữa các khái niệm NLP và Speech, giúp NLP
 
 ## Architecture Mapping Diagram
 
-<figure id="fig-nlp-speech-mapping">
-  <img src="fig-appendix-c-mapping-26.png" alt="NLP Pipeline vs Speech Pipeline  -  Architecture Mapping" />
-  <figcaption><strong>Hình:</strong> NLP Pipeline vs Speech Pipeline  -  Architecture Mapping</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    subgraph NLP["NLP pipeline"]
+        TXT["Text"] --> TOK["Tokenizer"]
+        TOK --> EMB["Token embeddings"]
+        EMB --> TR["Transformer"]
+        TR --> OUTT["Text logits / tokens"]
+    end
+    subgraph Speech["Speech pipeline"]
+        WAV["Waveform"] --> FEAT["Feature extractor<br>mel / SSL / codec"]
+        FEAT --> REP["Frame or codec embeddings"]
+        REP --> STR["Conformer / Transformer / Speech LLM"]
+        STR --> OUTS["Text, units, waveform, labels"]
+    end
+    TOK -. conceptual analogue .- FEAT
+    EMB -. representation space .- REP
+    TR -. sequence model .- STR
+```
+
+**Hình:** Mapping kiến trúc giữa NLP và Speech. Điểm khác biệt cốt lõi là speech phải biến tín hiệu liên tục thành frame, representation hoặc codec tokens trước khi áp dụng sequence modeling.
 
 ## Scale Comparison
 
