@@ -4,23 +4,24 @@ Compiled from Tavily web search during autonomous rewrite session 2.
 
 ## Qwen-Omni Family
 
-### Qwen3-Omni (October 2025)
+### Qwen3-Omni (September 2025)
 - **Repo**: <https://github.com/QwenLM/Qwen3-Omni>
-- **Variants**: Qwen3-Omni-30B-A3B (Instruct, Thinking)
-- **Architecture**: MoE Thinker-Talker design
-- **Languages**: 119 text, 19 speech input, 10 speech output
-- **Benchmarks**: SOTA on 22 of 36 audio/video benchmarks, open-source SOTA on 32 of 36
-- **Comparable to**: Gemini 2.5 Pro on ASR, audio understanding, voice conversation
+- **Variants**: Qwen3-Omni-30B-A3B-Instruct, Thinking, Captioner
+- **Architecture**: MoE Thinker-Talker design; Thinker for multimodal reasoning, Talker for streaming speech generation, Code2Wav for waveform output
+- **Languages**: 119 text input, 19 speech input including Vietnamese, 10 speech output excluding Vietnamese in the official README list
+- **Benchmarks**: official report claims leading results on 22/36 audio/video benchmarks and open-source leading results on 32/36; verify per benchmark protocol
+- **Comparable to**: Gemini 2.5 Pro on several reported ASR, audio understanding, and voice conversation benchmarks
 - **License**: Apache 2.0
-- **Reasoning model**: Qwen3-Omni-30B-A3B-Thinking — supports chain-of-thought over multimodal inputs
+- **Reasoning model**: Qwen3-Omni-30B-A3B-Thinking, reasoning-oriented and primarily text-output in official model descriptions
+- **Serving**: vLLM-Omni supports `vllm serve Qwen/Qwen3-Omni-30B-A3B-Instruct --omni`; stage-based deployment splits Thinker, Talker, and Code2Wav
 
 ### Qwen3-Omni-Flash (December 2025)
 - Faster variant, optimized latency
 - URL: <https://qwen.ai/blog?id=qwen3-omni-flash-20251201>
 
 ### Qwen3.5-Omni (March 30, 2026)
-- **Plus variant**: 215 SOTA results across audio, audio-video, reasoning, interaction
-- Outperformed Gemini 3.1 Pro on general audio understanding, reasoning, translation
+- **Plus variant**: official report claims many leading results across audio, audio-video, reasoning, and interaction benchmarks
+- Reported favorable comparisons against Gemini 3.1 Pro on selected general audio understanding, reasoning, and translation benchmarks; verify per benchmark protocol
 - Native multimodal (text, image, audio, video in single pass)
 - Real-time streaming speech output
 
@@ -54,7 +55,7 @@ Compiled from Tavily web search during autonomous rewrite session 2.
 - Helps Moshi answer tough questions with help from text LLM
 
 ### Kyutai TTS / Pocket TTS
-- 100M params TTS matching 10x larger SOTA
+- 100M params TTS reported to be competitive with much larger models in the authors' evaluation setup
 - Voice cloning support
 - Real-time streaming
 

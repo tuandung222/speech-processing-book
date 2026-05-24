@@ -46,7 +46,7 @@ Trang này tập hợp các tham khảo cốt lõi xuyên suốt cuốn sách, t
 - Chu, Y. và cộng sự (2023). "Qwen-Audio". arXiv:2311.07919.
 - Défossez, A. và cộng sự (2024). "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue". arXiv:2410.00037.
 - Xu, J. và cộng sự (2025). "Qwen2.5-Omni Technical Report". arXiv:2503.20215.
-- Qwen Team (2025). "Qwen3-Omni Technical Report". GitHub Qwen3-Omni.
+- Qwen Team (2025). "Qwen3-Omni Technical Report". arXiv:2509.17765; GitHub QwenLM/Qwen3-Omni.
 - Qwen Team (2026). "Qwen3.5-Omni Technical Report".
 - OpenAI (2025). "Introducing gpt-realtime and Realtime API updates for production voice agents". <https://openai.com/index/introducing-gpt-realtime>.
 

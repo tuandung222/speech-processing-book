@@ -478,16 +478,16 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 - Audio + image + video encoders → Thinker LLM → Talker streaming speech output.
 - Streaming capable.
 
-#### Qwen3-Omni (October 2025) ⭐ Major release
+#### Qwen3-Omni (September 2025) — major open-source release
 
-- Architecture: MoE (Mixture-of-Experts) Thinker-Talker.
+- Architecture: MoE (Mixture-of-Experts) Thinker-Talker, gồm Thinker cho multimodal understanding/reasoning và Talker cho streaming speech generation.
 - Available variants:
-  - Qwen3-Omni-30B-A3B-Instruct (text+audio+video input, text+audio output).
-  - Qwen3-Omni-30B-A3B-Thinking (chain-of-thought reasoning capable).
-  - Qwen3-Omni-30B-A3B-Captioner (audio→text descriptions).
-- Languages: 119 text, 19 speech input, 10 speech output.
+  - Qwen3-Omni-30B-A3B-Instruct (text, image, audio, video input; text+audio output).
+  - Qwen3-Omni-30B-A3B-Thinking (reasoning-oriented, text output).
+  - Qwen3-Omni-30B-A3B-Captioner (detailed audio captioning).
+- Languages: 119 text input, 19 speech input (có Vietnamese), 10 speech output (chưa có Vietnamese trong danh sách chính thức).
 - Benchmarks: theo technical report của nhóm tác giả, model đạt kết quả dẫn đầu trên nhiều benchmark audio/video; cần đọc từng benchmark theo protocol và thời điểm công bố.
-- ASR + audio understanding + voice conversation comparable to Gemini 2.5 Pro.
+- ASR, audio understanding và voice conversation được báo cáo là cạnh tranh với Gemini 2.5 Pro trên nhiều benchmark công khai; cần benchmark lại khi triển khai thực tế.
 - License: Apache 2.0.
 
 #### Qwen3-Omni-Flash (Dec 2025)
@@ -545,7 +545,7 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 |---|---|---|---|---|---|---|---|
 | Qwen2-Audio | 2024 | 7B | ✓ | ✗ | ✗ | ✗ | ✓ |
 | Qwen2.5-Omni | 2025 | 7B | ✓ | ✓ | partial | ✓ | ✓ |
-| Qwen3-Omni | Oct 2025 | 30B-A3B (MoE) | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Qwen3-Omni | Sep 2025 | 30B-A3B (MoE) | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Qwen3-Omni-Flash | Dec 2025 | smaller MoE | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Qwen3.5-Omni Plus | Mar 2026 | larger MoE | ✓ | ✓ | ✓ | ✓ | ✓ |
 | Moshi v1 | Sep 2024 | 7.6B | ✓ | ✓ | ✓ | ✓ | ✓ |
@@ -558,7 +558,7 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 
 1. **MoE architectures dominant**: Qwen3-Omni's MoE Thinker-Talker design provides best efficiency/capability tradeoff.
 2. **Native multimodal converging**: separate audio + image + video encoders are being replaced by unified transformers.
-3. **Open source catching up to closed**: Qwen3.5-Omni vượt Gemini 3.1 Pro is significant milestone.
+3. **Open source catching up to closed on selected benchmarks**: các báo cáo Qwen3.5-Omni cho thấy open-source Omni models đang thu hẹp khoảng cách, nhưng cần kiểm chứng theo workload thực tế.
 4. **Latency targets sub-300ms**: all serious systems now target sub-300ms first-byte for natural conversation.
 5. **Tool calling integrated**: GPT-Realtime MCP support, Qwen3-Omni function calling natively.
 6. **RAG for speech**: MoshiRAG demonstrates retrieval-augmented speech LMs as new paradigm.
@@ -582,7 +582,7 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 | Audio → LLM → Text | Qwen2-Audio | Audio adapter for LLM |
 | Full-duplex dialogue | Moshi | Dual-stream + Depth Transformer |
 | MoE Multimodal | Qwen3-Omni | MoE Thinker-Talker, 119 langs |
-| Native unified multimodal | Qwen3.5-Omni Plus | Outperform Gemini 3.1 Pro |
+| Native unified multimodal | Qwen3.5-Omni Plus | Frontier report; verify per benchmark |
 | RAG-enhanced speech | MoshiRAG | Async knowledge retrieval |
 | Production closed | GPT-Realtime | MCP + SIP phone integration |
 

@@ -192,7 +192,7 @@ $$
 | Qwen2.5-Omni | khoảng 300 ms | Thinker-Talker | Có | CosyVoice codec | 2025 |
 | Gemini Live | khoảng 250 ms | Neural | Không | Proprietary | 2025 |
 | GPT-Realtime | sub-500 ms target | Neural | Không | Proprietary | Aug 2025 |
-| Qwen3-Omni | sub-300 ms | MoE Thinker-Talker | Có | Mimi-like | Oct 2025 |
+| Qwen3-Omni | sub-300 ms | MoE Thinker-Talker | Có | Multi-codebook audio | Sep 2025 |
 | Moshi v2 + MoshiRAG | khoảng 200 ms | Neural + RAG | Có | Mimi | Apr 2026 |
 | Gemini 3 Live | sub-250 ms target | Neural | Không | Proprietary | 2026 |
 

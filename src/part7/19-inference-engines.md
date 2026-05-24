@@ -372,11 +372,12 @@ WhisperX [^bain2023whisperx] mở rộng faster-whisper với:
 
 ## vLLM cho Speech LLMs
 
-vLLM [^kwon2023efficient] cho serving Speech LLMs (Qwen2-Audio, SALMONN):
+vLLM [^kwon2023efficient] và vLLM-Omni cho serving Speech LLMs (Qwen2-Audio, Qwen3-Omni, SALMONN):
 
 - **PagedAttention**: Efficient KV-cache management
 - **Continuous batching**: Dynamic request scheduling
 - **Tensor parallelism**: Multi-GPU serving
+- **Omni serving**: hỗ trợ text/image/audio/video input và text/audio output qua OpenAI-compatible API trong vLLM-Omni
 
 ```python
 #| eval: false
@@ -399,6 +400,23 @@ vLLM [^kwon2023efficient] cho serving Speech LLMs (Qwen2-Audio, SALMONN):
 # prompt = "Transcribe the following audio in Vietnamese:"
 # # result = llm.generate(prompt, sampling_params)
 ```
+
+### vLLM-Omni cho Qwen3-Omni
+
+Với Qwen3-Omni, vLLM-Omni dùng flag `--omni` và có thể chạy unified process hoặc stage-based deployment. Recipe chính thức minh hoạ:
+
+```bash
+#| eval: false
+vllm serve Qwen/Qwen3-Omni-30B-A3B-Instruct --omni --port 8091
+```
+
+Khi cần tách tải production, có thể chạy ba stage:
+
+1. **Stage 0**: Thinker + API server.
+2. **Stage 1**: Talker, sinh speech tokens.
+3. **Stage 2**: Code2Wav, chuyển codec tokens thành waveform.
+
+Điểm cần nhớ: `/v1/realtime` yêu cầu tắt `async_chunk` trong một số cấu hình; benchmark nên đo riêng TTFT, TPOT, inter-token latency và end-to-end latency cho cả text-only lẫn text+audio output.
 
 ## OpenVINO (Intel)
 

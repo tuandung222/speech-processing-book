@@ -33,7 +33,7 @@ Theo plan, 12 phase đã được thực hiện tuần tự với autonomy cao:
 - **Phase 3**: Viết Chương 0 mới (510 dòng, foundations: linguistics, acoustics, DSP, ML cổ điển), audit tone Chương 1, thêm Chương N: prefix và intro cho Chương 2 và 3.
 - **Phase 4**: Thêm Chương N: prefix và intro cho Ch4-Ch7 (ASR Foundations, Modern ASR, Whisper/Canary, Streaming ASR), fix em-dash trong Ch6.
 - **Phase 5**: Thêm intro cho Ch8-Ch10 (TTS Foundations, End-to-End TTS, Audio Codecs), fix em-dash trong Ch9.
-- **Phase 6**: Thêm intro cho Ch11-Ch13 (Speech LLMs, Multimodal Omni, Full-Duplex). Mở rộng Ch12 với GPT-Realtime (Aug 2025), Qwen3-Omni (Oct 2025), Qwen3.5-Omni Plus (Mar 2026), Gemini Live 3. Mở rộng Ch13 với MoshiRAG (Apr 2026), Pocket TTS, MoshiVis, evaluation metrics cho full-duplex dialogue.
+- **Phase 6**: Thêm intro cho Ch11-Ch13 (Speech LLMs, Multimodal Omni, Full-Duplex). Mở rộng Ch12 với GPT-Realtime (Aug 2025), Qwen3-Omni (Sep 2025), Qwen3.5-Omni Plus (Mar 2026), Gemini Live 3. Mở rộng Ch13 với MoshiRAG (Apr 2026), Pocket TTS, MoshiVis, evaluation metrics cho full-duplex dialogue.
 - **Phase 7**: Thêm intro cho Ch14 (Speech Classification) với production context (Trusting Social KYC, call center analytics, smart home). Ch15 và Ch21 đã có intro từ session trước.
 - **Phase 8**: Thêm intro cho Ch16 (Vietnamese Speech), Ch17 (Vietnamese Datasets), App E (Vietnamese Resources). Fix em-dash separators trong prose Ch16. Fix typo "đặc thu" → "đặc thù".
 - **Phase 9**: Thêm intro cho Ch18 (Training Frameworks), Ch19 (Inference Engines), App F (Tool Comparison). Ch20 đã có intro từ session trước.
@@ -79,6 +79,17 @@ Các điểm còn có thể tiếp tục cải thiện trong tương lai:
 - Bổ sung thêm notebook hoặc runnable examples cho một số code listing dài.
 - Nếu cần mở rộng chương mới, cân nhắc một chương/phụ lục riêng cho Speech Enhancement (denoising, dereverberation, separation).
 - Vietnamese benchmark cho code-switching và emotion vẫn là khoảng trống thực sự của ngành, cần dữ liệu mới ngoài phạm vi rewrite nội dung.
+
+## Cập nhật nguồn Qwen3-Omni chính thức
+
+Sau yêu cầu tiếp tục đối chiếu nguồn ngoài, đã kiểm tra GitHub user `dung-vpt`. GitHub API hiện trả về `0` public repositories cho account này, và các URL repo khả dĩ như `dung-vpt/speech-processing-book`, `dung-vpt/S-AI`, `dung-vpt/speech-ai` đều không public hoặc không tồn tại, nên không thể clone để so sánh trực tiếp.
+
+Thay vào đó, nội dung Qwen3-Omni đã được đối chiếu với nguồn chính thức `QwenLM/Qwen3-Omni` và recipe `vllm-project/vllm-omni`. Các điểm cập nhật chính:
+
+- Qwen3-Omni được chỉnh về mốc công bố tháng 9/2025 theo README chính thức.
+- Ghi rõ 19 speech input languages có Vietnamese, nhưng 10 speech output languages chính thức chưa có Vietnamese.
+- Bổ sung ghi chú deployment vLLM-Omni: unified serving với `--omni`, hoặc stage-based Thinker, Talker, Code2Wav.
+- Các claim benchmark được giữ ở mức “theo technical report/official report” và nhắc cần verify theo protocol benchmark.
 
 ## Stop conditions đã gặp
 

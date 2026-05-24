@@ -477,7 +477,7 @@ Advantages: simpler architecture, scaling laws giống LLM. Cũng support T2T, S
 
 Year 2025-2026 mang lại major improvements:
 
-- **Qwen3-Omni (Oct 2025)**: open-source, MoE Thinker-Talker, được báo cáo có kết quả cạnh tranh với Gemini 2.5 Pro trên một số tác vụ voice translation.
+- **Qwen3-Omni (Sep 2025)**: open-source, MoE Thinker-Talker, được báo cáo có kết quả cạnh tranh với Gemini 2.5 Pro trên một số tác vụ voice translation.
 - **Qwen3.5-Omni (Mar 2026)**: Plus variant được công bố có kết quả mạnh trên một số translation benchmarks; cần đọc theo protocol benchmark cụ thể.
 - **GPT-Realtime (Aug 2025)**: OpenAI Realtime API có realtime translation feature, MCP server support.
 - **Gemini 3 multimodal Live**: Google streaming translation trong video call.
@@ -685,11 +685,11 @@ Pros: Stable, well-tested, open. Cons: Slow, error propagation.
 - S2TT for ~10 languages.
 - Better translation than Qwen2-Audio.
 
-### 8.6 Qwen3-Omni (Alibaba, Oct 2025) ⭐ Major release
+### 8.6 Qwen3-Omni (Alibaba, Sep 2025) — major open-source release
 
-- MoE Thinker-Talker (30B-A3B variant).
-- 119 text languages, 19 speech input, 10 speech output.
-- ASR + audio understanding comparable to Gemini 2.5 Pro.
+- MoE Thinker-Talker (30B-A3B variant), gồm Thinker cho multimodal reasoning và Talker cho streaming speech generation.
+- 119 text languages, 19 speech input languages, 10 speech output languages. Vietnamese có trong speech input nhưng chưa có trong speech output chính thức.
+- ASR và audio understanding được báo cáo là cạnh tranh với Gemini 2.5 Pro trên nhiều benchmark công khai.
 - Open source Apache 2.0.
 - Available variants: Instruct, Thinking (reasoning), Captioner (audio→text).
 
@@ -701,7 +701,7 @@ Pros: Stable, well-tested, open. Cons: Slow, error propagation.
 ### 8.8 Qwen3.5-Omni (Mar 2026) — frontier open-source report
 
 - Theo technical report, đạt nhiều kết quả dẫn đầu trên các benchmark âm thanh, video và reasoning.
-- Theo công bố của nhóm tác giả, so sánh thuận lợi với Gemini 3.1 Pro trên một số benchmark general audio understanding, reasoning và translation.
+- Theo công bố của nhóm tác giả, so sánh thuận lợi với Gemini 3.1 Pro trên một số benchmark general audio understanding, reasoning và translation; cần kiểm chứng lại khi chuyển sang workload production.
 - Plus variant native multimodal (text+image+audio+video single pass).
 - Streaming speech output realtime.
 
@@ -742,8 +742,8 @@ Pros: Stable, well-tested, open. Cons: Slow, error propagation.
 | AudioPaLM 2 | E2E LM | 2023 | 100+ | No | No | Higher than Seamless |
 | Qwen2-Audio | Multimodal LM | 2024 | 10+ | No | Yes | Comparable to Seamless |
 | Qwen2.5-Omni | Multimodal LM | 2025 | 19 | Yes | Yes | Better than Qwen2-Audio |
-| Qwen3-Omni | MoE Multimodal | Oct 2025 | 119/19/10 | Yes | Yes | ~ Gemini 2.5 Pro |
-| Qwen3.5-Omni | MoE Multimodal | Mar 2026 | 119+ | Yes | Yes | **> Gemini 3.1 Pro** |
+| Qwen3-Omni | MoE Multimodal | Sep 2025 | 119/19/10 | Yes | Yes | Strong public benchmarks |
+| Qwen3.5-Omni | MoE Multimodal | Mar 2026 | 119+ | Yes | Yes | Frontier report; verify per benchmark |
 | GPT-Realtime | Closed S2S | Aug 2025 | 50+ | Yes | No | Commercial leader |
 | Gemini 3 Live | Closed Streaming | 2026 | 50+ | Yes | No | Commercial leader |
 | Hibiki | E2E Streaming | 2025 | 4-6 pairs | Yes | Yes | Best open simultaneous |
@@ -908,7 +908,7 @@ Solution: train ASR trên code-switched data (CMC challenge có dataset này), h
 1. **Cascaded baseline**: PhoWhisper (ASR Vi) + NLLB-200 hoặc GPT-4o-mini (MT) + ElevenLabs Multilingual (TTS En).
 2. **Streaming**: ASR streaming với Deepgram Nova hoặc Whisper streaming, MT incremental, TTS Cartesia.
 3. **Voice cloning Vi**: XTTS v2 fine-tuned trên Vi data.
-4. **Multimodal Vi-aware**: Qwen3-Omni đã support Vi text input, audio output gần đủ.
+4. **Multimodal Vi-aware**: Qwen3-Omni hỗ trợ Vietnamese speech input theo README chính thức, nhưng chưa hỗ trợ Vietnamese speech output trong danh sách speech output. Với voice agent Việt, hướng thực dụng là dùng Qwen3-Omni cho audio understanding/S2TT hoặc reasoning, sau đó ghép với TTS tiếng Việt riêng.
 
 ---
 
@@ -968,7 +968,7 @@ Các hệ thống TTS streaming thương mại hỗ trợ khoảng 50-100 ngôn 
 
 - SeamlessM4T v2 paper (Nature 2024).
 - Hibiki technical report (Kyutai 2025).
-- Qwen3-Omni technical report (Alibaba, Oct 2025).
+- Qwen3-Omni technical report (Alibaba, Sep 2025).
 - AudioPaLM 2 (Google).
 - GPT-Realtime API docs (OpenAI).
 
@@ -991,7 +991,7 @@ Chương 16 (Vietnamese Speech Processing) và Chương 17 (Vietnamese Datasets)
 9. Saeki, T. et al. (2022). UTMOS: UTokyo-SaruLab System for VoiceMOS Challenge 2022. Interspeech.
 10. Radford, A. et al. (2022). Robust Speech Recognition via Large-Scale Weak Supervision (Whisper). OpenAI.
 11. Le, T. et al. (2024). PhoWhisper: Automatic Speech Recognition for Vietnamese. ICLR Tiny Papers.
-12. Qwen Team (Oct 2025). Qwen3-Omni Technical Report. Alibaba.
+12. Qwen Team (2025). Qwen3-Omni Technical Report. arXiv:2509.17765; GitHub QwenLM/Qwen3-Omni.
 13. OpenAI (Aug 2025). Introducing gpt-realtime and Realtime API updates for production voice agents.
 14. Borsos, Z. et al. (2023). AudioLM: A Language Modeling Approach to Audio Generation. IEEE/ACM TASLP.
 15. Wang, C. et al. (2023). VALL-E: Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers. arXiv:2301.02111.
