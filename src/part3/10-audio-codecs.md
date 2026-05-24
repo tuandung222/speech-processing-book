@@ -245,10 +245,19 @@ class ResidualVQ(nn.Module):
 
 EnCodec [^defossez2022encodec] là neural audio codec của Meta:
 
-<figure id="fig-encodec-arch">
-  <img src="fig-10-audio-codecs-12.png" alt="Kiến trúc EnCodec: Encoder → RVQ → Decoder" />
-  <figcaption><strong>Hình:</strong> Kiến trúc EnCodec: Encoder → RVQ → Decoder</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    X["Waveform"] --> ENC["Convolutional encoder"]
+    ENC --> Z["Continuous latent z"]
+    Z --> RVQ["Residual vector quantization<br>multiple codebooks"]
+    RVQ --> C["Discrete codec tokens"]
+    C --> DEC["Convolutional decoder"]
+    DEC --> XHAT["Reconstructed waveform"]
+    XHAT --> D["Multi-scale discriminator"]
+    X --> D
+```
+
+**Hình:** EnCodec nén waveform thành codec tokens thông qua RVQ. Các tokens này vừa phục vụ nén audio, vừa trở thành “vocabulary” cho Speech LLM và audio generation.
 
 ### Training Losses
 
@@ -304,10 +313,20 @@ DAC [^kumar2024dac] cải tiến EnCodec với:
 
 SpeechTokenizer tách biệt **semantic** và **acoustic** information:
 
-<figure id="fig-speechtokenizer">
-  <img src="fig-10-audio-codecs-13.png" alt="SpeechTokenizer: Disentangled Semantic/Acoustic Tokens" />
-  <figcaption><strong>Hình:</strong> SpeechTokenizer: Disentangled Semantic/Acoustic Tokens</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    X["Waveform"] --> ENC["Encoder"]
+    ENC --> RVQ["RVQ layers"]
+    RVQ --> S["Layer 1<br>semantic token"]
+    RVQ --> A["Layers 2..N<br>acoustic tokens"]
+    HUB["HuBERT teacher"] --> DIST["Semantic distillation loss"]
+    S --> DIST
+    S --> DEC["Decoder"]
+    A --> DEC
+    DEC --> Y["Reconstructed speech"]
+```
+
+**Hình:** SpeechTokenizer cố tình tách lớp token semantic khỏi các lớp acoustic. Cách tách này giúp model downstream dùng token ngữ nghĩa cho understanding và token acoustic cho reconstruction hoặc voice style.
 
 Training: Thêm **semantic distillation loss** cho layer 1:
 

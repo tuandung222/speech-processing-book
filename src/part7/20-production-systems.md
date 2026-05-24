@@ -101,27 +101,22 @@ Bây giờ vào kiến trúc cụ thể. Đây là blueprint cho voice agent đa
 
 ### 2.1 Pipeline tổng quan
 
+```mermaid
+flowchart TD
+    MIC["User microphone"] --> C["WebRTC client<br>browser, mobile, phone"]
+    C --> W["WebRTC server<br>LiveKit, Daily, Twilio"]
+    W --> VAD["VAD<br>speech / silence"]
+    VAD --> END["Endpointing<br>end-of-utterance"]
+    END --> ASR["Streaming ASR"]
+    ASR --> LLM["LLM stage<br>function calling, RAG, state tracking"]
+    LLM --> TTS["Streaming TTS"]
+    TTS --> W
+    W --> SPK["User speaker"]
+    ASR -. partial transcript .-> OBS["Observability<br>logs, traces, metrics"]
+    LLM -. tool calls .-> TOOLS["External tools<br>CRM, database, ticketing"]
 ```
-[User microphone]
-     ↓
-WebRTC client (browser, mobile, phone) — packetize audio
-     ↓
-WebRTC server (LiveKit, Daily, Twilio) — receive, optionally transcode
-     ↓
-VAD (Voice Activity Detection) — silero-vad, webrtcvad
-     ↓
-Endpointing — detect end-of-utterance
-     ↓
-Streaming ASR (Deepgram Nova-3, AssemblyAI, Whisper streaming)
-     ↓
-LLM (GPT-4o-mini, Claude, self-host) — handle function calling, RAG
-     ↓
-Streaming TTS (Cartesia, ElevenLabs Flash, Deepgram Aura)
-     ↓
-WebRTC playback ←─── (back through WebRTC server)
-     ↓
-[User speaker]
-```
+
+**Hình:** Pipeline voice agent production là một hệ thống streaming end-to-end. Mỗi cạnh trong sơ đồ đều có latency, failure mode và telemetry riêng; vì vậy tối ưu production cần quan sát toàn bộ chuỗi thay vì chỉ tối ưu model ASR hoặc TTS riêng lẻ.
 
 ### 2.2 Voice Activity Detection (VAD)
 

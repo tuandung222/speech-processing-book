@@ -203,10 +203,18 @@ $$
 
 ### Text Processing Pipeline cho Tiếng Việt
 
-<figure id="fig-vi-tts-pipeline">
-  <img src="fig-16-vietnamese-speech-21.png" alt="Vietnamese Text Processing Pipeline cho TTS" />
-  <figcaption><strong>Hình:</strong> Vietnamese Text Processing Pipeline cho TTS</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    RAW["Raw Vietnamese text"] --> UNI["Unicode normalization<br>NFC/NFKC"]
+    UNI --> TN["Text normalization<br>numbers, dates, abbreviations"]
+    TN --> SEG["Word / syllable segmentation"]
+    SEG --> G2P["Vietnamese G2P<br>initial, rhyme, tone"]
+    G2P --> PROS["Prosody features<br>phrase breaks, emphasis"]
+    PROS --> TTS["TTS acoustic model"]
+    TTS --> WAV["Vietnamese speech waveform"]
+```
+
+**Hình:** Text processing cho TTS tiếng Việt cần giữ thanh điệu, dấu tiếng Việt và ranh giới âm tiết nhất quán. Nếu normalization sai ở bước đầu, acoustic model phía sau thường không thể tự sửa lỗi.
 
 ### Vietnamese G2P
 

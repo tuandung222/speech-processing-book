@@ -37,10 +37,17 @@ trong đó $Y = (y_1, \ldots, y_U)$ là chuỗi text tokens và $\mathbf{x}$ là
 
 Hầu hết TTS systems chia thành 2 giai đoạn:
 
-<figure id="fig-tts-pipeline">
-  <img src="fig-08-tts-foundations-05.png" alt="Two-Stage TTS Pipeline" />
-  <figcaption><strong>Hình:</strong> Two-Stage TTS Pipeline</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    T["Text"] --> TN["Text normalization"]
+    TN --> G2P["G2P / phoneme sequence"]
+    G2P --> AM["Acoustic model<br>Text to mel"]
+    AM --> MEL["Mel spectrogram"]
+    MEL --> VOC["Neural vocoder<br>Mel to waveform"]
+    VOC --> WAV["Waveform"]
+```
+
+**Hình:** Pipeline TTS hai giai đoạn. Acoustic model học cấu trúc ngôn ngữ và prosody ở mức mel spectrogram; vocoder chịu trách nhiệm chuyển biểu diễn phổ thành waveform nghe được.
 
 **Tại sao 2 stages?**
 
@@ -60,10 +67,20 @@ Hầu hết TTS systems chia thành 2 giai đoạn:
 
 Tacotron 2 [^shen2018natural] là attention-based seq2seq model cho Text-to-Mel:
 
-<figure id="fig-tacotron2-arch">
-  <img src="fig-08-tts-foundations-06.png" alt="Kiến trúc Tacotron 2" />
-  <figcaption><strong>Hình:</strong> Kiến trúc Tacotron 2</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    P["Phoneme / character sequence"] --> E["Encoder"]
+    E --> A["Location-sensitive attention"]
+    PR["Previous mel frame"] --> PN["PreNet"]
+    PN --> D["Autoregressive decoder"]
+    A --> D
+    D --> M["Mel frame"]
+    D --> S["Stop token"]
+    M --> PP["PostNet"]
+    PP --> OUT["Refined mel spectrogram"]
+```
+
+**Hình:** Tacotron 2 là seq2seq autoregressive. Attention alignment là thành phần then chốt, vì nếu alignment lệch, model có thể lặp từ, bỏ từ hoặc dừng sai thời điểm.
 
 ### Location-Sensitive Attention
 
@@ -122,10 +139,21 @@ $$
 
 FastSpeech 2 [^ren2020fastspeech] giải quyết tất cả hạn chế của Tacotron 2 bằng **parallel generation** + **explicit duration prediction**:
 
-<figure id="fig-fastspeech2-arch">
-  <img src="fig-08-tts-foundations-07.png" alt="Kiến trúc FastSpeech 2: Non-Autoregressive TTS" />
-  <figcaption><strong>Hình:</strong> Kiến trúc FastSpeech 2: Non-Autoregressive TTS</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    P["Phoneme sequence"] --> ENC["Feed-forward Transformer encoder"]
+    ENC --> DUR["Duration predictor"]
+    ENC --> PIT["Pitch predictor"]
+    ENC --> ENG["Energy predictor"]
+    DUR --> LR["Length regulator"]
+    ENC --> LR
+    PIT --> LR
+    ENG --> LR
+    LR --> DEC["Parallel decoder"]
+    DEC --> MEL["Mel spectrogram"]
+```
+
+**Hình:** FastSpeech 2 thay attention autoregressive bằng duration prediction và length regulator. Thiết kế này giúp inference song song hơn và kiểm soát trực tiếp duration, pitch, energy.
 
 ### Variance Adaptors
 

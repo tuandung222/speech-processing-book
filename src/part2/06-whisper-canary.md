@@ -39,10 +39,17 @@ $$
 
 Whisper là **encoder-decoder Transformer** kinh điển:
 
-<figure id="fig-whisper-arch">
-  <img src="fig-06-whisper-canary-04.png" alt="Kiến trúc Whisper: Encoder-Decoder Transformer cho Multitask Speech" />
-  <figcaption><strong>Hình:</strong> Kiến trúc Whisper: Encoder-Decoder Transformer cho Multitask Speech</figcaption>
-</figure>
+```mermaid
+flowchart LR
+    A["Waveform<br>30 s window"] --> B["Log-mel spectrogram<br>80 x 3000"]
+    B --> C["Conv1d stack<br>downsample 2x"]
+    C --> D["Transformer Encoder<br>audio representation"]
+    E["Task tokens<br>language, transcribe/translate, timestamps"] --> F["Autoregressive Text Decoder"]
+    D --> F
+    F --> G["Text tokens<br>or timestamp tokens"]
+```
+
+**Hình:** Kiến trúc Whisper ở mức hệ thống. Điểm quan trọng là encoder xử lý log-mel spectrogram cố định, còn decoder nhận task tokens để cùng một model thực hiện transcription, translation và timestamp prediction.
 
 ### Audio Encoder
 
