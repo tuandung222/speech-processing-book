@@ -2,12 +2,12 @@
 
 ## Vì sao chương này quan trọng
 
-Neural audio codec (EnCodec, DAC, Mimi, SpeechTokenizer) là thành phần engineering chủ chốt cho phép Speech LLM tồn tại. Bằng cách biến tín hiệu audio liên tục thành chuỗi token rời rạc cỡ 1k-8k vocabulary với bit-rate thấp (vài kbps), codec tạo ra "BPE cho audio" và cho phép áp dụng paradigm autoregressive LM trực tiếp lên speech.
+Neural audio codec (EnCodec, DAC, Mimi, SpeechTokenizer) là thành phần engineering chủ chốt cho phép Speech LLM tồn tại. Bằng cách biến tín hiệu audio liên tục thành chuỗi token rời rạc với bitrate thấp, codec tạo ra một dạng “BPE cho audio” và cho phép áp dụng paradigm autoregressive LM trực tiếp lên speech.
 
 Chương này phát triển ba trục cốt lõi của codec:
 
 - **Vector quantization và residual VQ**: cơ chế biến embedding liên tục thành token rời rạc với ít distortion.
-- **Bit-rate và quality trade-off**: vì sao Mimi (1.1 kbps, 12.5 fps) lại là đột phá so với EnCodec (6 kbps, 75 fps).
+- **Bit-rate và quality trade-off**: vì sao frame rate thấp như Mimi (12.5 fps) rất quan trọng cho Speech LLM realtime so với codec token rate cao hơn.
 - **Streaming và causal architecture**: yêu cầu kỹ thuật để codec hoạt động realtime cho voice agent.
 
 Hiểu codec là điều kiện cần để đọc paper Speech LLM frontier (Moshi, VALL-E, Qwen3-Omni), và để thiết kế pipeline production voice agent có chi phí và latency hợp lý.
@@ -19,6 +19,28 @@ Hiểu codec là điều kiện cần để đọc paper Speech LLM frontier (Mo
 > - **Phần 3**: EnCodec (Meta, 2022), kiến trúc và performance.
 > - **Phần 4**: DAC, Mimi, SpeechTokenizer, các thế hệ codec cải tiến.
 > - **Phần 5**: trade-off bit-rate, latency, quality và lựa chọn cho Speech LLM.
+
+### Bản đồ codec trong Speech LLM
+
+```mermaid
+flowchart LR
+    WAV["Waveform"] --> ENC["Neural codec encoder"]
+    ENC --> TOK["Discrete codec tokens"]
+    TOK --> LM["Audio / Speech LM"]
+    LM --> OTOK["Generated codec tokens"]
+    OTOK --> DEC["Codec decoder"]
+    DEC --> OWAV["Generated waveform"]
+```
+
+Điểm mấu chốt: LLM không thích waveform raw vì sequence quá dài và liên tục. LLM thích token rời rạc. Codec chính là cầu nối biến audio thành token để transformer có thể học theo kiểu next-token prediction.
+
+### Ba câu hỏi khi đánh giá codec
+
+| Câu hỏi | Ý nghĩa |
+|---|---|
+| Codec giữ được gì? | nội dung lời nói, speaker, prosody, emotion, noise nền |
+| Codec bỏ mất gì? | phase detail, high-frequency fidelity, room tone, nuance nhỏ |
+| Token có rẻ cho LM không? | frame rate, số codebooks, bitrate, self-attention cost |
 
 ## Phần 1 — Tại sao cần Neural Audio Codec
 
@@ -34,15 +56,29 @@ $$
 >
 > | Text Processing | Audio Processing |
 > |----------------|------------------|
-> | BPE tokenizer | Neural codec (EnCodec) |
-> | Vocabulary (32K–128K) | Codebook (1024 per layer × 8 layers) |
-> | Lossless (exact reconstruction) | Near-lossless (perceptual) |
-> | Deterministic | Learned (neural network) |
-> | Input to GPT/BERT | Input to VALL-E/AudioLM |
+> | BPE tokenizer | Neural codec (EnCodec/DAC/Mimi) |
+> | Vocabulary (32K–128K) | Codebook (ví dụ 1024 entries/layer) |
+> | Lossless đối với text | Lossy/perceptual đối với audio |
+> | Deterministic sau khi train tokenizer | Learned encoder/decoder + quantizer |
+> | Input to GPT/BERT | Input to VALL-E/AudioLM/Moshi-style models |
+
+Tuy nhiên analogy BPE không hoàn hảo. Text tokenization có thể reconstruct lại đúng chuỗi ký tự. Audio codec reconstruct lại waveform gần giống perceptually, nhưng không đảm bảo giống từng sample. Điều này ảnh hưởng trực tiếp tới speaker similarity và naturalness của TTS/voice cloning.
 
 
 
 ## Vector Quantization (VQ)
+
+### Trực giác trước công thức
+
+Vector quantization giống việc thay một vector liên tục bằng “mã gần nhất” trong một từ điển vector. Nếu encoder tạo ra latent vector biểu diễn 40 ms audio, VQ chọn codebook entry gần nhất và lưu **index** của entry đó. Index này chính là token.
+
+Ví dụ đơn giản với codebook 2D:
+
+| Latent | Codebook gần nhất | Token ID |
+|---|---|---:|
+| `(0.9, 0.1)` | `e_7 = (1.0, 0.0)` | 7 |
+| `(-0.2, 1.1)` | `e_3 = (0.0, 1.0)` | 3 |
+| `(0.4, 0.6)` | `e_9 = (0.5, 0.5)` | 9 |
 
 ### Basic VQ
 
@@ -89,6 +125,15 @@ Với codebook size $K = 1024$ và dimension $d = 128$:
 
 Thay vì 1 codebook lớn, dùng **nhiều codebooks nhỏ** quantize **residual** (phần dư):
 
+Trực giác RVQ giống vẽ một điểm bằng nhiều nét bút. Codebook đầu tiên vẽ phác thảo lớn; codebook thứ hai sửa phần sai còn lại; các codebook sau thêm chi tiết nhỏ hơn.
+
+| Bước | Việc làm | Kết quả |
+|---|---|---|
+| 1 | quantize latent gốc | nắm thông tin thô |
+| 2 | quantize residual còn lại | sửa lỗi lớn |
+| 3..Q | tiếp tục quantize residual | thêm chi tiết acoustic |
+| Tổng | cộng tất cả codebook vectors | reconstructed latent |
+
 <a id="eq-rvq"></a>
 
 $$
@@ -124,11 +169,11 @@ $$
 >
 > Các codebook layers mang thông tin khác nhau:
 >
-> - **Layer 1**: Semantic/linguistic content (phonemes, words)
-> - **Layers 2–4**: Prosody, speaker identity
-> - **Layers 5–8**: Fine acoustic details, timbre
+> - **Layer đầu** thường mang nhiều thông tin thô/semantic hơn trong một số thiết kế.
+> - **Các layer giữa** bổ sung prosody, speaker và acoustic detail.
+> - **Các layer sau** thường thêm fine detail để reconstruction tốt hơn.
 >
-> Đây là lý do AudioLM và VALL-E xử lý codebook 1 (AR) và codebooks 2–8 (NAR) khác nhau.
+> Đây là trực giác phía sau nhiều thiết kế AR/NAR: dự đoán coarse/semantic token trước, sau đó bổ sung acoustic detail bằng các codebook còn lại.
 
 
 
@@ -259,6 +304,18 @@ flowchart LR
 
 **Hình:** EnCodec nén waveform thành codec tokens thông qua RVQ. Các tokens này vừa phục vụ nén audio, vừa trở thành “vocabulary” cho Speech LLM và audio generation.
 
+### EnCodec trong pipeline Speech LLM
+
+EnCodec quan trọng không chỉ vì nén audio, mà vì nó cung cấp token interface cho các mô hình như AudioLM/VALL-E-style systems. Khi chọn EnCodec hoặc codec tương tự cho LLM, bạn cần quan tâm hai đại lượng:
+
+| Đại lượng | Tác động tới LM |
+|---|---|
+| Frame rate | càng cao thì sequence càng dài |
+| Số codebooks | càng nhiều thì mỗi frame có nhiều token/layer hơn |
+| Codebook size | ảnh hưởng vocabulary và entropy |
+| Bitrate | ảnh hưởng fidelity và cost |
+| Causal/non-causal | ảnh hưởng streaming latency |
+
 ### Training Losses
 
 <a id="eq-encodec-loss"></a>
@@ -298,14 +355,30 @@ DAC [^kumar2024dac] cải tiến EnCodec với:
 
 1. **Improved codebook utilization**: Factorized codes + L2 normalization
 2. **Snake activation**: $\text{Snake}(x) = x + \frac{1}{\alpha}\sin^2(\alpha x)$  -  tốt hơn cho periodic signals
-3. **Higher quality**: Đặc biệt ở bitrate thấp
+3. **Cải thiện chất lượng trong nhiều thiết lập**: đặc biệt đáng chú ý ở bitrate thấp, tùy benchmark
 
-| Codec | ViSQOL (↑) @ 6kbps | Codebook Usage |
-|-------|---------------------|----------------|
-| EnCodec | 3.69 | ~60% |
-| **DAC** | **4.01** | **~95%** |
+| Codec | Hướng cải tiến | Điểm cần kiểm tra |
+|-------|----------------|-------------------|
+| EnCodec | codec nền tảng, phổ biến trong nghiên cứu codec LM | token rate và quality theo bitrate |
+| DAC | cải thiện codebook usage và fidelity trong nhiều benchmark | license, checkpoint, domain audio |
 
-: DAC vs EnCodec quality <a id="tbl-dac-vs-encodec"></a>
+: Đọc DAC vs EnCodec theo hướng trade-off <a id="tbl-dac-vs-encodec"></a>
+
+## Metric đánh giá codec
+
+Codec không nên được đánh giá chỉ bằng “nghe có giống không”. Với Speech LLM, cần nhiều lớp metric:
+
+| Metric | Đo điều gì | Hạn chế |
+|---|---|---|
+| PESQ/STOI | intelligibility/speech quality proxy | không luôn khớp human preference |
+| ViSQOL | perceptual similarity | phụ thuộc domain và setup |
+| Mel/STFT loss | reconstruction phổ | không đủ cho naturalness |
+| Speaker similarity | giữ timbre/speaker identity | cần speaker encoder đáng tin |
+| ASR WER sau reconstruction | giữ nội dung lời nói | ASR cũng có lỗi riêng |
+| Token rate | cost cho LM | thấp quá có thể mất fidelity |
+| Latency | streaming feasibility | phụ thuộc implementation |
+
+Với codec cho Speech LLM, một codec “nghe hay” nhưng token rate quá cao có thể không phù hợp realtime. Ngược lại, token rate thấp nhưng mất thanh điệu hoặc speaker identity sẽ gây lỗi ở voice cloning tiếng Việt.
 
 ## SpeechTokenizer
 
@@ -342,7 +415,7 @@ $$
 
 ### Key Innovation
 
-Mimi (dùng trong Moshi [^defossez2024moshi]) đạt **ultra-low frame rate**:
+Mimi (dùng trong Moshi [^defossez2024moshi]) nổi bật vì frame rate thấp so với nhiều codec trước đó:
 
 <a id="eq-mimi-framerate"></a>
 
@@ -357,7 +430,7 @@ $$
 3. **Semantic distillation**: Layer 1 aligned với WavLM features
 4. **Split RVQ**: 1 semantic codebook + 7 acoustic codebooks
 
-### Tại sao 12.5 Hz quan trọng?
+### Tại sao frame rate thấp quan trọng?
 
 <a id="eq-mimi-tokens"></a>
 
@@ -365,7 +438,7 @@ $$
 \text{Tokens per second} = 12.5 \times 8 = 100 \text{ tokens/s (total)}
 $$
 
-So sánh: EnCodec = $75 \times 8 = 600$ tokens/s. Mimi giảm **6×** số tokens → Transformer self-attention nhanh hơn **36×** ($O(L^2)$).
+So sánh: EnCodec = $75 \times 8 = 600$ tokens/s. Nếu một codec giảm token rate 6×, chi phí self-attention lý tưởng có thể giảm khoảng 36× theo $O(L^2)$, dù chi phí thực tế còn phụ thuộc batching, architecture và cách sắp xếp codebooks.
 
 > **⚠️ Latency Warning**
 >
@@ -375,20 +448,45 @@ So sánh: EnCodec = $75 \times 8 = 600$ tokens/s. Mimi giảm **6×** số token
 > | **Mimi** | 12.5 Hz | 100 | 1,000 | $O(1M)$ |
 > | Reduction | 6× | 6× | 6× | **36×** |
 >
-> Mimi's low frame rate là yếu tố quyết định cho full-duplex dialogue trong Moshi.
+> Frame rate thấp là một yếu tố rất quan trọng cho full-duplex dialogue, vì nó giảm sequence length mà Speech LM phải xử lý liên tục.
 
 
 
 ## Codec Comparison
 
-| Codec | Frame Rate | RVQ Layers | Bitrate | Quality | Semantic? |
-|-------|-----------|------------|---------|---------|-----------|
-| EnCodec | 75 Hz | 8 | 6 kbps | Good | No |
-| DAC | 86 Hz | 9 | 8 kbps | **Better** | No |
-| SpeechTokenizer | 50 Hz | 8 | 4 kbps | Good | **Layer 1** |
-| **Mimi** | **12.5 Hz** | 8 | 1.1 kbps | Good | **Layer 1** |
+| Codec | Frame rate tương đối | Thiết kế nổi bật | Phù hợp khi | Điểm cần kiểm tra |
+|-------|----------------------|------------------|-------------|-------------------|
+| EnCodec | cao hơn Mimi | RVQ phổ biến, dễ hiểu | VALL-E/AudioLM-style baseline | token rate, bitrate, domain |
+| DAC | cao, quality-oriented | codebook utilization/fidelity | audio quality quan trọng | license, domain, speed |
+| SpeechTokenizer | trung bình | semantic/acoustic disentanglement | cần token semantic riêng | downstream task fit |
+| Mimi | thấp | semantic + acoustic split, low frame rate | realtime dialogue/Speech LM | fidelity, language/domain coverage |
 
 : Audio codec comparison <a id="tbl-codec-comparison"></a>
+
+Không có codec phù hợp tuyệt đối cho mọi mục tiêu. Codec cho music, codec cho phone-call compression, codec cho TTS cloning và codec cho full-duplex Speech LM có tiêu chí khác nhau.
+
+## Chọn codec theo use case
+
+| Use case | Ưu tiên | Codec/thiết kế nên cân nhắc |
+|---|---|---|
+| TTS zero-shot | speaker similarity, fidelity | EnCodec/DAC-style hoặc codec được dùng bởi model TTS |
+| Full-duplex dialogue | token rate thấp, streaming | Mimi-style low frame-rate codec |
+| Speech understanding | semantic token rõ | SpeechTokenizer/semantic distillation |
+| Audio compression | perceptual quality/bitrate | DAC/EnCodec-style benchmark kỹ |
+| Vietnamese voice agent | tone, speaker, code-switching | benchmark riêng theo tiếng Việt |
+
+### Codec và tiếng Việt
+
+Với tiếng Việt, codec cần giữ tốt các đặc trưng sau:
+
+- contour F0 của sáu thanh điệu;
+- âm cuối ngắn như /p/, /t/, /k/;
+- khác biệt vùng miền Bắc/Trung/Nam;
+- code-switching Việt-Anh;
+- speaker identity trong prompt ngắn;
+- prosody câu hỏi/câu cảm thán.
+
+Một codec có ViSQOL tốt trên tiếng Anh chưa chắc giữ thanh điệu tiếng Việt đủ tốt cho TTS hoặc Speech LM. Vì vậy, hãy đánh giá codec bằng ASR tiếng Việt sau reconstruction và human listening test bản ngữ.
 
 ```python
 #| eval: false
@@ -456,6 +554,14 @@ class EnCodecEncoder(nn.Module):
         return z
 ```
 
+## Những lỗi thường gặp khi dùng codec tokens
+
+- **Nhầm bitrate với token rate**: bitrate thấp chưa chắc sequence ngắn nếu frame rate/codebooks vẫn cao.
+- **Bỏ qua codec decoder**: LM sinh token tốt nhưng decoder tạo artifact thì audio vẫn kém.
+- **Train LM trên token không ổn định**: codebook collapse hoặc unused codes làm LM học phân phối xấu.
+- **Không benchmark reconstruction**: trước khi train Speech LM, hãy kiểm tra codec reconstruct audio domain của bạn.
+- **Không kiểm tra streaming**: codec non-causal hoặc look-ahead lớn có thể không dùng được cho realtime.
+
 ## Tóm tắt
 
 | Concept | Equation | Role |
@@ -467,7 +573,7 @@ class EnCodecEncoder(nn.Module):
 
 : Audio codec key concepts <a id="tbl-codec-summary"></a>
 
-Neural audio codecs là **nền tảng** cho Speech LLMs. Chương tiếp theo sẽ khám phá cách AudioLM, Qwen2-Audio, và Moshi xây dựng trên codec tokens để tạo ra speech-native language models.
+Neural audio codecs là **nền tảng** cho Speech LLMs. Chương tiếp theo sẽ khám phá cách AudioLM, Qwen2-Audio/Qwen3-Omni-style systems, Moshi và các mô hình speech-native xây dựng trên codec tokens hoặc audio embeddings để tạo ra mô hình ngôn ngữ đa phương thức.
 
 
 
