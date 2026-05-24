@@ -645,7 +645,7 @@ SpecAugment được áp dụng directly trên mel spectrogram, không phải tr
 
 ### C. Loading pretrained models (HuggingFace Transformers focus)
 
-HF Transformers là default framework cho loading SOTA speech models.
+HF Transformers là framework phổ biến để tải và thử nghiệm các speech models hiện đại từ HuggingFace Hub.
 
 #### C.1 Whisper
 

@@ -130,6 +130,6 @@ flowchart LR
 | Typical sequence length | 512–4096 tokens | 1500 frames (30s) or 480K samples | ~1–100× |
 | Vocabulary size | 32K–128K | 1024 (per codebook) × 8 | 4–16× |
 | Pre-training data | ~1–15T tokens | ~680K hours | Different units |
-| Model size (SOTA) | 70B–405B | 1.5B–7B | 10–100× smaller |
+| Model size (frontier public models) | 70B–405B | 1.5B–7B | 10–100× smaller |
 | Inference speed | ~50 tokens/s | Real-time (RTF ≤ 1) | Different metrics |
 | Human eval | Preference ranking | MOS (1–5 scale) | Different scales |

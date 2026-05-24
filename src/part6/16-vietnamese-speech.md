@@ -411,7 +411,7 @@ Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam
 
 **Đánh giá chất lượng**: các sản phẩm của ZaloAI đã được kiểm chứng trong môi trường consumer quy mô lớn. Tuy nhiên, do không có benchmark công khai đầy đủ, ta chỉ có thể kết luận rằng hệ thống phù hợp với các domain command hẹp như thanh toán, điều hướng hoặc thao tác trong ứng dụng, thay vì suy rộng sang mọi bài toán ASR/TTS tiếng Việt.
 
-**Limitations**: closed-source, không có public model weights.
+**Hạn chế**: closed-source, không có public model weights.
 
 ### FPT.AI — Commercial APIs
 
@@ -455,7 +455,7 @@ Viettel (largest Vietnamese telco) has internal AI division:
 
 ### Đánh giá thận trọng: Vietnamese voice AI ở thời điểm 2026
 
-| Capability | Status | Best option |
+| Capability | Status | Practical baseline |
 |---|---|---|
 | Vietnamese ASR (clean) | Tương đối trưởng thành | PhoWhisper-large cho baseline mở; API thương mại cần benchmark lại theo domain |
 | Vietnamese ASR (noisy) | Đang cải thiện | Fine-tune với noise augmentation và dữ liệu domain-specific |

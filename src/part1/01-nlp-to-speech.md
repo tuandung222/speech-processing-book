@@ -557,7 +557,7 @@ Pipeline:
 
 1. Pretrain Wav2Vec 2.0 trên 60K giờ unlabeled audio.
 2. Fine-tune với CTC loss trên 100 giờ labeled (LibriSpeech).
-3. Achieve SOTA WER thấp hơn Whisper-Large (trained trên 680K giờ supervised).
+3. Đạt WER rất cạnh tranh trên LibriSpeech trong thiết lập được công bố, dù dùng ít labeled data hơn nhiều so với các hệ thống supervised quy mô lớn.
 
 Đây là minh chứng rằng **self-supervised + ít labeled data > nhiều labeled data**, ít nhất với English.
 
@@ -793,7 +793,7 @@ Bạn có thể bắt đầu thấy tại sao kỹ thuật engineering của Mim
 
 ## Phần 7 — Limitations & Open Problems
 
-Mọi tổng quan đều cần một phần thẳng thắn về điểm yếu của technology hiện tại. Đây là honest discussion về Speech AI năm 2026.
+Mọi tổng quan đều cần một phần thẳng thắn về giới hạn của công nghệ hiện tại. Phần này phân tích các điểm yếu quan trọng của Speech AI ở thời điểm 2026.
 
 ### 7.1 Codec tokens chưa hoàn toàn lossless
 
@@ -841,7 +841,7 @@ Speech LLMs (Qwen2-Audio, GPT-4o) học audio + text trong cùng model, nhưng a
 
 ### 7.5 Compute / cost
 
-Streaming TTS state-of-the-art năm 2026 (Cartesia Sonic, ElevenLabs Turbo) đạt latency khoảng 200 ms với chi phí khoảng 0.0001 USD mỗi ký tự. Nghe thấp nhưng cho một call center handle 1 triệu conversations, tổng chi phí lên tới hàng nghìn USD mỗi ngày.
+Một số hệ thống streaming TTS frontier năm 2026 công bố latency khoảng vài trăm mili-giây, nhưng chi phí theo ký tự hoặc theo phút vẫn có thể lớn khi nhân lên quy mô call center. Với 1 triệu cuộc hội thoại, khác biệt nhỏ ở cost per turn có thể chuyển thành hàng nghìn USD mỗi ngày.
 
 So sánh với text LLM (khoảng 0.0001 USD per token, generate vài trăm token per response), audio interaction đắt hơn khoảng 10-100 lần. Đây là rào cản kinh tế cho widespread deployment.
 

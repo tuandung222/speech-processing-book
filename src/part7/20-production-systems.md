@@ -14,7 +14,7 @@ Mục tiêu của chương là cung cấp một khung phân tích thực dụng 
 > Phần 3-4: architecture chi tiết cho voice agent đa năng + latency optimization.
 > Phần 5-6: real production stacks (case studies từ ElevenLabs, Cartesia, Deepgram, OpenAI Realtime) + cost engineering.
 > Phần 7-8: deployment patterns + observability.
-> Phần 9: honest production stories (common pitfalls với root cause analysis).
+> Phần 9: production pitfalls và root cause analysis.
 > Phần 10: Vietnamese production reality (ZaloAI, VinAI, Trusting Social context).
 > Phần 11: recommended starter stack + summary.
 
@@ -552,9 +552,9 @@ Best practices:
 
 ---
 
-## Phần 8 — Common Production Pitfalls (Honest Stories)
+## Phần 8 — Common Production Pitfalls và Root Cause Analysis
 
-These are real-world issues that academic papers don't warn you about. Each comes from public incident reports, postmortems, or community discussions.
+Phần này tổng hợp các lỗi thường gặp khi triển khai voice AI trong production. Mỗi nhóm lỗi được diễn giải theo hướng root cause analysis để người đọc có thể thiết kế logging, monitoring và fallback phù hợp.
 
 ### 8.1 Whisper hallucination in silence periods
 
@@ -746,11 +746,11 @@ End state: ~0.02-0.04 USD/min, but with significant ops overhead.
 
 7. **Vietnamese voice AI ecosystem đang trưởng**: VinAI mở source, ZaloAI/FPT có commercial APIs, opportunity còn nhiều cho Vi-native quality.
 
-### 11.2 Honest disclaimers
+### 11.2 Lưu ý về phạm vi số liệu
 
 - Mọi con số trong chương này là estimates từ public sources, không phải insider data.
 - Vendors thay đổi pricing thường xuyên, verify trước khi commit budget.
-- Production stacks evolve rapidly, what's SOTA tháng 11/2025 có thể outdated giữa 2026.
+- Production stacks thay đổi nhanh; một cấu hình được xem là frontier ở tháng 11/2025 có thể đã lỗi thời giữa năm 2026.
 
 ### 11.3 Chương tiếp theo
 

@@ -88,7 +88,7 @@ Phụ lục này cung cấp bảng so sánh toàn diện các công cụ, framew
 |-------|--------|---------------|-----------|------------|
 | Wav2Vec 2.0 | 317M | 60K hrs | Contrastive | ASR |
 | HuBERT | 317M | 60K hrs | Masked prediction | ASR, classification |
-| WavLM | 317M | 94K hrs | Masked + denoising | **All tasks** (SUPERB SOTA) |
+| WavLM | 317M | 94K hrs | Masked + denoising | Nhiều SUPERB tasks |
 | data2vec 2.0 | 317M | 60K hrs | Teacher-student | ASR, classification |
 | CLAP | ~200M | 630K pairs | Audio-text contrastive | Zero-shot, retrieval |
 | Whisper | 1.5B | 5M hrs | Supervised seq2seq | ASR, translation |

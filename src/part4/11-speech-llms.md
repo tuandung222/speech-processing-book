@@ -9,7 +9,7 @@ Chương này phát triển bốn họ kiến trúc theo trình tự lịch sử
 - **AudioLM**: hierarchical audio LM, đặt nền móng cho paradigm "audio as language".
 - **Qwen2-Audio**: speech-aware LLM với Whisper encoder cộng adapter, ASR + understanding + reasoning.
 - **Moshi**: full-duplex dual-stream Speech LLM, end-to-end speech-to-speech với latency dưới 300 ms.
-- **Qwen3-Omni và Qwen3.5-Omni**: MoE Thinker-Talker, open-source SOTA năm 2025-2026.
+- **Qwen3-Omni và Qwen3.5-Omni**: MoE Thinker-Talker, thuộc nhóm open-source frontier theo các báo cáo công khai năm 2025-2026.
 
 Đồng thời chương cập nhật các release frontier trong Q4 2025 và năm 2026 (GPT-Realtime, MoshiRAG, Gemini 3 Live), để người đọc có bức tranh đầy đủ về landscape tại thời điểm viết.
 
@@ -486,7 +486,7 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
   - Qwen3-Omni-30B-A3B-Thinking (chain-of-thought reasoning capable).
   - Qwen3-Omni-30B-A3B-Captioner (audio→text descriptions).
 - Languages: 119 text, 19 speech input, 10 speech output.
-- Benchmarks: SOTA on 22 of 36 audio/video benchmarks. Open-source SOTA on 32 of 36.
+- Benchmarks: theo technical report của nhóm tác giả, model đạt kết quả dẫn đầu trên nhiều benchmark audio/video; cần đọc từng benchmark theo protocol và thời điểm công bố.
 - ASR + audio understanding + voice conversation comparable to Gemini 2.5 Pro.
 - License: Apache 2.0.
 
@@ -495,11 +495,11 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 - Variant optimized for inference latency.
 - Real-time streaming voice output prioritized.
 
-#### Qwen3.5-Omni (March 2026) ⭐⭐ Current SOTA Open Source
+#### Qwen3.5-Omni (March 2026) — frontier open-source report
 
 - Released March 30, 2026.
-- Plus variant: 215 SOTA results across audio, audio-video understanding, reasoning, interaction benchmarks.
-- **Outperforms Gemini 3.1 Pro** on general audio understanding, reasoning, translation.
+- Plus variant: theo báo cáo công khai, đạt kết quả dẫn đầu trên nhiều nhóm benchmark audio, audio-video understanding, reasoning và interaction.
+- Báo cáo công khai so sánh thuận lợi với một số hệ thống frontier ở các tác vụ audio understanding, reasoning và translation; khi dùng thực tế vẫn cần benchmark lại trên workload riêng.
 - Native multimodal processing (text + image + audio + video in single forward pass).
 - Streaming speech output realtime.
 
@@ -535,11 +535,11 @@ Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ
 #### Pocket TTS
 
 - 100M params TTS model.
-- Matches quality of 10x larger SOTA models.
+- Báo cáo của tác giả cho thấy chất lượng cạnh tranh với các model lớn hơn đáng kể trong thiết lập đánh giá được công bố.
 - Voice cloning support.
 - Real-time streaming.
 
-### Updated SOTA comparison (mid-2026)
+### Updated frontier comparison (mid-2026)
 
 | Model | Year | Params | Speech-in | Speech-out | Full-duplex | Streaming | Open Source |
 |---|---|---|---|---|---|---|---|

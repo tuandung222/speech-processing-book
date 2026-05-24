@@ -410,7 +410,7 @@ python examples/asr/asr_finetune.py \
 k2 [^povey2021k2] và icefall là framework từ Daniel Povey (tác giả Kaldi):
 
 - **Differentiable FST** operations (k2 library)
-- **Zipformer** encoder (SOTA efficiency)
+- **Zipformer** encoder, thường được dùng như một kiến trúc hiệu quả cho ASR hiện đại
 - **Pruned RNN-T** loss (memory efficient)
 - **Rất nhanh** training và inference
 
