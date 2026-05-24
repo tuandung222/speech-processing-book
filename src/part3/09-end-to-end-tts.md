@@ -2,11 +2,11 @@
 
 ## Vì sao chương này quan trọng
 
-Chương 8 đã trình bày pipeline TTS hai giai đoạn cổ điển: text → mel spectrogram → waveform. Chương này tiến tới các mô hình **end-to-end**, sinh trực tiếp waveform từ text trong một network duy nhất, đồng thời mở ra khả năng **zero-shot voice cloning**: chỉ với 3-10 giây audio mẫu, mô hình có thể clone giọng nói của bất kỳ ai để đọc text bất kỳ.
+Chương 8 đã trình bày pipeline TTS hai giai đoạn cổ điển: text → mel spectrogram → waveform. Chương này tiến tới các mô hình **end-to-end hoặc gần end-to-end**, trong đó alignment, acoustic representation và waveform/token generation được học thống nhất hơn. Đồng thời, chương mở ra chủ đề **zero-shot voice cloning**: chỉ với vài giây audio mẫu, mô hình có thể bắt chước đặc điểm giọng nói để đọc text mới.
 
 Đây là bước tiến quan trọng vì hai lý do. Thứ nhất, end-to-end loại bỏ vấn đề error compounding của pipeline hai giai đoạn (mel imperfection làm vocoder degrade thêm). Thứ hai, voice cloning đơn giản hoá nhiều ứng dụng (audiobook tự động, voiceover localization, accessibility cho người mất tiếng), đồng thời mở ra rủi ro về deepfake và misuse cần được nhìn nhận thẳng thắn.
 
-Chương này phân tích bốn họ kiến trúc chính: VITS (CVAE + adversarial), VALL-E (neural codec LM), NaturalSpeech 3 (factorized diffusion), và F5-TTS (flow matching cộng DiT).
+Chương này phân tích bốn họ kiến trúc chính: VITS (CVAE + adversarial), VALL-E (neural codec LM), NaturalSpeech/NaturalSpeech-style diffusion, và F5-TTS (flow matching cộng DiT).
 
 > **Cấu trúc chương**
 >
@@ -15,6 +15,22 @@ Chương này phân tích bốn họ kiến trúc chính: VITS (CVAE + adversari
 > - **Phần 3**: VALL-E, neural codec language model cho zero-shot voice cloning.
 > - **Phần 4**: NaturalSpeech 3 và F5-TTS, diffusion và flow matching.
 > - **Phần 5**: voice cloning trong production, deepfake và considerations đạo đức.
+
+### Bản đồ các hướng end-to-end TTS
+
+```mermaid
+flowchart LR
+    TEXT["Text / phonemes"] --> VITS["VITS<br>latent + GAN"]
+    TEXT --> CODEC["VALL-E<br>codec LM"]
+    TEXT --> FLOW["F5-TTS<br>flow matching"]
+    PROMPT["Speaker prompt"] --> CODEC
+    PROMPT --> FLOW
+    VITS --> WAV["Waveform"]
+    CODEC --> WAV
+    FLOW --> WAV
+```
+
+Điểm chung của các hướng này là giảm phụ thuộc vào pipeline “acoustic model rồi vocoder” tách rời. Nhưng “end-to-end” không có nghĩa mọi thứ đơn giản hơn. Ta đổi sự dễ debug của pipeline cổ điển lấy khả năng học chung mạnh hơn và voice cloning linh hoạt hơn.
 
 ## Phần 1 — Từ Two-Stage đến End-to-End
 
@@ -30,11 +46,24 @@ flowchart LR
 
 **Hình:** TTS hiện đại đi từ pipeline hai giai đoạn sang các mô hình học trực tiếp hơn giữa text, latent/audio tokens và waveform. Mỗi bước giảm một phần mismatch giữa training objective và tín hiệu nghe cuối cùng.
 
+### End-to-end không phải luôn tốt hơn
+
+| Tiêu chí | Two-stage TTS | End-to-end / zero-shot TTS |
+|---|---|---|
+| Debug | dễ tách lỗi mel/vocoder | khó hơn vì nhiều lỗi trộn nhau |
+| Controllability | duration/pitch/energy rõ | phụ thuộc thiết kế condition |
+| Voice cloning | thường cần fine-tune/speaker embedding | mạnh hơn với prompt audio |
+| Latency | có thể rất thấp | phụ thuộc AR/ODE/codec steps |
+| Data requirement | có thể train single-speaker tốt | thường cần dữ liệu lớn và đa speaker |
+| Misuse risk | thấp hơn nếu single speaker | cao hơn vì clone giọng dễ hơn |
+
+Vì vậy, trong production, lựa chọn mô hình không chỉ dựa trên MOS. Bạn cần hỏi: có cần clone giọng không, có cần realtime không, có cần kiểm soát emotion không, có rủi ro deepfake không?
+
 ## VITS, Variational Inference with Adversarial Learning
 
 ### Key Innovation
 
-VITS [^kim2021conditional] là model **end-to-end** đầu tiên đạt chất lượng ngang two-stage systems. Kết hợp 3 frameworks:
+VITS [^kim2021conditional] là một cột mốc quan trọng vì đưa alignment, latent acoustic modeling và waveform generation vào một framework huấn luyện thống nhất. Nó kết hợp 3 ý tưởng:
 
 1. **VAE** (Variational Autoencoder): Latent representation learning
 2. **Normalizing Flows**: Flexible posterior distribution
@@ -106,6 +135,20 @@ $$
 f(\mathbf{z}) &= \text{concat}(\mathbf{z}_a, \mathbf{z}_b')
 \end{aligned}
 $$
+
+### Trực giác VITS
+
+VITS có thể được hiểu như sau:
+
+| Thành phần | Vai trò trực giác |
+|---|---|
+| Text prior encoder | dự đoán phân phối latent nên nghe như thế nào từ text |
+| Posterior encoder | nhìn audio thật để học latent speech thực tế |
+| Flow | làm cho prior và posterior khớp nhau linh hoạt hơn |
+| MAS | tìm alignment monotonic giữa text và latent frames |
+| GAN decoder | biến latent thành waveform nghe tự nhiên |
+
+Điểm hay của VITS là model không cần forced alignment bên ngoài như FastSpeech 2. MAS tự tìm alignment trong training. Điểm khó là training có nhiều loss và dễ nhạy với dữ liệu, preprocessing và batch composition.
 
 ### Monotonic Alignment Search (MAS)
 
@@ -222,7 +265,9 @@ $$
 
 > **💡 NLP Parallel: GPT for Speech**
 >
-> VALL-E là **GPT applied to speech**. Thay vì predict next BPE token, nó predict next audio codec token. 3-second audio prompt đóng vai trò **in-context learning**, giống few-shot prompting cho LLM.
+> VALL-E là **GPT applied to speech** ở mức ý tưởng: thay vì predict next BPE token, nó predict next audio codec token. Audio prompt vài giây đóng vai trò điều kiện in-context, giống few-shot prompting cho LLM, nhưng output là đặc điểm âm học của speaker.
+
+Điểm cần phân biệt: BPE token là lossless đối với text, còn codec token là lossy đối với audio. Vì vậy codec LM luôn bị giới hạn bởi chất lượng codec decoder và bitrate/codebook của codec.
 
 
 
@@ -266,9 +311,26 @@ $$
 P_{\text{NAR}}(\mathbf{c}^{(q)} \mid \mathbf{c}^{(1)}, \ldots, \mathbf{c}^{(q-1)}, \mathbf{y}) = \prod_{t=1}^{T} P(c_t^{(q)} \mid \mathbf{c}^{(<q)}, \mathbf{y})
 $$
 
+### Vì sao codec token mở đường cho voice cloning?
+
+Neural codec biến waveform thành chuỗi token rời rạc. Khi đã có token, TTS trở thành bài toán language modeling có điều kiện:
+
+```mermaid
+flowchart LR
+    P["Prompt audio"] --> ENC["Codec encoder"]
+    ENC --> PTOK["Prompt codec tokens"]
+    TXT["Target text"] --> LM["Codec language model"]
+    PTOK --> LM
+    LM --> OTOK["Generated codec tokens"]
+    OTOK --> DEC["Codec decoder"]
+    DEC --> WAV["Speech in prompted voice"]
+```
+
+Audio prompt cung cấp speaker identity, timbre, speaking rate và acoustic style. Text cung cấp nội dung cần đọc. Codec LM học cách kết hợp hai nguồn này.
+
 ### Zero-Shot Voice Cloning
 
-VALL-E đạt zero-shot voice cloning chỉ với **3 giây** audio prompt:
+VALL-E cho thấy zero-shot voice cloning có thể hoạt động với audio prompt rất ngắn trong thiết lập nghiên cứu:
 
 <a id="eq-valle-cloning"></a>
 
@@ -276,12 +338,12 @@ $$
 \text{Voice Cloning} = \text{In-Context Learning trên Codec Tokens}
 $$
 
-| Feature | VALL-E | Tacotron 2 | VITS |
-|---------|--------|------------|------|
-| Voice cloning | **3s prompt** (zero-shot) | Requires fine-tuning | Requires fine-tuning |
-| Training data | 60K hours | 24 hours (single speaker) | 24+ hours |
-| Naturalness (MOS) | 3.8 | 4.1 | 4.2 |
-| Speaker similarity | **0.58** (zero-shot!) | N/A (same speaker) | N/A |
+| Feature | VALL-E-style codec LM | Tacotron 2 | VITS |
+|---------|------------------------|------------|------|
+| Voice cloning | prompt-based zero-shot trong thiết lập nghiên cứu | thường cần fine-tuning hoặc speaker setup | thường cần speaker setup/fine-tuning |
+| Training data | cần dữ liệu đa speaker quy mô lớn | có thể train single speaker | có thể train single/multi-speaker |
+| Naturalness | phụ thuộc codec, LM và prompt | mạnh trong single-speaker clean data | mạnh với training ổn định |
+| Speaker similarity | có thể cao nếu prompt sạch | không phải mục tiêu mặc định | phụ thuộc thiết kế multi-speaker |
 
 : VALL-E comparison <a id="tbl-valle-comparison"></a>
 
@@ -289,7 +351,9 @@ $$
 
 ### Flow Matching
 
-F5-TTS [^chen2024f5tts] sử dụng **flow matching** [^lipman2023flow], phương pháp mới hơn diffusion:
+F5-TTS [^chen2024f5tts] sử dụng **flow matching** [^lipman2023flow], một hướng generative modeling liên quan diffusion nhưng dùng objective velocity field trực tiếp:
+
+Trực giác: thay vì học cách khử noise từng bước như diffusion cổ điển, flow matching học “vector vận tốc” để di chuyển một sample từ noise distribution đến data distribution. Khi inference, ta giải một ODE từ noise đến mel/acoustic representation mong muốn.
 
 <a id="eq-flow-matching-ode"></a>
 
@@ -326,9 +390,9 @@ $$
 > |---|----------|--------------|
 > | Path | Stochastic (SDE) | Deterministic (ODE) |
 > | Training | Score matching | Velocity matching |
-> | Sampling | Many steps (50–1000) | Fewer steps (10–50) |
-> | Implementation | Complex noise schedules | **Simple**: linear interpolation |
-> | Speed | Slower | **Faster** |
+> | Sampling | thường nhiều bước hơn | thường ít bước hơn trong nhiều thiết lập |
+> | Implementation | cần noise schedule | objective velocity trực tiếp hơn |
+> | Speed | phụ thuộc sampler | phụ thuộc số ODE steps và model size |
 
 
 
@@ -419,17 +483,19 @@ def flow_matching_sample(
     return x  # [B, 80, T] - float32, generated mel
 ```
 
-### F5-TTS Results
+### Đọc kết quả F5-TTS và các mô hình zero-shot
 
-| Model | MOS ↑ | Speaker Sim ↑ | RTF ↓ | Zero-shot? |
-|-------|-------|---------------|-------|------------|
-| VITS | 4.2 | N/A | 0.01 | No |
-| VALL-E | 3.8 | 0.58 | 0.8 | Yes (3s) |
-| NaturalSpeech 2 | 4.2 | 0.62 | 0.3 | Yes (3s) |
-| **F5-TTS** | **4.3** | **0.68** | **0.15** | **Yes (3s)** |
-| CosyVoice | 4.1 | 0.65 | 0.2 | Yes (3s) |
+| Model family | Strength | Caveat | Zero-shot? |
+|-------|----------|--------|------------|
+| VITS | end-to-end latent + GAN, mạnh cho single/multi-speaker khi train tốt | không phải prompt-based cloning mặc định | không mặc định |
+| VALL-E-style codec LM | voice cloning qua audio prompt | AR decoding và codec quality là nút thắt | có trong thiết lập nghiên cứu |
+| NaturalSpeech-style diffusion | naturalness và speaker similarity mạnh trong paper | sampling cost và closed/open availability khác nhau | có tùy phiên bản |
+| F5-TTS-style flow matching | prompt-based TTS với flow matching/DiT | cần benchmark lại theo ngôn ngữ, prompt và latency | có |
+| CosyVoice-style systems | thực dụng cho multilingual/zero-shot | phụ thuộc model card và license | có tùy checkpoint |
 
 : End-to-end TTS comparison <a id="tbl-e2e-tts"></a>
+
+Các con số MOS, speaker similarity và RTF trong TTS rất khó so sánh trực tiếp giữa paper vì khác dataset, người đánh giá, prompt length, ngôn ngữ, vocoder, hardware và sampling steps. Vì vậy bảng trên nhấn mạnh hướng kiến trúc thay vì xếp hạng tuyệt đối.
 
 ## TTS Evolution Timeline
 
@@ -441,7 +507,7 @@ def flow_matching_sample(
 | 2020 | HiFi-GAN | GAN vocoder | Multi-period/scale discriminators |
 | 2021 | VITS | End-to-end | VAE + Flow + GAN |
 | 2023 | VALL-E | Codec LM | Zero-shot cloning via in-context learning |
-| 2024 | F5-TTS | Flow matching | DiT + CFM, fastest zero-shot |
+| 2024 | F5-TTS | Flow matching | DiT + CFM, prompt-based TTS |
 
 : TTS evolution timeline <a id="tbl-tts-timeline"></a>
 
@@ -449,22 +515,55 @@ def flow_matching_sample(
 >
 > Zero-shot TTS models (VALL-E, F5-TTS) có latency cao hơn traditional TTS:
 >
-> - FastSpeech 2 + HiFi-GAN: **~50ms** cho 5s audio
-> - VITS: **~100ms** cho 5s audio
-> - VALL-E: **~2s** cho 5s audio (AR decoding bottleneck)
-> - F5-TTS: **~500ms** cho 5s audio (32 ODE steps)
+> - FastSpeech 2 + HiFi-GAN thường có latency thấp vì mel generation và vocoder đều parallel-friendly.
+> - VITS có thể nhanh nhưng phụ thuộc decoder và implementation.
+> - VALL-E-style codec LM có thể chậm nếu AR decoding là bottleneck.
+> - F5-TTS-style flow matching phụ thuộc số ODE steps, model size và vocoder.
 >
-> Production voice cloning cần cân bằng quality vs latency.
+> Production voice cloning cần đo lại latency trên workload thật, thay vì lấy số từ paper làm mặc định.
 
 
+
+## Voice cloning: rủi ro và kiểm soát
+
+Zero-shot voice cloning là công nghệ hai mặt. Nó hỗ trợ accessibility, localization, audiobook, dubbing và cá nhân hóa trợ lý ảo; nhưng cũng có thể bị dùng cho giả mạo giọng nói, lừa đảo tài chính, deepfake chính trị hoặc vi phạm quyền riêng tư.
+
+### Checklist governance tối thiểu
+
+| Rủi ro | Biện pháp kiểm soát |
+|---|---|
+| Clone giọng không có consent | yêu cầu consent rõ ràng, audit log, voice enrollment policy |
+| Lừa đảo/impersonation | watermarking, disclosure, giới hạn use case nhạy cảm |
+| Prompt audio bị đánh cắp | mã hóa storage, retention ngắn, access control |
+| Sinh nội dung độc hại bằng giọng thật | content policy, moderation, abuse monitoring |
+| Không truy vết được audio sinh ra | metadata signing, watermark detector, logging |
+| Sai giọng trong domain nhạy cảm | human review cho y tế/pháp lý/tài chính |
+
+### Nguyên tắc triển khai an toàn
+
+- Không cho phép clone giọng người thứ ba nếu không có quyền sử dụng.
+- Luôn phân biệt “voice conversion/clone” với “generic synthetic voice” trong UX và policy.
+- Với ứng dụng public, nên có watermark hoặc disclosure khi âm thanh là synthetic.
+- Không dùng giọng clone cho xác thực danh tính.
+- Đánh giá bias theo giới, vùng miền, accent và ngôn ngữ.
+
+## TTS tiếng Việt trong mô hình zero-shot
+
+Với tiếng Việt, zero-shot TTS cần kiểm tra kỹ hơn các yếu tố sau:
+
+- prompt speaker nói giọng vùng nào và target text có phù hợp vùng đó không;
+- model có giữ đúng thanh điệu khi clone timbre không;
+- code-switching Việt-Anh có làm mất speaker similarity không;
+- tên riêng, số tiền, ngày tháng có được text normalization đúng không;
+- giọng clone có giữ nhịp tự nhiên hay chỉ giống âm sắc bề mặt.
 
 ## Tóm tắt
 
 | Model | Approach | Pros | Cons |
 |-------|----------|------|------|
-| VITS | VAE + Flow + GAN | End-to-end, high quality | Single speaker, no cloning |
-| VALL-E | Codec LM (AR + NAR) | Zero-shot cloning | Slow AR decoding |
-| F5-TTS | Flow matching + DiT | Fast, high quality, zero-shot | Requires good codec |
+| VITS | VAE + Flow + GAN | joint training, naturalness tốt khi train ổn | training phức tạp, cloning không mặc định |
+| VALL-E-style | Codec LM (AR + NAR) | prompt-based voice cloning | AR/codec bottleneck, misuse risk |
+| F5-TTS-style | Flow matching + DiT | prompt-based TTS, sampling linh hoạt | cần benchmark theo ngôn ngữ, latency và prompt |
 
 : End-to-end TTS summary <a id="tbl-e2e-summary"></a>
 
