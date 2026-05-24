@@ -239,7 +239,7 @@ Pipeline này chuyển 16,000 floats thành 8,000 floats (80 × 100). Compressio
 
 ### 2.2 Con đường 2 — Self-supervised continuous representations (Wav2Vec 2.0, HuBERT)
 
-Năm 2020, Wav2Vec 2.0 từ Meta AI đề xuất một ý tưởng đột phá: thay vì dùng spectrogram handcrafted, hãy **học** một biểu diễn audio tốt hơn bằng self-supervised pretraining trên hàng nghìn giờ audio không có nhãn.
+Năm 2020, Wav2Vec 2.0 từ Meta AI đề xuất một ý tưởng có ảnh hưởng lớn: thay vì dùng spectrogram handcrafted, hãy **học** một biểu diễn audio tốt hơn bằng self-supervised pretraining trên hàng nghìn giờ audio không có nhãn.
 
 **Ý tưởng cốt lõi**: train một transformer encoder trên một pretext task không cần label, ép nó phải hiểu cấu trúc temporal và phonetic của speech. Sau pretraining, các activation của encoder là **contextualized speech representations**, tương tự BERT embeddings cho text.
 
@@ -303,7 +303,7 @@ $$
 
 trong đó $Q$ là số codebooks (8 với EnCodec, 8 với Mimi), $C$ là codebook size (1024).
 
-**Output**: ma trận integer $(Q, T'')$. EnCodec ở 75 fps: 10 giây audio → $(8, 750)$. Mimi ở 12.5 fps: 10 giây → $(8, 125)$, gọn hơn nhiều, đây là một trong các đột phá của Moshi.
+**Output**: ma trận integer $(Q, T'')$. EnCodec ở 75 fps: 10 giây audio → $(8, 750)$. Mimi ở 12.5 fps: 10 giây → $(8, 125)$, gọn hơn nhiều, đây là một cải tiến engineering quan trọng của Moshi.
 
 > **🔄 Analogy quan trọng nhất của cuốn sách: BPE ↔ Codec tokens**
 >
@@ -448,7 +448,7 @@ Một câu nói "I love speech" có khoảng:
 - 12 phonemes → 12 phoneme tokens (nếu dùng phoneme system).
 - 1.5 giây audio → 150 mel frames, 75 Wav2Vec frames, 112 EnCodec frames, 19 Mimi frames.
 
-Tỉ lệ frame/token là quan trọng: nếu bạn đang dùng codec ở 75 fps để feed vào LLM, cùng một câu sẽ chiếm gấp ~25 lần "tokens" so với BPE. Đây là lý do tại sao Mimi (12.5 fps) là đột phá: gần như tương đương rate text token.
+Tỉ lệ frame/token là quan trọng: nếu bạn đang dùng codec ở 75 fps để feed vào LLM, cùng một câu sẽ chiếm gấp ~25 lần "tokens" so với BPE. Đây là lý do Mimi (12.5 fps) rất quan trọng: token rate tiến gần hơn tới text token rate.
 
 #### 3.2.2 BERT pretraining ≈ Wav2Vec 2.0: chi tiết khác biệt
 
@@ -547,7 +547,7 @@ Cùng một transformer 1B params, nhưng Speech LM cần xử lý sequence dài
 
 Trên thực tế, Moshi 7B param có inference memory tương đương với LLaMA-7B-Instruct. Nhưng nếu dùng EnCodec ở 75 fps thay vì Mimi 12.5 fps, sequence length sẽ 6x dài hơn, memory bùng nổ.
 
-Đây là một lý do quan trọng tại sao Mimi (12.5 fps) là một đột phá engineering: nó cho phép Speech LLM có memory tương đương LLM thay vì 6-10 lần hơn.
+Đây là một lý do quan trọng khiến Mimi (12.5 fps) có giá trị engineering lớn: nó giúp Speech LLM tiến gần hơn tới memory profile của text LLM thay vì tăng 6-10 lần.
 
 ### 4.4 Training compute
 
@@ -605,7 +605,7 @@ Encoder process audio, decoder attention vào encoder, autoregressive generate t
 
 Combine CTC's per-frame output với attention's autoregressive nature. Three components: encoder (audio), predictor (history of outputs), joiner (combine). Streaming-friendly + LM bias.
 
-- Pros: best of both worlds, streaming, strong accuracy.
+- Pros: kết hợp streaming với output dependency, accuracy mạnh trong nhiều thiết lập.
 - Cons: complex training, slower convergence.
 
 Sẽ giải thích kỹ cả ba ở Chương 4.
@@ -844,7 +844,7 @@ Nếu coi mỗi "tuple" của codec (8 codebooks tại một time step) là mộ
 - EnCodec ở 75 fps: 75 tokens/sec → 10 giây = 750 tokens. So với text 10s speech ≈ 30-40 tokens, gấp ~20x.
 - Mimi ở 12.5 fps: 12.5 tokens/sec → 10 giây = 125 tokens. Gấp ~3-4x text rate. Đây gần như tỉ lệ "lý tưởng" để LLM xử lý audio hiệu quả.
 
-Bạn có thể bắt đầu thấy tại sao kỹ thuật engineering của Mimi (rate thấp + quality cao) là một trong các đột phá quan trọng nhất của 2024.
+Bạn có thể bắt đầu thấy vì sao kỹ thuật engineering của Mimi (rate thấp + quality cao) là một cải tiến quan trọng cho Speech LLM realtime.
 
 ## Phần 7 — Limitations & Open Problems
 

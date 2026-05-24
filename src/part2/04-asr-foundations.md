@@ -289,15 +289,15 @@ class CTCModel(nn.Module):
         logits: Tensor = self.output_proj(h)  # [B, T, vocab]
 
         # Argmax per frame
-        best_path: Tensor = logits.argmax(dim=-1)  # [B, T] - int64
+        argmax_path: Tensor = logits.argmax(dim=-1)  # [B, T] - int64
 
         # Collapse: remove blanks and repeated
         decoded: list[list[int]] = []
-        for b in range(best_path.size(0)):
+        for b in range(argmax_path.size(0)):
             tokens: list[int] = []
             prev: int = -1
-            for t in range(best_path.size(1)):
-                tok: int = best_path[b, t].item()
+            for t in range(argmax_path.size(1)):
+                tok: int = argmax_path[b, t].item()
                 if tok != 0 and tok != prev:  # 0 = blank
                     tokens.append(tok)
                 prev = tok
@@ -315,7 +315,7 @@ CTC training cộng xác suất của nhiều path, nhưng greedy decoding chỉ
 | Greedy | argmax từng frame rồi collapse | nhanh, đơn giản | bỏ qua LM và tổng xác suất nhiều path |
 | Prefix beam search | giữ nhiều prefix ứng viên | tốt hơn greedy | tốn compute hơn |
 | CTC + external LM | cộng điểm acoustic và LM | sửa lỗi ngôn ngữ | cần LM và tuning weight |
-| Rescoring | ASR sinh N-best, LM chấm lại | linh hoạt | pipeline phức tạp hơn |
+| Rescoring | ASR sinh nhiều ứng viên, LM chấm lại | linh hoạt | pipeline phức tạp hơn |
 
 ### CTC Decoding
 
