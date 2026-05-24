@@ -1,0 +1,435 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 13: Full-Duplex Dialogue - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html" class="active"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part4/13-full-duplex.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-13-full-duplex-dialogue"><a class="header" href="#chương-13-full-duplex-dialogue">Chương 13: Full-Duplex Dialogue</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Cuộc đối thoại tự nhiên giữa người với người không phải tuần tự "tôi nói xong, đến lượt bạn". Hai bên thường xuyên overlap: backchannel ngắn (vâng, ừm, à), ngắt lời để bổ sung, đồng thời nghe và phản hồi. Voice AI thế hệ cũ (Siri, Alexa) chỉ hỗ trợ half-duplex: nghe, xử lý, trả lời, không thể bị ngắt giữa chừng. Trải nghiệm này khác xa đối thoại người với người.</p>
+<p>Full-duplex dialogue là khả năng <strong>nói và nghe đồng thời</strong>, đặc trưng kỹ thuật khó nhất của Speech AI hiện đại. Moshi (Kyutai, tháng 9/2024) là model open-source đầu tiên hỗ trợ full-duplex thực sự, đạt latency dưới 300 ms với dual-stream architecture. GPT-Realtime (OpenAI, tháng 8/2025) và Gemini Live (Google) cũng hỗ trợ full-duplex, dù kiến trúc chi tiết không được công bố.</p>
+<p>Chương này phân tích các thành phần kỹ thuật của full-duplex dialogue: dual-stream tokenization, turn-taking model, interruption handling, backchannel generation, và các metric đánh giá đối thoại.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: half-duplex vs full-duplex, vì sao full-duplex khó.</li>
+<li><strong>Phần 2</strong>: Moshi, kiến trúc dual-stream và Depth Transformer.</li>
+<li><strong>Phần 3</strong>: turn-taking, interruption, backchannel.</li>
+<li><strong>Phần 4</strong>: MoshiRAG (tháng 4/2026), retrieval-augmented full-duplex.</li>
+<li><strong>Phần 5</strong>: đánh giá đối thoại, latency, safety, observability.</li>
+</ul>
+</blockquote>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Full-duplex dialogue là khả năng <strong>nói và nghe đồng thời</strong>, giống cuộc trò chuyện tự nhiên giữa người với người. Đây là thách thức lớn nhất trong voice AI, đòi hỏi model phải xử lý <strong>real-time turn-taking</strong>, <strong>interruptions</strong>, và <strong>backchannel signals</strong> (ừ, vâng, à).</p>
+<blockquote>
+<p><strong>📝 Half-Duplex vs Full-Duplex</strong></p>
+<ul>
+<li><strong>Half-duplex</strong> (Siri, Alexa): Nghe → Xử lý → Nói. Không thể bị interrupt.</li>
+<li><strong>Full-duplex</strong> (Moshi, GPT-4o): Nghe VÀ nói đồng thời. Có thể bị interrupt, phản hồi overlap.</li>
+</ul>
+</blockquote>
+<h2 id="moshi-kiến-trúc-full-duplex"><a class="header" href="#moshi-kiến-trúc-full-duplex">Moshi: Kiến trúc Full-Duplex</a></h2>
+<p>Moshi <sup class="footnote-reference"><a href="#defossez2024moshi">1</a></sup> từ Kyutai là model full-duplex đầu tiên được open-source:</p>
+<h3 id="dual-stream-architecture"><a class="header" href="#dual-stream-architecture">Dual-Stream Architecture</a></h3>
+<p>Moshi xử lý <strong>hai audio streams song song</strong>:</p>
+<ul>
+<li><strong>User stream</strong>: Audio từ microphone (input)</li>
+<li><strong>Model stream</strong>: Audio do model generate (output)</li>
+</ul>
+<p><a id="eq-moshi-dual"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1735em;vertical-align:-0.2744em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">model</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7144em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">user</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2744em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8991em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">model</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2744em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> là audio tokens tại time step <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> là inner text tokens.</p>
+<h3 id="inner-monologue"><a class="header" href="#inner-monologue">Inner Monologue</a></h3>
+<p>Moshi sử dụng <strong>inner monologue</strong> - text tokens nội bộ giúp model "suy nghĩ":</p>
+<p><a id="eq-moshi-stream"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Stream</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.6247em;vertical-align:-1.5799em;"></span><span class="mopen">[</span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.4444em;"><span style="top:-1.5345em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">inner text</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.4444em;"><span class="svg-align" style="top:-2.202em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.798em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.4655em;"><span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-1.4649em;"><span class="pstrut" style="height:3.0448em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">user audio</span></span></span></span></span><span style="top:-3.0448em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span class="svg-align" style="top:-2.151em;"><span class="pstrut" style="height:3.0448em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3.0448em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mtight"><span class="mord mathnormal mtight">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">user</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.143em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8938em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5799em;"><span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-1.4649em;"><span class="pstrut" style="height:3.0448em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">model audio</span></span></span></span></span><span style="top:-3.0448em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span class="svg-align" style="top:-2.151em;"><span class="pstrut" style="height:3.0448em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3.0448em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mtight"><span class="mord mathnormal mtight">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">model</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8938em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.5799em;"><span></span></span></span></span></span><span class="mclose">]</span></span></span></span></span></p>
+<h3 id="mimi-audio-codec"><a class="header" href="#mimi-audio-codec">Mimi Audio Codec</a></h3>
+<p>Moshi sử dụng <strong>Mimi</strong> codec riêng (không dùng EnCodec):</p>
+<ul>
+<li>12.5 fps (80ms per frame) - thấp hơn EnCodec (75 fps)</li>
+<li>Semantic + acoustic tokens trong 1 codec</li>
+<li>First codebook encode semantic information</li>
+<li>Remaining codebooks encode acoustic details</li>
+</ul>
+<p><a id="eq-mimi-bitrate"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">Bitrate</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Mimi</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">12.5</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mclose">)</span><span class="mord text"><span class="mord"> bps</span></span></span></span></span></span></p>
+<p>với <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> codebooks, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2048</span></span></span></span> entries → 1.1 kbps.</p>
+<h3 id="depth-transformer"><a class="header" href="#depth-transformer">Depth Transformer</a></h3>
+<p>Moshi sử dụng <strong>Depth Transformer</strong> để predict <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span> codebook levels:</p>
+<ul>
+<li><strong>Temporal Transformer</strong>: Process sequence over time (large, autoregressive)</li>
+<li><strong>Depth Transformer</strong>: Process codebook levels at each timestep (small)</li>
+</ul>
+<p><a id="eq-moshi-depth"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8444em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2948em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">TemporalTF</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2948em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">DepthTF</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Moshi Depth Transformer (Simplified)"
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+class DepthTransformer(nn.Module):
+    """Predict Q codebook tokens at each time step."""
+
+    def __init__(
+        self,
+        d_model: int = 4096,
+        n_codebooks: int = 8,
+        codebook_size: int = 2048,
+        depth_layers: int = 6,
+    ) -&gt; None:
+        super().__init__()
+        self.n_codebooks = n_codebooks
+        self.embeddings = nn.ModuleList([
+            nn.Embedding(codebook_size, d_model)
+            for _ in range(n_codebooks)
+        ])
+        self.depth_tf = nn.TransformerEncoder(
+            nn.TransformerEncoderLayer(
+                d_model, nhead=16, dim_feedforward=d_model * 4,
+                batch_first=True
+            ),
+            num_layers=depth_layers,
+        )
+        self.heads = nn.ModuleList([
+            nn.Linear(d_model, codebook_size)
+            for _ in range(n_codebooks)
+        ])
+
+    def forward(
+        self,
+        h_temporal: Tensor,  # [B, D] - from temporal transformer
+    ) -&gt; Tensor:
+        """Autoregressively predict Q codebook tokens."""
+        B = h_temporal.shape[0]
+        tokens: list[Tensor] = []
+        depth_input: Tensor = h_temporal.unsqueeze(1)  # [B, 1, D]
+
+        for q in range(self.n_codebooks):
+            # Run depth transformer
+            out: Tensor = self.depth_tf(
+                depth_input
+            )  # [B, q+1, D] - float32
+
+            # Predict token for codebook q
+            logits: Tensor = self.heads[q](
+                out[:, -1, :]
+            )  # [B, codebook_size] - float32
+
+            token: Tensor = logits.argmax(dim=-1)  # [B] - int64
+            tokens.append(token)
+
+            # Add embedding to depth input
+            emb: Tensor = self.embeddings[q](
+                token
+            )  # [B, D] - float32
+            depth_input = torch.cat(
+                [depth_input, emb.unsqueeze(1)], dim=1
+            )  # [B, q+2, D]
+
+        return torch.stack(tokens, dim=1)  # [B, Q] - int64
+</code></pre>
+<h3 id="training"><a class="header" href="#training">Training</a></h3>
+<ul>
+<li>Pre-trained Helium 7B LLM trên text</li>
+<li>Fine-tuned trên paired (user audio, model audio) conversations</li>
+<li><strong>Streaming inference</strong>: 12.5 fps = 80ms per step, với ~200ms tổng latency</li>
+</ul>
+<h2 id="turn-taking-models"><a class="header" href="#turn-taking-models">Turn-Taking Models</a></h2>
+<h3 id="challenges"><a class="header" href="#challenges">Challenges</a></h3>
+<p>Turn-taking trong conversation tự nhiên cực kỳ phức tạp:</p>
+<ol>
+<li><strong>Overlap</strong>: ~40% turn transitions có overlap (người nói tiếp trước khi người kia ngừng)</li>
+<li><strong>Backchannels</strong>: "ừ", "vâng", "uh-huh" - không phải turn-taking mà là acknowledgment</li>
+<li><strong>Interruptions</strong>: Cắt ngang chủ đích - model phải ngừng generate</li>
+<li><strong>Silence interpretation</strong>: Im lặng 500ms có thể là "đang nghĩ" hoặc "đã nói xong"</li>
+</ol>
+<h3 id="voice-activity-projection-vap"><a class="header" href="#voice-activity-projection-vap">Voice Activity Projection (VAP)</a></h3>
+<p>VAP <sup class="footnote-reference"><a href="#ekstedt2022voice">2</a></sup> dự đoán ai sẽ nói tiếp:</p>
+<p><a id="eq-vap"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord text"><span class="mord">speaker</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1864em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">next</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord text"><span class="mord">audio</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">L</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mord text"><span class="mord">VAP</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">L</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose">))</span></span></span></span></span></p>
+<h2 id="so-sánh-full-duplex-models-mid-2026"><a class="header" href="#so-sánh-full-duplex-models-mid-2026">So sánh Full-Duplex Models (mid-2026)</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Latency first byte</th><th>Turn-taking</th><th>Open-source</th><th>Codec</th><th>Năm</th></tr></thead><tbody>
+<tr><td>Moshi</td><td>khoảng 200 ms</td><td>Neural dual-stream</td><td>Có</td><td>Mimi</td><td>Sep 2024</td></tr>
+<tr><td>GPT-4o Voice</td><td>khoảng 320 ms</td><td>Neural</td><td>Không</td><td>Proprietary</td><td>2024</td></tr>
+<tr><td>Qwen2.5-Omni</td><td>khoảng 300 ms</td><td>Thinker-Talker</td><td>Có</td><td>CosyVoice codec</td><td>2025</td></tr>
+<tr><td>Gemini Live</td><td>khoảng 250 ms</td><td>Neural</td><td>Không</td><td>Proprietary</td><td>2025</td></tr>
+<tr><td>GPT-Realtime</td><td>sub-500 ms target</td><td>Neural</td><td>Không</td><td>Proprietary</td><td>Aug 2025</td></tr>
+<tr><td>Qwen3-Omni</td><td>sub-300 ms</td><td>MoE Thinker-Talker</td><td>Có</td><td>Multi-codebook audio</td><td>Sep 2025</td></tr>
+<tr><td>Moshi v2 + MoshiRAG</td><td>khoảng 200 ms</td><td>Neural + RAG</td><td>Có</td><td>Mimi</td><td>Apr 2026</td></tr>
+<tr><td>Gemini 3 Live</td><td>sub-250 ms target</td><td>Neural</td><td>Không</td><td>Proprietary</td><td>2026</td></tr>
+</tbody></table>
+</div>
+<p>: So sánh Full-Duplex Dialogue Models <a id="tbl-full-duplex-comparison"></a></p>
+<h2 id="moshirag-april-2026"><a class="header" href="#moshirag-april-2026">MoshiRAG (April 2026)</a></h2>
+<p>MoshiRAG là phát triển quan trọng của Kyutai vào tháng 4/2026, giải quyết một hạn chế cơ bản của Speech LLM: <strong>kiến thức bị giới hạn bởi training data</strong>.</p>
+<h3 id="vấn-đề"><a class="header" href="#vấn-đề">Vấn đề</a></h3>
+<p>Moshi v1 và các Speech LLM full-duplex đều có vốn kiến thức cố định tại thời điểm training. Khi user hỏi về sự kiện mới, dữ liệu chuyên ngành, hoặc thông tin cá nhân hoá, model không thể trả lời chính xác. Pipeline cascaded có thể bù bằng cách gọi text-LLM cộng RAG, nhưng phá vỡ ưu điểm low-latency của full-duplex.</p>
+<h3 id="cơ-chế-asynchronous-rag"><a class="header" href="#cơ-chế-asynchronous-rag">Cơ chế asynchronous RAG</a></h3>
+<p>MoshiRAG giữ nguyên kiến trúc dual-stream của Moshi nhưng bổ sung <strong>asynchronous knowledge retrieval</strong>: khi model phát hiện câu hỏi cần kiến thức chi tiết, nó gửi truy vấn đến text-LLM cộng RAG system (chạy song song trên server), và inject kết quả vào stream khi sẵn sàng. Cơ chế này giữ được latency thấp cho phần lớn câu trả lời, đồng thời cho phép trả lời các câu hỏi cần kiến thức ngoài.</p>
+<h3 id="pocket-tts-và-moshivis-cùng-giai-đoạn"><a class="header" href="#pocket-tts-và-moshivis-cùng-giai-đoạn">Pocket TTS và MoshiVis (cùng giai đoạn)</a></h3>
+<p>Kyutai cũng release:</p>
+<ul>
+<li><strong>Pocket TTS</strong>: TTS khoảng 100M parameters, được báo cáo có chất lượng cạnh tranh với một số model lớn hơn trong thiết lập đánh giá công khai, hỗ trợ voice cloning và streaming realtime.</li>
+<li><strong>MoshiVis</strong>: Moshi với image input support, giữ nguyên latency realtime.</li>
+</ul>
+<h2 id="Đánh-giá-full-duplex-dialogue"><a class="header" href="#Đánh-giá-full-duplex-dialogue">Đánh giá full-duplex dialogue</a></h2>
+<p>Đánh giá full-duplex khó hơn đánh giá ASR hay TTS đơn lẻ, vì cần đo cả nội dung lẫn động lực đối thoại. Các metric thực dụng:</p>
+<ul>
+<li><strong>First byte latency</strong>: thời gian từ "user nói xong" đến "AI bắt đầu phát audio". Target: dưới 500 ms cho voice agent production, dưới 300 ms cho trải nghiệm natural.</li>
+<li><strong>Interruption handling latency</strong>: thời gian AI ngừng phát audio khi user bắt đầu nói chen vào.</li>
+<li><strong>Backchannel naturalness</strong>: tần suất và độ tự nhiên của backchannel ("vâng", "à", "ừm").</li>
+<li><strong>Turn-taking accuracy</strong>: tỷ lệ AI nhường lượt đúng lúc, không cắt lời user, không chậm trễ.</li>
+<li><strong>Conversation MOS</strong>: Mean Opinion Score do người đánh giá cho toàn cuộc đối thoại, không chỉ đoạn audio đơn lẻ.</li>
+</ul>
+<p>Hiện chưa có benchmark public chuẩn cho full-duplex evaluation. Các sản phẩm thương mại đều dùng internal eval với human raters.</p>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<ol>
+<li><strong>Full-duplex dialogue</strong> yêu cầu nghe và nói đồng thời, phá vỡ rào cản turn-taking tuần tự của voice AI thế hệ cũ.</li>
+<li><strong>Moshi</strong> (Kyutai, tháng 9/2024) tiên phong với dual-stream cộng inner monologue cộng Mimi codec, đạt latency dưới 300 ms.</li>
+<li><strong>Depth Transformer</strong> giải quyết multi-codebook generation hiệu quả trong Moshi.</li>
+<li><strong>Turn-taking</strong> vẫn là bài toán mở, cần neural models thay vì rule-based đơn giản.</li>
+<li><strong>MoshiRAG</strong> (tháng 4/2026) mở rộng full-duplex sang retrieval-augmented, giải quyết hạn chế về kiến thức.</li>
+<li><strong>Xu hướng</strong>: GPT-Realtime, Gemini 3 Live, Qwen3-Omni đều hỗ trợ full-duplex. Mỗi nhà cung cấp có cách tiếp cận riêng nhưng tất cả đều nhắm tới sub-300 ms first-byte latency.</li>
+</ol>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="defossez2024moshi"><sup class="footnote-definition-label">1</sup>
+<p>D{'e}fossez, Alexandre and Musicant, Laurent and others, "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue", arXiv preprint arXiv:2410.00037</p>
+</div>
+<div class="footnote-definition" id="ekstedt2022voice"><sup class="footnote-definition-label">2</sup>
+<p>Ekstedt, Erik and Skantze, Gabriel, "Voice Activity Projection: Self-supervised Learning of Turn-taking Events", Interspeech</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part4/12-multimodal-omni.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part5/14-speech-classification.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part4/12-multimodal-omni.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part5/14-speech-classification.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

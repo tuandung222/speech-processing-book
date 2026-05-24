@@ -1,0 +1,569 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 7: Streaming ASR - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html" class="active"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part2/07-streaming-asr.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-7-streaming-asr"><a class="header" href="#chương-7-streaming-asr">Chương 7: Streaming ASR</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Streaming ASR là điều kiện cần cho mọi voice product real-time: trợ lý ảo, voice agent, live captioning, in-car voice, dictation. Khác với offline ASR (đầu vào toàn bộ utterance trước khi sinh output), streaming ASR phải bắt đầu sinh transcript ngay khi audio bắt đầu chảy vào, với độ trễ chỉ vài trăm mili-giây.</p>
+<p>Yêu cầu này đặt ra ba ràng buộc kỹ thuật chính:</p>
+<ul>
+<li><strong>Causal hoặc chunked attention</strong>: không được nhìn vào frame tương lai vô hạn.</li>
+<li><strong>Endpointing</strong>: phát hiện khi nào người dùng kết thúc câu để chốt output.</li>
+<li><strong>Partial hypotheses</strong>: cập nhật transcript "đang nói" trong khi user vẫn đang nói.</li>
+</ul>
+<p>Chương này trình bày cả ba ràng buộc và các kiến trúc giải quyết chúng (RNN-T, streaming Conformer, chunk-based attention), kèm các trade-off thực tế giữa latency, accuracy, và compute.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: yêu cầu streaming, latency budget, partial vs final hypothesis.</li>
+<li><strong>Phần 2</strong>: RNN-Transducer trong vai trò architecture chuẩn cho streaming.</li>
+<li><strong>Phần 3</strong>: streaming Conformer và chunk-based attention.</li>
+<li><strong>Phần 4</strong>: endpointing, VAD, và turn-taking.</li>
+<li><strong>Phần 5</strong>: production patterns, latency optimization, integration với voice agent.</li>
+</ul>
+</blockquote>
+<h3 id="bản-đồ-vòng-đời-một-utterance-streaming"><a class="header" href="#bản-đồ-vòng-đời-một-utterance-streaming">Bản đồ vòng đời một utterance streaming</a></h3>
+<pre class="mermaid">sequenceDiagram
+    participant U as User audio
+    participant VAD as VAD / Endpointer
+    participant ASR as Streaming ASR
+    participant NLU as LLM / NLU
+    participant TTS as TTS
+    U-&gt;&gt;ASR: audio chunks 20-100 ms
+    ASR--&gt;&gt;U: partial hypotheses
+    U-&gt;&gt;VAD: speech / silence evidence
+    VAD-&gt;&gt;ASR: endpoint signal
+    ASR-&gt;&gt;NLU: final transcript
+    NLU-&gt;&gt;TTS: response text / plan
+    TTS--&gt;&gt;U: first audio packet
+</pre>
+<p>Streaming ASR không chỉ là “ASR nhanh hơn”. Nó là một hệ thống tương tác, nơi partial transcript, endpointing và latency perception quyết định cảm giác tự nhiên của hội thoại.</p>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Streaming ASR (hay Online ASR) là bài toán nhận dạng giọng nói <strong>real-time</strong> - model phải output text <strong>trong khi người dùng đang nói</strong>, không chờ toàn bộ utterance. Đây là yêu cầu bắt buộc cho voice assistants, live captioning, và call center AI.</p>
+<blockquote>
+<p><strong>📝 Offline vs Streaming ASR</strong></p>
+<ul>
+<li><strong>Offline ASR</strong>: Nhận toàn bộ audio → output transcript. Latency không quan trọng, chỉ cần accuracy.</li>
+<li><strong>Streaming ASR</strong>: Nhận audio từng chunk → output <strong>partial results</strong> liên tục. Phải cân bằng <strong>accuracy vs latency</strong>.</li>
+</ul>
+</blockquote>
+<p>Một ví dụ UX:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: right">Thời điểm</th><th>Audio vừa nhận</th><th>Partial transcript</th></tr></thead><tbody>
+<tr><td style="text-align: right">0.4s</td><td>“tôi...”</td><td>“tôi”</td></tr>
+<tr><td style="text-align: right">0.9s</td><td>“tôi muốn...”</td><td>“tôi muốn”</td></tr>
+<tr><td style="text-align: right">1.4s</td><td>“tôi muốn đổi...”</td><td>“tôi muốn đổi”</td></tr>
+<tr><td style="text-align: right">2.1s</td><td>“tôi muốn đổi mật khẩu”</td><td>“tôi muốn đổi mật khẩu”</td></tr>
+<tr><td style="text-align: right">endpoint</td><td>im lặng đủ lâu</td><td>final transcript được chốt</td></tr>
+</tbody></table>
+</div>
+<p>Nếu partial thay đổi quá nhiều, người dùng thấy chữ “nhảy”. Nếu endpoint quá chậm, voice agent trả lời trễ. Nếu endpoint quá sớm, agent cắt lời người dùng.</p>
+<h2 id="offline-vs-online-phân-tích-chi-tiết"><a class="header" href="#offline-vs-online-phân-tích-chi-tiết">Offline vs Online: Phân tích Chi tiết</a></h2>
+<h3 id="bảng-so-sánh"><a class="header" href="#bảng-so-sánh">Bảng So sánh</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>Offline ASR</th><th>Streaming ASR</th></tr></thead><tbody>
+<tr><td>Input</td><td>Toàn bộ utterance</td><td>Từng chunk (10-640ms)</td></tr>
+<tr><td>Attention</td><td>Bidirectional (full context)</td><td>Causal / limited context</td></tr>
+<tr><td>Latency</td><td>Không phải ràng buộc chính</td><td>thường nhắm vài trăm ms cho partial và dưới khoảng 1s cho turn response</td></tr>
+<tr><td>WER</td><td>thường tốt hơn nhờ full context</td><td>thường kém hơn nếu look-ahead bị giới hạn</td></tr>
+<tr><td>Use case</td><td>Transcription, subtitles</td><td>Voice assistant, live caption</td></tr>
+<tr><td>Decoding</td><td>Beam search (offline)</td><td>Greedy / streaming beam</td></tr>
+</tbody></table>
+</div>
+<p>: So sánh Offline vs Streaming ASR <a id="tbl-offline-vs-streaming"></a></p>
+<h3 id="latency-budget"><a class="header" href="#latency-budget">Latency Budget</a></h3>
+<p>Tổng latency của một voice AI system:</p>
+<p><a id="eq-latency-budget"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">total</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">audio</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">endpointing</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">ASR</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">NLU</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">TTS</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>Trong đó:</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">audio</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: Audio buffering (chunk size) - 80-640ms</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">endpointing</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span>: Phát hiện người dùng ngừng nói - 200-800ms</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">ASR</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: Inference time - 50-200ms</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">NLU</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: Language understanding - 100-500ms</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">TTS</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: Tổng hợp giọng nói - 100-300ms</li>
+</ul>
+<blockquote>
+<p><strong>⚠️ Latency Target</strong></p>
+<p>Với voice agent, người dùng thường cảm nhận rõ độ trễ sau khi họ ngừng nói. Mục tiêu thực tế phụ thuộc sản phẩm, nhưng hệ thống hội thoại tự nhiên thường cố giữ thời gian từ endpoint đến first audio response dưới khoảng 1 giây. Streaming ASR nên phát partial nhanh hơn nhiều so với final turn response.</p>
+</blockquote>
+<h3 id="latency-budget-mẫu-cho-voice-agent"><a class="header" href="#latency-budget-mẫu-cho-voice-agent">Latency budget mẫu cho voice agent</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Thành phần</th><th style="text-align: right">Mục tiêu tham khảo</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Audio chunk/buffering</td><td style="text-align: right">20-100 ms</td><td>chunk nhỏ giảm latency nhưng tăng overhead</td></tr>
+<tr><td>ASR partial update</td><td style="text-align: right">50-200 ms</td><td>người dùng thấy transcript chạy realtime</td></tr>
+<tr><td>Endpointing</td><td style="text-align: right">200-800 ms</td><td>trade-off cắt lời vs chờ lâu</td></tr>
+<tr><td>LLM first token</td><td style="text-align: right">100-700 ms</td><td>phụ thuộc model, prompt, tool call</td></tr>
+<tr><td>TTS first audio</td><td style="text-align: right">100-500 ms</td><td>streaming TTS giảm perceived latency</td></tr>
+</tbody></table>
+</div>
+<p>Điểm quan trọng là <strong>latency cộng dồn</strong>. Một thành phần chỉ chậm thêm 200 ms có thể làm toàn hệ thống mất cảm giác tự nhiên.</p>
+<h3 id="ctc-based-streaming"><a class="header" href="#ctc-based-streaming">CTC-based Streaming</a></h3>
+<p>CTC tự nhiên hỗ trợ streaming vì output tại mỗi frame <strong>độc lập</strong> (conditional independence):</p>
+<p><a id="eq-ctc-streaming"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord mathbf" style="margin-right:0.01597em;">y</span><span class="mord">∣</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.3443em;vertical-align:-1.516em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.05em;"><span style="top:-1.809em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord boldsymbol mtight" style="margin-right:0.03704em;">π</span></span></span><span class="mrel mtight">∈</span><span class="mord mtight"><span class="mord mathcal mtight" style="margin-right:0.03041em;">B</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7463em;"><span style="top:-2.786em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span><span class="mopen mtight">(</span><span class="mord mathbf mtight" style="margin-right:0.01597em;">y</span><span class="mclose mtight">)</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.516em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8829em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∏</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2671em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">π</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2952em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">≤</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2452em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>Chỉ cần <strong>causal encoder</strong> (không nhìn future frames) là có thể streaming.</p>
+<p>CTC streaming đơn giản và nhanh, nhưng thường cần cơ chế ổn định output vì frame-level predictions có thể dao động. Với tiếng Việt, dao động dấu thanh hoặc âm cuối trong partial transcript có thể gây UX khó chịu nếu hiển thị quá sớm.</p>
+<h3 id="rnn-transducer-streaming"><a class="header" href="#rnn-transducer-streaming">RNN-Transducer Streaming</a></h3>
+<p>RNN-T <sup class="footnote-reference"><a href="#graves2012sequence">1</a></sup> là kiến trúc streaming phổ biến nhất trong production:</p>
+<p><a id="eq-rnnt-streaming"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">p</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∣</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2952em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">≤</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2452em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2274em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">JointNet</span></span><span class="mopen">(</span><span class="mord text"><span class="mord">Encoder</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2952em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">≤</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2452em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">Predictor</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2274em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">))</span></span></span></span></span></p>
+<ul>
+<li><strong>Encoder</strong>: Causal (chỉ nhìn past + current)</li>
+<li><strong>Predictor</strong>: Autoregressive trên previous tokens</li>
+<li><strong>Joint Network</strong>: Kết hợp encoder và predictor</li>
+</ul>
+<h3 id="streaming-conformer"><a class="header" href="#streaming-conformer">Streaming Conformer</a></h3>
+<p>Conformer gốc thường dùng bidirectional context, nhưng có thể chuyển sang streaming bằng một số kỹ thuật:</p>
+<div class="table-wrapper"><table><thead><tr><th>Kỹ thuật</th><th>Ý tưởng</th><th>Trade-off</th></tr></thead><tbody>
+<tr><td>Causal convolution</td><td>conv chỉ nhìn quá khứ</td><td>latency thấp hơn, ít context hơn</td></tr>
+<tr><td>Chunked self-attention</td><td>attention trong chunk + left context</td><td>cân bằng accuracy/latency</td></tr>
+<tr><td>Limited right context</td><td>cho nhìn trước vài frames</td><td>tăng accuracy nhưng thêm latency</td></tr>
+<tr><td>Cache encoder states</td><td>lưu K/V hoặc hidden states cũ</td><td>giảm compute khi stream</td></tr>
+</tbody></table>
+</div><pre class="mermaid">flowchart LR
+    C1[&quot;Chunk 1&quot;] --&gt; E1[&quot;Encode + cache&quot;]
+    C2[&quot;Chunk 2&quot;] --&gt; E2[&quot;Encode with left cache&quot;]
+    C3[&quot;Chunk 3&quot;] --&gt; E3[&quot;Encode with left cache&quot;]
+    E1 --&gt; P[&quot;Partial decoding&quot;]
+    E2 --&gt; P
+    E3 --&gt; P
+</pre>
+<h3 id="chunked-attention"><a class="header" href="#chunked-attention">Chunked Attention</a></h3>
+<p>Thay vì full bidirectional attention, chunked attention <sup class="footnote-reference"><a href="#zhang2020streaming">2</a></sup> chia audio thành chunks:</p>
+<p><a id="eq-chunked-attention"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Attention</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf" style="margin-right:0.01597em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.016em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4684em;vertical-align:-0.95em;"></span><span class="mord text"><span class="mord">softmax</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.5183em;"><span style="top:-2.2528em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord sqrt"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8572em;"><span class="svg-align" style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord" style="padding-left:0.833em;"><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.8172em;"><span class="pstrut" style="height:3em;"></span><span class="hide-tail" style="min-width:0.853em;height:1.08em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='1.08em' viewBox='0 0 400000 1080' preserveAspectRatio='xMinYMin slice'><path d='M95,702 c-2.7,0,-7.17,-2.7,-13.5,-8c-5.8,-5.3,-9.5,-10,-9.5,-14 c0,-2,0.3,-3.3,1,-4c1.3,-2.7,23.83,-20.7,67.5,-54 c44.2,-33.3,65.8,-50.3,66.5,-51c1.3,-1.3,3,-2,5,-2c4.7,0,8.7,3.3,12,10 s173,378,173,378c0.7,0,35.3,-71,104,-213c68.7,-142,137.5,-285,206.5,-429 c69,-144,104.5,-217.7,106.5,-221 l0 -0 c5.3,-9.3,12,-14,20,-14 H400000v40H845.2724 s-225.272,467,-225.272,467s-235,486,-235,486c-2.7,4.7,-9,7,-19,7 c-6,0,-10,-1,-12,-3s-194,-422,-194,-422s-65,47,-65,47z M834 80h400000v40h-400000z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1828em;"><span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">Q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">K</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.93em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf" style="margin-right:0.01597em;">V</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.016em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">c</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">c</span></span></span></span> là chunk index, và keys/values chỉ từ:</p>
+<ul>
+<li>Current chunk</li>
+<li>Left context (previous <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> chunks)</li>
+<li>Optional: Right context (future <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span></span></span></span> frames - thêm latency)</li>
+</ul>
+<h3 id="dynamic-chunk-training"><a class="header" href="#dynamic-chunk-training">Dynamic Chunk Training</a></h3>
+<p><strong>Unified model</strong> <sup class="footnote-reference"><a href="#zhang2022wenet">3</a></sup> train với <strong>random chunk sizes</strong> để một model duy nhất hoạt động ở nhiều latency modes:</p>
+<p><a id="eq-dynamic-chunk"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">chunk size</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∼</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Uniform</span></span><span class="mopen">({</span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">4</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">16</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">∞</span><span class="mclose">})</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">subsampling factor</span></span></span></span></span></span></p>
+<ul>
+<li>chunk_size = <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span> → offline mode (full attention)</li>
+<li>chunk_size = 1 → streaming mode (minimum latency)</li>
+<li>chunk_size = 4-8 → balanced mode</li>
+</ul>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Dynamic Chunk Attention Mask"
+import torch
+from torch import Tensor
+
+def create_chunk_mask(
+    seq_len: int,
+    chunk_size: int,
+    left_context: int = -1,  # -1 means unlimited
+) -&gt; Tensor:
+    """Create attention mask for chunked streaming ASR.
+
+    Args:
+        seq_len: Sequence length T
+        chunk_size: Size of each chunk in frames
+        left_context: Number of left chunks to attend to (-1 = all)
+
+    Returns:
+        mask: [T, T] boolean mask, True = can attend
+    """
+    mask: Tensor = torch.zeros(
+        seq_len, seq_len, dtype=torch.bool
+    )  # [T, T] - bool
+
+    for i in range(seq_len):
+        chunk_idx: int = i // chunk_size
+        # Can attend to frames in same chunk
+        chunk_start: int = chunk_idx * chunk_size
+        chunk_end: int = min((chunk_idx + 1) * chunk_size, seq_len)
+        mask[i, chunk_start:chunk_end] = True
+
+        # Can attend to left context
+        if left_context == -1:
+            mask[i, :chunk_start] = True  # unlimited left context
+        else:
+            left_start: int = max(
+                0, (chunk_idx - left_context) * chunk_size
+            )
+            mask[i, left_start:chunk_start] = True
+
+    return mask  # [T, T] - bool
+
+# Example: chunk_size=4, left_context=2
+mask = create_chunk_mask(seq_len=16, chunk_size=4, left_context=2)
+print(f"Mask shape: {mask.shape}")  # [16, 16]
+print(f"Sparsity: {(~mask).float().mean():.1%}")
+</code></pre>
+<h2 id="endpointing"><a class="header" href="#endpointing">Endpointing</a></h2>
+<h3 id="tại-sao-endpointing-quan-trọng"><a class="header" href="#tại-sao-endpointing-quan-trọng">Tại sao Endpointing quan trọng?</a></h3>
+<p>Endpointing (Voice Activity Detection + End-of-Query detection) quyết định <strong>khi nào người dùng ngừng nói</strong> để trigger response generation:</p>
+<p><a id="eq-endpointing"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">endpoint</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size4">{</span></span><span class="mord"><span class="mtable"><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord">True</span></span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord">False</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.69em;"><span style="top:-3.69em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord">n</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">e</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">u </span></span><span class="mord text"><span class="mord">silence duration</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">threshold</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.25em;"><span class="pstrut" style="height:3.008em;"></span><span class="mord"><span class="mord text"><span class="mord">ng</span><span class="mord latin_fallback">ư</span><span class="mord">ợc lại</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.19em;"><span></span></span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<h3 id="3-chiến-lược-endpointing"><a class="header" href="#3-chiến-lược-endpointing">3 Chiến lược Endpointing</a></h3>
+<ol>
+<li>
+<p><strong>VAD-based</strong>: Đơn giản, dùng energy/model-based VAD</p>
+<ul>
+<li>Silero VAD: ONNX, ~1ms inference</li>
+<li>Threshold: 300-800ms silence</li>
+</ul>
+</li>
+<li>
+<p><strong>Token-based</strong>: Dựa trên ASR output</p>
+<ul>
+<li>Nếu ASR output <code>&lt;eos&gt;</code> token → endpoint</li>
+<li>Hoặc: N consecutive blank tokens trong CTC</li>
+</ul>
+</li>
+<li>
+<p><strong>Neural Endpointer</strong>: Learned model</p>
+<ul>
+<li>Input: Audio features + ASR state</li>
+<li>Output: Probability of end-of-query</li>
+<li>Neural endpointer có thể giảm độ trễ endpointing trong một số hệ thống, nhưng cần benchmark theo domain</li>
+</ul>
+</li>
+</ol>
+<h2 id="production-patterns-cho-voice-agent"><a class="header" href="#production-patterns-cho-voice-agent">Production patterns cho voice agent</a></h2>
+<p>Một voice agent realtime thường không dùng ASR như một hàm batch <code>audio -&gt; text</code>. Nó dùng event stream:</p>
+<div class="table-wrapper"><table><thead><tr><th>Event</th><th>Ý nghĩa</th><th>Consumer</th></tr></thead><tbody>
+<tr><td><code>speech_started</code></td><td>VAD phát hiện người dùng bắt đầu nói</td><td>UI, barge-in logic</td></tr>
+<tr><td><code>partial_transcript</code></td><td>ASR hypothesis tạm thời</td><td>caption, live intent detection</td></tr>
+<tr><td><code>stable_prefix</code></td><td>phần transcript ít khả năng đổi</td><td>incremental NLU</td></tr>
+<tr><td><code>speech_ended</code></td><td>endpointer chốt lượt nói</td><td>LLM turn start</td></tr>
+<tr><td><code>final_transcript</code></td><td>transcript cuối</td><td>logging, NLU, analytics</td></tr>
+</tbody></table>
+</div>
+<p>Với full-duplex agents, ASR còn phải xử lý <strong>barge-in</strong>: người dùng nói chen khi TTS đang phát. Khi đó hệ thống cần dừng hoặc hạ âm TTS, tiếp tục nhận audio người dùng, và tránh ASR transcribe chính giọng TTS của agent.</p>
+<h2 id="streaming-asr-trong-industry"><a class="header" href="#streaming-asr-trong-industry">Streaming ASR trong Industry</a></h2>
+<h3 id="nvidia-streaming-asr-stack"><a class="header" href="#nvidia-streaming-asr-stack">NVIDIA streaming ASR stack</a></h3>
+<p>Các mô hình/recipe ASR trong hệ sinh thái NVIDIA thường nhấn mạnh FastConformer, cache-based streaming và deployment trên GPU NVIDIA:</p>
+<ul>
+<li><strong>FastConformer</strong> encoder với cache-based streaming</li>
+<li>Hybrid CTC/RNNT decoding</li>
+<li><strong>Multi-blank CTC</strong>: Skip blank frames, giảm decoding time</li>
+<li>RTF thấp trong các cấu hình benchmark được báo cáo; cần đo lại theo hardware, batch và decoding thực tế</li>
+</ul>
+<h3 id="nvidia-canary"><a class="header" href="#nvidia-canary">NVIDIA Canary</a></h3>
+<p>Canary <sup class="footnote-reference"><a href="#nvidia2024canary">4</a></sup> là họ mô hình multilingual/multitask trong NeMo; khả năng streaming phụ thuộc checkpoint và recipe triển khai cụ thể:</p>
+<ul>
+<li>Multi-task: ASR + Translation + Language ID</li>
+<li>Streaming via chunked attention</li>
+<li>coverage ngôn ngữ phụ thuộc model card/checkpoint cụ thể</li>
+</ul>
+<h3 id="wenet-unified-framework"><a class="header" href="#wenet-unified-framework">WeNet Unified Framework</a></h3>
+<p>WeNet <sup class="footnote-reference"><a href="#zhang2022wenet">3</a></sup> cung cấp <strong>unified streaming/non-streaming ASR</strong>:</p>
+<ul>
+<li>Single model, switchable modes (chunk size = 1 → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord">∞</span></span></span></span>)</li>
+<li>Dynamic chunk training</li>
+<li>runtime C++ phục vụ triển khai thực tế</li>
+<li>ONNX + TensorRT export</li>
+</ul>
+<h3 id="google-usm-universal-speech-model"><a class="header" href="#google-usm-universal-speech-model">Google USM (Universal Speech Model)</a></h3>
+<p>USM <sup class="footnote-reference"><a href="#zhang2023google">5</a></sup> là mô hình quy mô lớn của Google cho ASR đa ngôn ngữ:</p>
+<ul>
+<li>Pre-trained trên 12M hours unlabeled audio</li>
+<li>Fine-tuned cho 300+ languages</li>
+<li>Streaming via causal attention + look-ahead</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Engine</th><th>Kiến trúc</th><th>Streaming</th><th>Languages</th><th>RTF</th></tr></thead><tbody>
+<tr><td>Whisper</td><td>Encoder-Decoder</td><td>chủ yếu offline/chunked wrapper</td><td>multilingual</td><td>phụ thuộc implementation</td></tr>
+<tr><td>NVIDIA FastConformer stack</td><td>FastConformer CTC/RNNT</td><td>Có theo recipe</td><td>tùy checkpoint</td><td>cần benchmark lại</td></tr>
+<tr><td>Canary</td><td>encoder-decoder / NeMo</td><td>tùy checkpoint/recipe</td><td>tùy model card</td><td>cần benchmark lại</td></tr>
+<tr><td>WeNet</td><td>Conformer-CTC/RNNT</td><td>Có (unified)</td><td>configurable</td><td>phụ thuộc runtime</td></tr>
+<tr><td>USM</td><td>Conformer-style large ASR</td><td>Có trong hệ thống được báo cáo</td><td>multilingual</td><td>không phải public deployment đơn giản</td></tr>
+</tbody></table>
+</div>
+<p>: So sánh các Streaming ASR engines <a id="tbl-streaming-asr-engines"></a></p>
+<h2 id="metrics-đánh-giá-streaming-asr"><a class="header" href="#metrics-đánh-giá-streaming-asr">Metrics đánh giá Streaming ASR</a></h2>
+<p>Ngoài WER (Word Error Rate), streaming ASR cần thêm:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metric</th><th>Công thức</th><th>Ý nghĩa</th></tr></thead><tbody>
+<tr><td><strong>RTF</strong> (Real-Time Factor)</td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.4365em;vertical-align:-0.4509em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.9857em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">audio</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.5073em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1645em;"><span style="top:-2.357em;margin-left:-0.1389em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">process</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2819em;"><span></span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.4509em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td><td>&lt; 1.0 = real-time</td></tr>
+<tr><td><strong>Latency</strong></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">first token</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9694em;vertical-align:-0.2861em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">speech end</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span></span></span></span></td><td>Thời gian chờ kết quả</td></tr>
+<tr><td><strong>EL</strong> (Emission Latency)</td><td>Average delay per token</td><td>Token-level latency</td></tr>
+<tr><td><strong>WER</strong></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">S</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight" style="margin-right:0.02778em;">D</span><span class="mbin mtight">+</span><span class="mord mathnormal mtight" style="margin-right:0.07847em;">I</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></td><td>Accuracy</td></tr>
+<tr><td><strong>Partial stability</strong></td><td>% partial results không thay đổi</td><td>UX quality</td></tr>
+</tbody></table>
+</div>
+<p>: Metrics cho Streaming ASR <a id="tbl-streaming-metrics"></a></p>
+<h3 id="Đánh-giá-riêng-cho-tiếng-việt-streaming"><a class="header" href="#Đánh-giá-riêng-cho-tiếng-việt-streaming">Đánh giá riêng cho tiếng Việt streaming</a></h3>
+<p>Với tiếng Việt, streaming ASR cần thêm các lát cắt evaluation:</p>
+<ul>
+<li><strong>Thanh điệu trong partial</strong>: dấu có ổn định sớm không, hay sửa liên tục ở cuối âm tiết?</li>
+<li><strong>Âm cuối</strong>: <code>/n/</code>, <code>/ŋ/</code>, <code>/t/</code>, <code>/k/</code> thường xuất hiện muộn, partial quá sớm dễ sai.</li>
+<li><strong>Phương ngữ</strong>: endpointing có bị ảnh hưởng bởi tốc độ nói và nhịp vùng miền không?</li>
+<li><strong>Code-switching</strong>: language ID có dao động khi người dùng chèn từ tiếng Anh không?</li>
+<li><strong>Tên riêng và số</strong>: partial/final có giữ đúng entity quan trọng không?</li>
+</ul>
+<p>Một WER trung bình tốt chưa đủ. Voice product tiếng Việt cần đo cả <strong>partial stability theo dấu thanh</strong> và lỗi entity quan trọng.</p>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<ol>
+<li><strong>Streaming ASR</strong> là nền tảng của voice AI realtime, nhưng nó là bài toán hệ thống chứ không chỉ là model nhanh.</li>
+<li><strong>CTC</strong> hỗ trợ streaming đơn giản; <strong>RNN-T</strong> thêm dependency theo output và rất phù hợp partial decoding.</li>
+<li><strong>Chunked attention</strong> và streaming Conformer cho phép kiểm soát trade-off giữa latency và accuracy.</li>
+<li><strong>Endpointing</strong> quyết định trải nghiệm hội thoại: quá sớm thì cắt lời, quá muộn thì agent phản hồi chậm.</li>
+<li><strong>Partial stability</strong> là metric UX quan trọng không kém WER trong live captioning và voice agent.</li>
+<li>Với tiếng Việt, cần đánh giá riêng lỗi dấu thanh, âm cuối, phương ngữ, code-switching và entity quan trọng.</li>
+</ol>
+<h3 id="checklist-thiết-kế-streaming-asr"><a class="header" href="#checklist-thiết-kế-streaming-asr">Checklist thiết kế Streaming ASR</a></h3>
+<ul>
+<li>Chọn chunk size dựa trên latency target, không chỉ dựa trên WER.</li>
+<li>Tách partial transcript và final transcript trong API.</li>
+<li>Có VAD/endpointer riêng, không chỉ dựa vào ASR text.</li>
+<li>Đo first-token latency, endpoint latency, RTF và partial stability.</li>
+<li>Benchmark theo thiết bị thật: browser, mobile, telephony, microphone xa/gần.</li>
+<li>Với voice agent, thiết kế barge-in và echo cancellation ngay từ đầu.</li>
+</ul>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="graves2012sequence"><sup class="footnote-definition-label">1</sup>
+<p>Graves, Alex, "Sequence Transduction with Recurrent Neural Networks", arXiv preprint arXiv:1211.3711</p>
+</div>
+<div class="footnote-definition" id="zhang2020streaming"><sup class="footnote-definition-label">2</sup>
+<p>Zhang, Shiliang and others, "Streaming Transformer ASR with Attention-based Chunk Approaches", IEEE International Conference on Acoustics, Speech and Signal Processing</p>
+</div>
+<div class="footnote-definition" id="zhang2022wenet"><sup class="footnote-definition-label">3</sup>
+<p>Zhang, Binbin and Wu, Di and Peng, Zhendong and others, "WeNet 2.0: More Productive End-to-End Speech Recognition Toolkit", Interspeech</p>
+</div>
+<div class="footnote-definition" id="nvidia2024nemotron"><sup class="footnote-definition-label">6</sup>
+<p>{NVIDIA}, "Streaming ASR and FastConformer resources", NVIDIA NeMo documentation and model cards</p>
+</div>
+<div class="footnote-definition" id="nvidia2024canary"><sup class="footnote-definition-label">4</sup>
+<p>{NVIDIA}, "Canary: Multi-Lingual Multi-Task ASR and Translation Model", NVIDIA NeMo Toolkit Documentation</p>
+</div>
+<div class="footnote-definition" id="zhang2023google"><sup class="footnote-definition-label">5</sup>
+<p>Zhang, Yu and Han, Wei and Qin, James and others, "Google USM: Scaling Automatic Speech Recognition Beyond 100 Languages", arXiv preprint arXiv:2303.01037</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part2/06-whisper-canary.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part3/08-tts-foundations.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part2/06-whisper-canary.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part3/08-tts-foundations.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,1064 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 1: Từ NLP đến Speech - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html" class="active"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part1/01-nlp-to-speech.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-1-từ-nlp-đến-speech--cầu-nối-khái-niệm"><a class="header" href="#chương-1-từ-nlp-đến-speech--cầu-nối-khái-niệm">Chương 1: Từ NLP đến Speech — Cầu nối Khái niệm</a></h1>
+<h2 id="mở-đầu-một-câu-hỏi-cho-data-scientist-nlp"><a class="header" href="#mở-đầu-một-câu-hỏi-cho-data-scientist-nlp">Mở đầu: Một câu hỏi cho data scientist NLP</a></h2>
+<p>Hãy bắt đầu bằng một câu hỏi đơn giản: <strong>vào năm 2026, tại sao một data scientist nền tảng NLP/LLM lại cần học Speech AI?</strong></p>
+<p>Câu trả lời ngắn gọn: vì ranh giới giữa "text intelligence" và "audio intelligence" đang biến mất với tốc độ chóng mặt. Hãy nhìn vào bức tranh hiện tại.</p>
+<p>GPT-4o của OpenAI có thể nghe người dùng nói, ngắt lời lịch sự, đổi giọng theo cảm xúc, và phản hồi trong vòng 320 mili-giây. Đó là độ trễ tương đương một cuộc trò chuyện thực giữa con người. Moshi của Kyutai Labs đi xa hơn: nó có thể nói và nghe <strong>đồng thời</strong>, không phải kiểu "đợi user kết thúc rồi mới response" như các chatbot truyền thống. Qwen2.5-Omni của Alibaba thống nhất bốn modality (text, audio, image, video) trong một transformer duy nhất. Gemini 2.0 streaming hỗ trợ video gọi thời gian thực.</p>
+<p>Điểm chung của tất cả những hệ thống này: chúng đều xây dựng trên cùng một kiến trúc transformer mà bạn đã quen thuộc khi training BERT, fine-tune GPT, hay deploy LLaMA. Khác biệt duy nhất nằm ở <strong>cách input và output được biểu diễn</strong>.</p>
+<p>Đây chính là điều cuốn sách này muốn giải thích. Và chương đầu tiên, cụ thể, sẽ xây dựng cây cầu khái niệm cho phép bạn ánh xạ từng kiến thức NLP đã có vào thế giới speech một cách trực giác. Sau khi đọc xong chương này, bạn sẽ thấy:</p>
+<blockquote>
+<p>Speech AI = NLP + hai bước biến đổi (continuous → discrete) + các kỹ thuật xử lý tín hiệu.</p>
+</blockquote>
+<p>Ba phần còn lại của Part I (Chương 2-3) sẽ đi sâu vào hai bước biến đổi đó. Phần II về sau là ASR. Phần III là TTS. Phần IV về Speech LLMs là điểm mà tất cả những gì bạn biết về Transformer thực sự được áp dụng trực tiếp lên audio. Cuốn sách được thiết kế để mỗi chương đều bắc cầu sang NLP, không bao giờ để bạn cảm thấy bị lạc giữa các thuật ngữ xa lạ.</p>
+<blockquote>
+<p><strong>📝 Lưu ý về phong cách trình bày</strong></p>
+<p>Cuốn sách này được viết cho người đã thành thạo Transformer, đã từng pretrain hoặc fine-tune ít nhất một LLM, đã hiểu attention mechanism ở mức implementation. Nếu bạn chưa có những kiến thức đó, hãy đọc bài "The Illustrated Transformer" của Jay Alammar trước, sau đó quay lại đây.</p>
+<p>Mỗi khi gặp một khái niệm Speech mới, chương sẽ dừng lại và bắc cầu sang NLP equivalent. Người đọc sẽ thấy rằng "thư viện trực giác" được xây dựng từ NLP không hề bị vứt bỏ, nó chỉ cần được mở rộng.</p>
+</blockquote>
+<h3 id="bản-đồ-cầu-nối-nlp--speech"><a class="header" href="#bản-đồ-cầu-nối-nlp--speech">Bản đồ cầu nối NLP → Speech</a></h3>
+<p>Để đọc chương này hiệu quả, hãy giữ một bảng ánh xạ rất đơn giản trong đầu:</p>
+<pre class="mermaid">flowchart LR
+    TEXT[&quot;Text string&quot;] --&gt; BPE[&quot;BPE / SentencePiece&quot;]
+    BPE --&gt; TID[&quot;Token IDs&quot;]
+    TID --&gt; TEMB[&quot;Token embeddings&quot;]
+    TEMB --&gt; TR[&quot;Transformer&quot;]
+
+    WAV[&quot;Waveform&quot;] --&gt; FEAT[&quot;Mel / SSL / Codec&quot;]
+    FEAT --&gt; AID[&quot;Frames or audio tokens&quot;]
+    AID --&gt; AEMB[&quot;Audio embeddings&quot;]
+    AEMB --&gt; TR
+</pre>
+<p>Chương này không yêu cầu bạn quên NLP. Ngược lại, nó yêu cầu bạn hỏi cùng một câu cho audio: “tokenizer là gì, sequence dài bao nhiêu, embedding được tạo ra thế nào, và output được decode ra sao?”</p>
+<div class="table-wrapper"><table><thead><tr><th>Câu hỏi quen thuộc trong NLP</th><th>Phiên bản tương ứng trong Speech</th></tr></thead><tbody>
+<tr><td>Tokenizer chia text thế nào?</td><td>Feature extractor/codec chia waveform thế nào?</td></tr>
+<tr><td>Vocabulary size bao nhiêu?</td><td>Codebook size hoặc frame dimension bao nhiêu?</td></tr>
+<tr><td>Sequence length có vượt context không?</td><td>Audio frame/token rate có quá dài không?</td></tr>
+<tr><td>Positional encoding dùng gì?</td><td>Time encoding và chunking xử lý ra sao?</td></tr>
+<tr><td>Decode bằng greedy/beam/sampling?</td><td>ASR decode text hay codec LM decode audio token?</td></tr>
+</tbody></table>
+</div>
+<h2 id="phần-1--vấn-đề-cốt-lõi-discrete-vs-continuous"><a class="header" href="#phần-1--vấn-đề-cốt-lõi-discrete-vs-continuous">Phần 1 — Vấn đề cốt lõi: Discrete vs Continuous</a></h2>
+<h3 id="11-thế-giới-nlp-bạn-đã-quen-thuộc-với-gì"><a class="header" href="#11-thế-giới-nlp-bạn-đã-quen-thuộc-với-gì">1.1 Thế giới NLP: bạn đã quen thuộc với gì?</a></h3>
+<p>Trước khi nói về speech, hãy ôn lại pipeline NLP cơ bản mà bạn đã thực hiện hàng nghìn lần. Khi đưa một câu văn vào model, các bước xảy ra:</p>
+<ol>
+<li>
+<p><strong>Tokenization</strong>: chuỗi ký tự <code>"Tôi yêu Speech AI"</code> được tách thành các token. Với BPE/SentencePiece, kết quả có thể là <code>["Tôi", " yêu", " Speech", " AI"]</code> hoặc tinh hơn <code>["Tôi", " y", "êu", " Speech", " AI"]</code> tuỳ tokenizer.</p>
+</li>
+<li>
+<p><strong>Lookup vocabulary</strong>: mỗi token được map sang một integer ID. Vocabulary của LLaMA-2 có 32,000 entries, GPT-4 có khoảng 100K, các tokenizer multilingual có thể đến 250K.</p>
+</li>
+<li>
+<p><strong>Embedding</strong>: mỗi token ID được tra cứu trong embedding matrix <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7252em;vertical-align:-0.0391em;"></span><span class="mord mathbf">E</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8491em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8491em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.22222em;">V</span><span class="mbin mtight">×</span><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span></span>, trả về vector <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span> chiều (thường <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">768</span></span></span></span> cho BERT-base, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4096</span></span></span></span> cho LLaMA-7B).</p>
+</li>
+<li>
+<p><strong>Positional encoding</strong>: thêm thông tin vị trí (sinusoidal hoặc learned hoặc RoPE).</p>
+</li>
+<li>
+<p><strong>Transformer layers</strong>: stack of self-attention + feedforward, mỗi layer biến đổi sequence of embeddings thành sequence of contextualized representations.</p>
+</li>
+<li>
+<p><strong>Output</strong>: tuỳ task (classification head, language modeling head, etc.).</p>
+</li>
+</ol>
+<p>Pipeline này có vài đặc điểm đáng để gọi tên rõ ràng:</p>
+<ul>
+<li><strong>Input là discrete và có vocabulary cố định</strong>. Khi bạn build tokenizer, bạn quyết định trước rằng vocabulary có 32K entries (hoặc 50K, hoặc 100K). Mỗi token bạn nhìn thấy CHẮC CHẮN phải nằm trong tập này (out-of-vocabulary đã được giải quyết bằng BPE/SentencePiece chia thành sub-units).</li>
+<li><strong>Mỗi token có nghĩa độc lập (gần đúng)</strong>. Token <code>"Speech"</code> mang nghĩa "speech" dù ở câu nào. Tokenization là deterministic.</li>
+<li><strong>Sequence length tương đối ngắn</strong>. Một câu văn dài ~20 tokens, một paragraph ~100, một đoạn văn dài ~500. Context windows hiện đại (Gemini 1.5: 2M, Claude 3.5: 200K) đã rất dài nhưng vẫn finite.</li>
+<li><strong>Information density cao</strong>. Mỗi token mang nhiều thông tin ngữ nghĩa, không có token nào "redundant" theo nghĩa lý thuyết thông tin.</li>
+</ul>
+<p>Hãy giữ những đặc điểm này trong đầu khi ta nhìn sang thế giới speech.</p>
+<h3 id="111-Điều-gì-dễ-trong-nlp-mà-speech-không-có"><a class="header" href="#111-Điều-gì-dễ-trong-nlp-mà-speech-không-có">1.1.1 Điều gì “dễ” trong NLP mà Speech không có?</a></h3>
+<p>Text đã được con người chuẩn hóa trước khi vào model. Một câu văn đã loại bỏ phần lớn biến thiên vật lý: ai nói, micro nào, phòng vang ra sao, người nói mệt hay khỏe, tốc độ nói nhanh hay chậm. Speech thì giữ tất cả những biến thiên đó.</p>
+<div class="table-wrapper"><table><thead><tr><th>Trong NLP</th><th>Trong Speech</th></tr></thead><tbody>
+<tr><td>Text gần như không phụ thuộc người viết ở mức ký tự</td><td>Waveform phụ thuộc speaker, microphone, room, emotion</td></tr>
+<tr><td>Token boundary thường rõ sau tokenizer</td><td>Phoneme boundary không quan sát trực tiếp</td></tr>
+<tr><td>Input ít noise vật lý</td><td>Input có background noise, clipping, reverberation</td></tr>
+<tr><td>Alignment token-token trong MT tương đối mềm</td><td>Alignment audio-text monotonic nhưng không biết trước</td></tr>
+<tr><td>Evaluation có thể nhìn text output</td><td>Evaluation TTS cần human perception hoặc proxy metric</td></tr>
+</tbody></table>
+</div>
+<p>Đây là lý do Speech AI luôn có thêm một lớp “data engineering vật lý” mà NLP thuần thường ít gặp.</p>
+<h3 id="12-thế-giới-speech-vấn-đề-là-gì"><a class="header" href="#12-thế-giới-speech-vấn-đề-là-gì">1.2 Thế giới Speech: vấn đề là gì?</a></h3>
+<p>Bây giờ tưởng tượng input là âm thanh thay vì text. Cụ thể, một file <code>.wav</code> ghi giọng người nói câu "Tôi yêu Speech AI" trong 1.5 giây. Bạn cần đưa file này vào một neural network. Bước đầu tiên là gì?</p>
+<p>Câu trả lời không hề hiển nhiên, và sự không-hiển-nhiên đó chính là nguồn cơn của toàn bộ ngành Speech AI.</p>
+<p>Hãy nhìn vào file đó dưới ống kính kỹ thuật. Microphone bắt sóng âm, một sóng cơ học truyền qua không khí, và biến đổi thành tín hiệu điện. Tín hiệu điện này được số hoá qua <strong>sampling</strong> (lấy mẫu) và <strong>quantization</strong> (lượng tử hoá). Với chuẩn 16 kHz / 16-bit (thông số mặc định cho speech), 1 giây audio = 16,000 mẫu, mỗi mẫu là một số nguyên signed 16-bit (-32768 đến 32767).</p>
+<p>Vậy file 1.5 giây của bạn = 24,000 mẫu. Một mảng <code>int16</code> có shape <code>(24000,)</code>.</p>
+<blockquote>
+<p><strong>🤔 Câu hỏi tự nhiên đầu tiên</strong></p>
+<p>"Vậy mỗi mẫu là một token, đúng không? Vocabulary size = <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8141em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">16</span></span></span></span></span></span></span></span></span></span></span></span> = 65,536, tương tự BPE token. Ta cứ embedding rồi đưa vào Transformer như NLP thôi mà?"</p>
+<p>Câu trả lời là <strong>KHÔNG</strong>, và để hiểu tại sao không, ta cần thấy một điều: <strong>mỗi audio sample không mang ngữ nghĩa độc lập</strong>.</p>
+</blockquote>
+<p>Hãy nghĩ thử: số <code>0</code> trong mảng audio có nghĩa gì? Đó là một điểm trên sóng âm tại thời điểm đó, biên độ bằng không (zero crossing). Không cho ta biết âm thanh đó là "Tôi" hay "yêu" hay "AI". Số <code>1000</code> thì sao? Cũng vậy, chỉ là một giá trị tại một điểm, không mang ngữ nghĩa.</p>
+<p>So sánh với NLP: token <code>"yêu"</code> (ID 12345 trong vocab) độc lập với context vẫn mang nghĩa "yêu". Embedding của nó trong <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6861em;"></span><span class="mord mathbf">E</span></span></span></span> chứa thông tin ngữ nghĩa được học từ pretraining.</p>
+<p>Audio sample thì khác hoàn toàn. Một âm vị (phoneme) như /a/ trong "Tôi" trải dài khoảng 80-120 mili-giây, tương đương <strong>1,280 đến 1,920 samples</strong> ở 16 kHz. Nói cách khác, để biết bạn đang nói âm /a/, model cần "nhìn" khoảng 1500 samples liên tiếp, KHÔNG phải 1 sample.</p>
+<p>Đây là khác biệt cốt lõi giữa NLP và Speech: <strong>information density của audio thấp hơn text vài bậc</strong>. Một token text xấp xỉ 1 phoneme, nhưng 1 token text = 1 unit trong sequence, còn 1 phoneme = ~1500 samples trong sequence audio.</p>
+<p>Hậu quả là:</p>
+<ul>
+<li><strong>Sequence length của audio cực dài</strong>. 10 giây audio = 160,000 samples. So với 10 giây speech được transcribe ra text khoảng 40 tokens. Tỉ lệ 4000:1.</li>
+<li><strong>Self-attention <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> trở thành thảm hoạ</strong>. Nếu cứ vô tư embedding 160K samples rồi cho qua transformer, FLOPs sẽ vượt cả LLM training. Đây là lý do mọi kiến trúc Speech AI đều có bước <strong>downsampling</strong> trước transformer.</li>
+<li><strong>Mỗi sample không có ngữ nghĩa riêng</strong>. Không thể "embedding lookup" giống NLP vì không có vocabulary cố định.</li>
+</ul>
+<p>Một phép tính nhỏ giúp thấy vấn đề rõ hơn:</p>
+<div class="table-wrapper"><table><thead><tr><th>Biểu diễn 10 giây speech</th><th style="text-align: right">Sequence length xấp xỉ</th><th>Có thể đưa thẳng vào Transformer không?</th></tr></thead><tbody>
+<tr><td>Raw waveform 16 kHz</td><td style="text-align: right">160,000 samples</td><td>Không thực tế với attention chuẩn</td></tr>
+<tr><td>Log-mel 10 ms hop</td><td style="text-align: right">1,000 frames</td><td>Có thể, sau projection/downsampling</td></tr>
+<tr><td>Wav2Vec latent</td><td style="text-align: right">khoảng 500 frames</td><td>Có thể, phù hợp encoder</td></tr>
+<tr><td>Mimi codec token rate</td><td style="text-align: right">khoảng 125 time steps</td><td>Rất phù hợp cho Speech LLM</td></tr>
+<tr><td>Transcript text</td><td style="text-align: right">30-50 tokens</td><td>Rất ngắn, nhưng mất prosody/audio</td></tr>
+</tbody></table>
+</div>
+<p>Bài học: không phải mọi “tokenization” đều tương đương nhau. Tokenizer tốt cho speech phải vừa nén mạnh, vừa giữ đúng thông tin cần cho task.</p>
+<h3 id="13-câu-hỏi-trung-tâm-của-speech-ai"><a class="header" href="#13-câu-hỏi-trung-tâm-của-speech-ai">1.3 Câu hỏi trung tâm của Speech AI</a></h3>
+<p>Từ các quan sát ở 1.1 và 1.2, ta có thể phát biểu vấn đề cốt lõi của Speech AI:</p>
+<blockquote>
+<p><strong>Cho một dòng audio liên tục (continuous signal) với mật độ thông tin thấp và sequence length cực dài, làm thế nào để biến nó thành một sequence các đơn vị discrete + có ngữ nghĩa, đủ ngắn để Transformer xử lý hiệu quả?</strong></p>
+</blockquote>
+<p>Nếu giải được bài toán này, mọi kỹ thuật bạn đã biết về Transformer (attention, masking, autoregressive generation, fine-tuning, RLHF, ...) đều áp dụng được trực tiếp lên audio. Đó là lý do ngày nay ta có Moshi, GPT-4o voice, Qwen2-Audio: chúng đều là LLM tiêu chuẩn, chỉ khác ở "tokenizer" của chúng tinh vi hơn BPE.</p>
+<p>Ba "tokenizer cho audio" sẽ được thảo luận chi tiết ở Phần 2 của chương này.</p>
+<blockquote>
+<p><strong>💡 Bài học trừu tượng</strong></p>
+<p>Mọi modality không phải text (image, audio, video, point cloud) đều phải trải qua một bước "tokenization" trước khi vào LLM. Khác biệt giữa các modality nằm ở chỗ tokenizer được thiết kế thế nào.</p>
+<ul>
+<li><strong>Text</strong>: BPE/SentencePiece (statistical, deterministic, lossless).</li>
+<li><strong>Image</strong>: ViT patches + linear projection (deterministic, lossy if low resolution), hoặc VQ-VAE tokens (learned, lossy, discrete).</li>
+<li><strong>Audio</strong>: mel spectrogram (handcrafted), Wav2Vec/HuBERT features (learned, continuous), EnCodec/Mimi codec tokens (learned, discrete).</li>
+</ul>
+<p>Nhận thức này quan trọng: nó cho thấy Speech AI <strong>không phải một ngành riêng biệt</strong>. Nó là một ứng dụng của paradigm "tokenize-then-transformer" với tokenizer được đặc-thù-hoá cho audio.</p>
+</blockquote>
+<h2 id="phần-2--ba-con-đường-biểu-diễn-audio"><a class="header" href="#phần-2--ba-con-đường-biểu-diễn-audio">Phần 2 — Ba con đường biểu diễn audio</a></h2>
+<p>Ba con đường này giải bài toán trung tâm theo ba cách khác nhau, mỗi cách có trade-off riêng. Chúng được sắp xếp theo thứ tự lịch sử (handcrafted → learned continuous → learned discrete), và cũng là thứ tự tăng dần độ "tương đồng với NLP".</p>
+<h3 id="21-con-đường-1--spectrogram-handcrafted-feature"><a class="header" href="#21-con-đường-1--spectrogram-handcrafted-feature">2.1 Con đường 1 — Spectrogram (handcrafted feature)</a></h3>
+<p>Đây là cách tiếp cận lâu đời nhất, có gốc rễ từ kỹ thuật xử lý tín hiệu (DSP) từ thế kỷ 20, và vẫn còn được dùng rộng rãi đến năm 2026 (Whisper, Tacotron, FastSpeech đều dùng).</p>
+<p><strong>Ý tưởng cốt lõi</strong>: thay vì xử lý waveform thô (160K samples cho 10 giây), ta biến đổi nó thành ma trận 2D giống như một bức ảnh thấp tầng. Mỗi cột của ma trận đại diện cho một "frame" (khung thời gian ngắn, ~25 ms), và mỗi hàng đại diện cho một dải tần số.</p>
+<p><strong>Pipeline</strong>:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Waveform</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">STFT</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.4404em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Complex spectrum</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.2459em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord mtight">∣</span><span class="mbin mtight">⋅</span><span class="mord mtight"><span class="mord mtight">∣</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3025em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Power spectrum</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Mel filterbank</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.3025em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Mel spectrogram</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mop mtight"><span class="mtight">l</span><span class="mtight">o</span><span class="mtight" style="margin-right:0.01389em;">g</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Log-mel spectrogram</span></span></span></span></span></span></p>
+<p>Chi tiết kỹ thuật của từng bước sẽ được giải thích kỹ ở Chương 2. Ở đây, ta chỉ cần hiểu kết quả cuối cùng:</p>
+<p><strong>Output</strong>: ma trận có shape <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">mels</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">frames</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>. Ví dụ với Whisper: <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">80</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3000</span><span class="mclose">)</span></span></span></span> cho 30 giây audio = 80 mel bands × 3000 frames @ 100 fps.</p>
+<p>Mỗi giá trị trong ma trận là một số thực (float32), đại diện cho năng lượng ở dải tần số đó tại thời điểm đó.</p>
+<blockquote>
+<p><strong>🔄 Analogy với NLP / Image</strong></p>
+<p>Mel spectrogram giống nhất với <strong>image patches của ViT</strong>:</p>
+<ul>
+<li>Ảnh raw (224 × 224 × 3 = 150K pixels) → patches (14×14 grid of 16×16 patches) → embedding sequence (196 tokens).</li>
+<li>Audio raw (160K samples) → mel spec (80 × 1000) → có thể flatten thành sequence of 1000 vectors mỗi vector 80-dim.</li>
+</ul>
+<p>Cả hai đều là "deterministic, handcrafted/fixed feature extraction" để rút gọn sequence length trước khi vào Transformer.</p>
+</blockquote>
+<p><strong>Ưu điểm</strong>:</p>
+<ul>
+<li>Deterministic, không cần training.</li>
+<li>Tương đối "physically grounded": mel scale phản ánh cách tai người cảm nhận tần số.</li>
+<li>Được hiểu rõ, debug dễ, audio engineer kinh nghiệm có thể "đọc" spectrogram bằng mắt.</li>
+<li>Sequence length giảm 160x so với raw (160000 → 1000 frames cho 10 giây).</li>
+</ul>
+<p><strong>Nhược điểm</strong>:</p>
+<ul>
+<li>Mất thông tin phase (chỉ giữ magnitude), cần vocoder (HiFi-GAN, BigVGAN) để tái tạo waveform.</li>
+<li>Không "học được": feature fixed, không thể thích ứng với task cụ thể.</li>
+<li>Vẫn là continuous (float values), không phải discrete tokens, không thể dùng cho autoregressive LM trực tiếp.</li>
+</ul>
+<p><strong>Khi nào dùng</strong>: encoder side của ASR (Whisper, Conformer-based ASR), encoder side của TTS (Tacotron 2 nhận text, sinh ra mel; vocoder biến mel thành wave). Hầu hết các pipeline production trước 2023 đều dùng mel spectrogram làm interface chuẩn.</p>
+<p><strong>Code minh hoạ</strong> (sẽ giải thích chi tiết ở Chương 2):</p>
+<pre><code class="language-python">import torch
+import torchaudio
+from torch import Tensor
+
+def waveform_to_mel(
+    waveform: Tensor,       # [1, T_samples] - float32, range [-1, 1]
+    sample_rate: int = 16000,
+    n_mels: int = 80,
+    n_fft: int = 400,       # 25 ms window
+    hop_length: int = 160,  # 10 ms hop
+) -&gt; Tensor:
+    """Biến waveform thành log-mel spectrogram.
+
+    Returns:
+        log_mel: [1, n_mels, T_frames] - float32
+    """
+    mel_transform = torchaudio.transforms.MelSpectrogram(
+        sample_rate=sample_rate,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        n_mels=n_mels,
+        power=2.0,
+    )
+    mel: Tensor = mel_transform(waveform)
+    log_mel: Tensor = torch.log(mel + 1e-10)
+    return log_mel
+
+
+# Ví dụ: 1 giây audio random
+waveform = torch.randn(1, 16000)
+log_mel = waveform_to_mel(waveform)
+print(log_mel.shape)  # torch.Size([1, 80, 100])
+</code></pre>
+<p>Pipeline này chuyển 16,000 floats thành 8,000 floats (80 × 100). Compression ratio 2:1 nếu tính theo số values, nhưng quan trọng hơn là sequence length giảm 160x (160 samples per frame).</p>
+<h3 id="22-con-đường-2--self-supervised-continuous-representations-wav2vec-20-hubert"><a class="header" href="#22-con-đường-2--self-supervised-continuous-representations-wav2vec-20-hubert">2.2 Con đường 2 — Self-supervised continuous representations (Wav2Vec 2.0, HuBERT)</a></h3>
+<p>Năm 2020, Wav2Vec 2.0 từ Meta AI đề xuất một ý tưởng có ảnh hưởng lớn: thay vì dùng spectrogram handcrafted, hãy <strong>học</strong> một biểu diễn audio tốt hơn bằng self-supervised pretraining trên hàng nghìn giờ audio không có nhãn.</p>
+<p><strong>Ý tưởng cốt lõi</strong>: train một transformer encoder trên một pretext task không cần label, ép nó phải hiểu cấu trúc temporal và phonetic của speech. Sau pretraining, các activation của encoder là <strong>contextualized speech representations</strong>, tương tự BERT embeddings cho text.</p>
+<p><strong>Pipeline</strong>:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1191em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Waveform</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">CNN feature extractor</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7252em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord">Latent </span></span><span class="mord mathbf">Z</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1191em;vertical-align:-0.011em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9925em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mbin mtight">×</span><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Transformer</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord">Contextualized </span></span><span class="mord mathbf">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.9925em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9925em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8278em;"><span style="top:-2.931em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mbin mtight">×</span><span class="mord mathnormal mtight">d</span></span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>Bước 1 (CNN feature extractor): giảm sequence length từ 160K samples xuống 500 latent vectors (downsampling 320x), mỗi vector 512-dim. Đây là bước downsample mạnh nhất.</p>
+<p>Bước 2 (Transformer encoder): xử lý 500 vectors qua 12-24 layers self-attention, output 500 contextualized vectors 768-dim (Wav2Vec 2.0 Base) hoặc 1024-dim (Large).</p>
+<p><strong>Pretext task</strong> (cách self-supervised pretrain): mask một số positions trong latent space, ép model predict masked positions từ context xung quanh. Loss là contrastive (chọn đúng vector từ tập distractors).</p>
+<blockquote>
+<p><strong>🔄 Analogy mạnh với BERT MLM</strong></p>
+<p>Wav2Vec 2.0 chính là <strong>BERT cho speech</strong>:</p>
+<div class="table-wrapper"><table><thead><tr><th></th><th>BERT (text)</th><th>Wav2Vec 2.0 (speech)</th></tr></thead><tbody>
+<tr><td>Input</td><td>Raw text → BPE tokens</td><td>Raw waveform → CNN latents</td></tr>
+<tr><td>Pretext task</td><td>Mask 15% tokens, predict</td><td>Mask 6.5% latent steps, predict via contrastive</td></tr>
+<tr><td>Loss</td><td>Cross-entropy</td><td>InfoNCE (contrastive)</td></tr>
+<tr><td>Pretrain corpus</td><td>BookCorpus + Wikipedia (~16GB)</td><td>LibriSpeech 960h + Libri-Light 60K h unlabeled</td></tr>
+<tr><td>Output</td><td>768-dim contextualized embeddings</td><td>768-dim contextualized speech reps</td></tr>
+<tr><td>Downstream</td><td>Fine-tune cho classification, NER, QA</td><td>Fine-tune cho ASR, speaker ID, emotion</td></tr>
+<tr><td>Vocabulary</td><td>30K BPE tokens</td><td>KHÔNG có vocabulary explicit (continuous)</td></tr>
+</tbody></table>
+</div>
+<p>Khác biệt duy nhất ở mức conceptual: Wav2Vec 2.0 output là continuous vectors (không phải logits over vocabulary), nên không thể dùng trực tiếp cho LM. Để dùng cho LM, ta cần một bước nữa (codec quantization, sẽ thảo luận ở 2.3).</p>
+</blockquote>
+<p><strong>Output</strong>: sequence <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mclose">)</span></span></span></span> ở khoảng 50 fps. Với 10 giây audio, ta có ma trận <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">500</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">768</span><span class="mclose">)</span></span></span></span>.</p>
+<p><strong>Ưu điểm</strong>:</p>
+<ul>
+<li>Học được features tốt hơn handcrafted spectrogram (đo bằng downstream task performance).</li>
+<li>Tận dụng được khối lượng unlabeled audio khổng lồ (LibriLight có 60,000 giờ, VoxPopuli có 400,000 giờ).</li>
+<li>Một backbone, nhiều downstream tasks (giống BERT): ASR, speaker ID, emotion recognition, language ID.</li>
+</ul>
+<p><strong>Nhược điểm</strong>:</p>
+<ul>
+<li>Vẫn là continuous (768-dim float vectors per frame), không discrete, nên không LM-friendly.</li>
+<li>Cần GPU mạnh để pretrain (Wav2Vec 2.0 Large dùng 128 V100 trong nhiều ngày).</li>
+<li>Domain gap có thể là vấn đề (pretrain trên LibriSpeech tiếng Anh, fine-tune cho tiếng Việt cần adaptation).</li>
+</ul>
+<p><strong>Khi nào dùng</strong>: encoder side của ASR khi muốn replace mel spectrogram bằng learned features. PhoWhisper cho tiếng Việt fine-tune từ Whisper, nhưng nhiều system commercial dùng Wav2Vec 2.0 cho low-resource languages.</p>
+<h3 id="23-con-đường-3--neural-codec-tokens-encodec-mimi"><a class="header" href="#23-con-đường-3--neural-codec-tokens-encodec-mimi">2.3 Con đường 3 — Neural codec tokens (EnCodec, Mimi)</a></h3>
+<p>Đây là con đường mới nhất (2022-2024) và là cầu nối trực tiếp đến Speech LLMs. Nó giải vấn đề cuối cùng của con đường 2: làm sao biến audio thành <strong>discrete tokens</strong> giống BPE để dùng autoregressive LM?</p>
+<p><strong>Ý tưởng cốt lõi</strong>: train một autoencoder neural với vector quantization (VQ-VAE variant) ở bottleneck. Encoder nén audio thành chuỗi codebook indices (integer IDs), decoder reconstruct lại waveform từ indices. Khi inference, ta dùng indices như "tokens" giống BPE.</p>
+<p>Cụ thể, EnCodec (Meta, 2022) và Mimi (Kyutai, 2024) đều dùng <strong>Residual Vector Quantization (RVQ)</strong>: thay vì 1 codebook, dùng nhiều codebooks xếp tầng, mỗi codebook lượng tử hoá residual của codebook trước.</p>
+<p><strong>Pipeline</strong>:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.158em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Waveform</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.147em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Encoder (CNN+conv1d)</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Latent </span></span><span class="mord mathbf">z</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">RVQ</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.0361em;vertical-align:-0.2861em;"></span><span class="mord text"><span class="mord">Token codes </span></span><span class="mopen">{</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">q</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">Q</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2861em;"><span></span></span></span></span></span></span><span class="mclose">}</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1413em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose"><span class="mclose">}</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">Q</span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span> là số codebooks (8 với EnCodec, 8 với Mimi), <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> là codebook size (1024).</p>
+<p><strong>Output</strong>: ma trận integer <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0019em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal">Q</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7519em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span>. EnCodec ở 75 fps: 10 giây audio → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">750</span><span class="mclose">)</span></span></span></span>. Mimi ở 12.5 fps: 10 giây → <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">8</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">125</span><span class="mclose">)</span></span></span></span>, gọn hơn nhiều, đây là một cải tiến engineering quan trọng của Moshi.</p>
+<blockquote>
+<p><strong>🔄 Analogy quan trọng nhất của cuốn sách: BPE ↔ Codec tokens</strong></p>
+<p>Nếu bạn chỉ nhớ một analogy duy nhất từ chương này, hãy nhớ analogy này.</p>
+<div class="table-wrapper"><table><thead><tr><th>Khía cạnh</th><th>BPE / SentencePiece</th><th>Neural Codec (EnCodec, Mimi)</th></tr></thead><tbody>
+<tr><td>Input</td><td>Raw text string</td><td>Raw audio waveform</td></tr>
+<tr><td>Output</td><td>Sequence of integer token IDs</td><td>Sequence of integer codebook indices</td></tr>
+<tr><td>Algorithm</td><td>Statistical merge (Byte-Pair Encoding)</td><td>Neural autoencoder + VQ</td></tr>
+<tr><td>Vocabulary</td><td>Fixed size (32K-128K typical)</td><td>Fixed codebook size × layers (1024 × 8 = 8192 effective)</td></tr>
+<tr><td>Reversible</td><td>Lossless (token IDs → exact text)</td><td>Near-lossless (perceptual, có degradation nhẹ)</td></tr>
+<tr><td>Compositional</td><td>Subwords compose chars</td><td>Codebooks compose acoustic features</td></tr>
+<tr><td>LM compatible</td><td>Yes (GPT, BERT, T5)</td><td><strong>Yes (VALL-E, AudioLM, Moshi)</strong></td></tr>
+<tr><td>Training data</td><td>Text corpus</td><td>Audio corpus (CommonVoice, AudioSet)</td></tr>
+<tr><td>Token rate</td><td>~1-2 tokens/word ≈ 4 tokens/sec speech</td><td>75-150 codec tokens/sec audio</td></tr>
+</tbody></table>
+</div>
+<p>Cốt lõi: <strong>codec tokens biến audio thành language modeling problem</strong>. Một khi audio đã thành chuỗi integer, mọi thứ về Transformer LM (next-token prediction, beam search, KV cache, RLHF, ...) đều áp dụng được như NLP.</p>
+</blockquote>
+<p><strong>Ưu điểm</strong>:</p>
+<ul>
+<li>Discrete tokens, dùng được autoregressive LM (GPT-style).</li>
+<li>Compression ratio cực cao (10x-30x so với waveform).</li>
+<li>Reconstructable waveform với chất lượng cao (Mimi 1.1 kbps gần như chất lượng telephone codec ở 24 kbps).</li>
+<li>Unified interface cho speech LLMs (Moshi, AudioLM, VALL-E).</li>
+</ul>
+<p><strong>Nhược điểm</strong>:</p>
+<ul>
+<li>Lossy (có chút degradation perceptual).</li>
+<li>Cần train codec trên domain phù hợp (codec train trên tiếng Anh có thể bị artifact trên tiếng Việt).</li>
+<li>Số tokens nhân với số codebooks → sequence length effective vẫn dài (8 codebooks × 750 frames = 6000 effective tokens cho 10 giây).</li>
+<li>Phụ thuộc vào quality của decoder để reconstruct.</li>
+</ul>
+<p><strong>Khi nào dùng</strong>: bất kỳ system Speech LLM nào (Moshi, AudioLM, VALL-E, Qwen2.5-Omni). Cũng dùng cho streaming codec cho low-bitrate transmission (Mimi 1.1 kbps).</p>
+<h3 id="24-so-sánh-ba-con-đường"><a class="header" href="#24-so-sánh-ba-con-đường">2.4 So sánh ba con đường</a></h3>
+<p>Bảng dưới đây tổng hợp ba con đường để bạn quyết định khi nào dùng cái nào:</p>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>Mel spectrogram</th><th>Wav2Vec 2.0 / HuBERT</th><th>Neural codec (EnCodec, Mimi)</th></tr></thead><tbody>
+<tr><td><strong>Output type</strong></td><td>Continuous matrix 2D</td><td>Continuous sequence 1D</td><td>Discrete integers 2D</td></tr>
+<tr><td><strong>Shape (10s audio)</strong></td><td>(80, 1000) float32</td><td>(500, 768) float32</td><td>(8, 750) int32</td></tr>
+<tr><td><strong>Data per sec</strong></td><td>32 KB</td><td>154 KB</td><td>6 KB</td></tr>
+<tr><td><strong>Frame rate (fps)</strong></td><td>100</td><td>50</td><td>75 (EnCodec) hoặc 12.5 (Mimi)</td></tr>
+<tr><td><strong>Training needed</strong></td><td>No (handcrafted)</td><td>Yes (60K+ hours unlabeled)</td><td>Yes (audio + reconstruction loss)</td></tr>
+<tr><td><strong>Reversible to wave</strong></td><td>Lossy (qua HiFi-GAN vocoder)</td><td>No (continuous, không có decoder explicit)</td><td>Yes (built-in decoder)</td></tr>
+<tr><td><strong>LM compatible</strong></td><td>No (continuous)</td><td>No (continuous)</td><td><strong>Yes</strong> (discrete)</td></tr>
+<tr><td><strong>Used by</strong></td><td>Whisper, Tacotron 2</td><td>XLS-R, multilingual ASR</td><td>VALL-E, AudioLM, Moshi</td></tr>
+<tr><td><strong>NLP analogy</strong></td><td>ViT image patches</td><td>BERT embeddings</td><td>BPE tokens</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>🎯 Quy tắc lựa chọn (rule of thumb)</strong></p>
+<ul>
+<li>Build ASR truyền thống → <strong>mel spectrogram</strong> (Whisper-style).</li>
+<li>Build ASR low-resource hoặc cross-lingual → <strong>Wav2Vec 2.0 / XLS-R</strong> (better transfer).</li>
+<li>Build Speech LLM (text + audio, conversational, generative) → <strong>neural codec tokens</strong> (Moshi-style).</li>
+<li>Build TTS modern → <strong>codec tokens + autoregressive transformer</strong> (VALL-E) hoặc <strong>mel + diffusion</strong> (NaturalSpeech 3, F5-TTS).</li>
+</ul>
+</blockquote>
+<p>Một xu hướng quan trọng năm 2024-2026: nhiều system "lai" dùng cả 3. Ví dụ AudioLM dùng:</p>
+<ul>
+<li>Semantic tokens (từ Wav2Vec/HuBERT) cho "what is being said".</li>
+<li>Acoustic tokens (từ EnCodec/Mimi) cho "how it is being said" (giọng, nhịp).</li>
+<li>Mel spectrogram cho training vocoder side.</li>
+</ul>
+<p>Hiểu rõ ưu nhược điểm của từng con đường giúp bạn đọc paper modern một cách thông thái.</p>
+<h3 id="25-ví-dụ-chọn-biểu-diễn-theo-sản-phẩm"><a class="header" href="#25-ví-dụ-chọn-biểu-diễn-theo-sản-phẩm">2.5 Ví dụ chọn biểu diễn theo sản phẩm</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Sản phẩm</th><th>Biểu diễn nên bắt đầu</th><th>Lý do</th></tr></thead><tbody>
+<tr><td>Transcribe meeting offline</td><td>log-mel + Whisper/Conformer</td><td>robust, dễ triển khai, output text</td></tr>
+<tr><td>ASR tiếng Việt low-resource</td><td>Whisper/PhoWhisper hoặc SSL fine-tune</td><td>tận dụng pretraining multilingual</td></tr>
+<tr><td>Voice agent realtime</td><td>streaming ASR hoặc codec-based speech model</td><td>latency và partial hypothesis quan trọng</td></tr>
+<tr><td>TTS đọc sách</td><td>mel + diffusion/flow hoặc codec TTS</td><td>cần naturalness và ổn định long-form</td></tr>
+<tr><td>Full-duplex dialogue</td><td>Mimi/codec tokens + streaming LM</td><td>cần audio in/out liên tục</td></tr>
+<tr><td>Audio event retrieval</td><td>CLAP/audio-text embedding</td><td>query bằng text, không cần transcript</td></tr>
+</tbody></table>
+</div>
+<p>Nếu chưa chắc chọn gì, hãy hỏi: output cuối cùng là text hay audio? Có cần realtime không? Có cần giữ giọng/speaker/prosody không? Có cần chạy on-prem không? Câu trả lời sẽ quyết định representation.</p>
+<h2 id="phần-3--nlpspeech-concept-mapping-big-picture"><a class="header" href="#phần-3--nlpspeech-concept-mapping-big-picture">Phần 3 — NLP↔Speech Concept Mapping (Big picture)</a></h2>
+<p>Phần này là bảng tham chiếu trung tâm của cuốn sách. Mỗi khái niệm NLP quen thuộc đều có đối ứng trong Speech. Bạn nên đánh dấu phần này để quay lại tra cứu khi đọc các chương sau.</p>
+<h3 id="31-bảng-mapping-đầy-đủ"><a class="header" href="#31-bảng-mapping-đầy-đủ">3.1 Bảng mapping đầy đủ</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Concept</th><th>Speech Equivalent</th><th>Ghi chú nhanh</th></tr></thead><tbody>
+<tr><td><strong>Token</strong></td><td>Audio frame / codec token</td><td>1 token ≈ 10-80 ms audio</td></tr>
+<tr><td><strong>BPE tokenizer</strong></td><td>Mel spectrogram + neural codec</td><td>Spectrogram handcrafted, codec learned</td></tr>
+<tr><td><strong>Embedding layer</strong></td><td>Audio encoder (CNN+Linear)</td><td>Maps raw signal → latent</td></tr>
+<tr><td><strong>Vocabulary <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span></span></span></span></strong></td><td>Codebook size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> × codebooks <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">Q</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">1024</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8192</span></span></span></span> effective</td></tr>
+<tr><td><strong>Vocabulary lookup</strong></td><td>RVQ nearest-neighbor search</td><td>Tìm code gần nhất trong codebook</td></tr>
+<tr><td><strong>BERT pretraining</strong></td><td>Wav2Vec 2.0 / HuBERT</td><td>Masked prediction self-supervised</td></tr>
+<tr><td><strong>GPT (causal LM)</strong></td><td>AudioLM / VALL-E / Moshi</td><td>Next-token prediction on codec tokens</td></tr>
+<tr><td><strong>T5 / BART (seq2seq)</strong></td><td>Whisper (ASR) / VITS (TTS)</td><td>Encoder-decoder</td></tr>
+<tr><td><strong>Sequence classification</strong></td><td>Audio classification</td><td>Speaker ID, emotion, language ID</td></tr>
+<tr><td><strong>Token classification</strong></td><td>CTC frame classification</td><td>Mỗi frame → 1 character</td></tr>
+<tr><td><strong>Cross-attention</strong></td><td>Encoder-decoder attention</td><td>Text conditions speech (TTS)</td></tr>
+<tr><td><strong>Causal mask</strong></td><td>Streaming mask</td><td>Limited look-ahead trong ASR streaming</td></tr>
+<tr><td><strong>Bidirectional attention</strong></td><td>Offline ASR encoder</td><td>Toàn bộ audio đã có sẵn</td></tr>
+<tr><td><strong>Positional encoding</strong></td><td>Time encoding (RoPE, sinusoidal)</td><td>Pretty much same techniques</td></tr>
+<tr><td><strong>KV cache</strong></td><td>KV cache (literally same)</td><td>Autoregressive speech gen</td></tr>
+<tr><td><strong>Beam search</strong></td><td>Beam search (literally same)</td><td>ASR/TTS decoding</td></tr>
+<tr><td><strong>Top-k / Top-p sampling</strong></td><td>Top-k / Top-p sampling</td><td>Speech generation diversity</td></tr>
+<tr><td><strong>Temperature</strong></td><td>Temperature</td><td>Same</td></tr>
+<tr><td><strong>Perplexity</strong></td><td>Perplexity on codec tokens</td><td>LM eval</td></tr>
+<tr><td><strong>BLEU / ROUGE</strong></td><td>WER (ASR), MOS (TTS)</td><td>Task-specific metrics</td></tr>
+<tr><td><strong>Accuracy</strong></td><td>WER inverted</td><td>ASR success rate</td></tr>
+<tr><td><strong>F1 score</strong></td><td>F1 for keyword spotting</td><td>Same idea</td></tr>
+<tr><td><strong>Fine-tuning</strong></td><td>Fine-tuning (literally same)</td><td>LoRA, adapter work on speech</td></tr>
+<tr><td><strong>PEFT / LoRA</strong></td><td>PEFT / LoRA</td><td>Same techniques</td></tr>
+<tr><td><strong>RLHF / DPO</strong></td><td>Speech RLHF (mới năm 2024)</td><td>Áp dụng cho TTS quality, voice cloning</td></tr>
+<tr><td><strong>Distillation</strong></td><td>Distil-Whisper, NeMo distill</td><td>Same technique</td></tr>
+<tr><td><strong>Quantization (INT8)</strong></td><td>Quantization (INT8)</td><td>Same techniques</td></tr>
+<tr><td><strong>vLLM, TGI inference</strong></td><td>vLLM-audio, Triton ASR</td><td>Inference engines extended for audio</td></tr>
+<tr><td><strong>Long context (RoPE, ALiBi)</strong></td><td>Streaming + chunked attention</td><td>Different solution (causality)</td></tr>
+<tr><td><strong>Multilingual</strong></td><td>Multilingual (Whisper, MMS)</td><td>More acute due to acoustic variation</td></tr>
+<tr><td><strong>Out-of-vocabulary</strong></td><td>Codebook collapse / unused codes</td><td>Different failure mode</td></tr>
+<tr><td><strong>Prompt engineering</strong></td><td>Prompt engineering for Speech LLM</td><td>Same idea, Moshi accepts prompts</td></tr>
+<tr><td><strong>In-context learning</strong></td><td>Voice cloning from 3-sec sample</td><td>VALL-E demonstrates this</td></tr>
+<tr><td><strong>RAG</strong></td><td>Retrieval-augmented ASR</td><td>Less mature, emerging area</td></tr>
+<tr><td><strong>Chain-of-thought</strong></td><td>Speech CoT (chain-of-speech)</td><td>Experimental</td></tr>
+<tr><td><strong>Function calling</strong></td><td>Tool use in Speech agents</td><td>GPT-4o, Moshi support</td></tr>
+</tbody></table>
+</div>
+<h3 id="32-Đào-sâu-các-mapping-quan-trọng"><a class="header" href="#32-Đào-sâu-các-mapping-quan-trọng">3.2 Đào sâu các mapping quan trọng</a></h3>
+<p>Một số mapping ở 3.1 là nông cạn (literally same), nhưng một số mapping cần đào sâu vì có nuance riêng. Hãy đi qua những cái quan trọng nhất.</p>
+<h4 id="321-token--audio-frame-cùng-concept-khác-đơn-vị"><a class="header" href="#321-token--audio-frame-cùng-concept-khác-đơn-vị">3.2.1 Token ≈ Audio frame: cùng concept, khác đơn vị</a></h4>
+<p>Ở NLP, token là đơn vị cơ bản của input. Vocabulary cố định, mỗi token có ID riêng. Sequence length đo bằng số tokens.</p>
+<p>Ở Speech, đơn vị tương đương phụ thuộc representation:</p>
+<ul>
+<li>Mel spectrogram: "frame" là 1 cột của ma trận, đại diện 10-25 ms audio.</li>
+<li>Wav2Vec 2.0: "frame" là 1 latent vector ở 50 fps = 20 ms/frame.</li>
+<li>EnCodec 75 fps: "frame" = 1 codebook tuple ở 75 fps = 13.3 ms/frame.</li>
+</ul>
+<p>Một câu nói "I love speech" có khoảng:</p>
+<ul>
+<li>3 từ → 3-4 BPE tokens.</li>
+<li>12 phonemes → 12 phoneme tokens (nếu dùng phoneme system).</li>
+<li>1.5 giây audio → 150 mel frames, 75 Wav2Vec frames, 112 EnCodec frames, 19 Mimi frames.</li>
+</ul>
+<p>Tỉ lệ frame/token là quan trọng: nếu bạn đang dùng codec ở 75 fps để feed vào LLM, cùng một câu sẽ chiếm gấp ~25 lần "tokens" so với BPE. Đây là lý do Mimi (12.5 fps) rất quan trọng: token rate tiến gần hơn tới text token rate.</p>
+<h4 id="322-bert-pretraining--wav2vec-20-chi-tiết-khác-biệt"><a class="header" href="#322-bert-pretraining--wav2vec-20-chi-tiết-khác-biệt">3.2.2 BERT pretraining ≈ Wav2Vec 2.0: chi tiết khác biệt</a></h4>
+<p>Cả hai đều là self-supervised, masked prediction. Nhưng:</p>
+<ul>
+<li>BERT mask <strong>discrete tokens</strong> (15% of input tokens replaced với <code>[MASK]</code>). Loss là cross-entropy over vocabulary (~30K classes).</li>
+<li>Wav2Vec 2.0 mask <strong>continuous latent vectors</strong> (6.5% of latent steps). Vector ground truth là 768-dim float, không thể cross-entropy. Thay vào đó dùng <strong>contrastive loss (InfoNCE)</strong>: chọn đúng vector từ tập distractors.</li>
+</ul>
+<p>Tại sao khác biệt? Vì continuous space không có "label" tự nhiên, không như text có vocabulary cố định. Contrastive learning là cách thông minh để giả lập classification loss trong continuous space.</p>
+<p>HuBERT (2021) đề xuất một workaround: trước pretraining, dùng k-means để clustering Wav2Vec features thành ~100 clusters, dùng cluster ID làm "label". Bây giờ pretext task là cross-entropy classification giống BERT, đơn giản hơn và performance cao hơn. Đây là HuBERT.</p>
+<h4 id="323-causal-mask--streaming-mask-nuance-khác-nhau"><a class="header" href="#323-causal-mask--streaming-mask-nuance-khác-nhau">3.2.3 Causal mask ≈ Streaming mask: nuance khác nhau</a></h4>
+<p>NLP causal mask: token tại vị trí <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> chỉ nhìn được tokens <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>. Đây là requirement của autoregressive LM.</p>
+<p>Speech streaming mask: phức tạp hơn vì có hai lý do gắn streaming:</p>
+<ol>
+<li><strong>Real-time constraint</strong>: ASR streaming phải output partial transcript khi user còn đang nói. Frame <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> chỉ có thể nhìn frames <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span></span></span></span> (giống causal NLP).</li>
+<li><strong>Latency constraint</strong>: thực tế, có thể chấp nhận "lookahead" nhỏ (say 100-200 ms) để cải thiện accuracy. Frame <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span> nhìn frames <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">t</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> với <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> là lookahead frames.</li>
+</ol>
+<p>Còn có <strong>chunked attention</strong> (used in streaming Conformer): chia audio thành chunks, mỗi chunk attention bidirectional bên trong nhưng causal giữa chunks. Đây là compromise giữa accuracy và latency.</p>
+<p>Trong NLP, ít khi gặp các pattern này vì text input thường đã có sẵn. Chỉ có streaming text generation (chatbot) mới có concern tương tự, và họ giải bằng cách generate token-by-token đơn giản.</p>
+<h4 id="324-kv-cache-thật-sự-giống-nhau"><a class="header" href="#324-kv-cache-thật-sự-giống-nhau">3.2.4 KV cache: thật sự giống nhau</a></h4>
+<p>KV cache cho speech LM (VALL-E, Moshi) hoạt động chính xác như cho NLP LM. Mỗi step generation, lưu lại K, V của tất cả tokens đã sinh, reuse khi sinh token tiếp theo. Đây là một trong những "free wins" khi bạn quen với NLP và làm Speech LLM: code KV cache không cần viết lại.</p>
+<p>Một chi tiết kỹ thuật đáng lưu ý: speech LM thường có nhiều codebook layers (Moshi có 8). KV cache cho mỗi codebook nên tách biệt hay chia sẻ? Moshi chọn phương án dùng "depth transformer", một transformer nhỏ xử lý codebook layers độc lập với KV cache riêng. Kỹ thuật này sẽ được trình bày kỹ ở Chương 11.</p>
+<h4 id="325-in-context-learning--voice-cloning"><a class="header" href="#325-in-context-learning--voice-cloning">3.2.5 In-context learning ↔ Voice cloning</a></h4>
+<p>NLP in-context learning: cho model 3-5 examples trong prompt, nó generalize được task mới mà không cần fine-tune.</p>
+<p>Speech equivalent: cho model 3 giây audio sample của một speaker, nó có thể clone giọng đó để đọc text bất kỳ. Đây chính là VALL-E (2023) và F5-TTS (2024).</p>
+<p>Cơ chế: VALL-E là một LM trên codec tokens. Prompt = audio prefix (codec tokens của 3-sec sample). Model tiếp tục sinh codec tokens "theo phong cách" của prefix. Decode về waveform → voice clone.</p>
+<p>Đây là một ví dụ đẹp cho thấy <strong>paradigm Transformer chung là đủ mạnh để khái niệm hoá hoàn toàn</strong>: in-context learning trong text và voice cloning là cùng một cơ chế chỉ khác token type.</p>
+<h2 id="phần-4--scale-difference-tại-sao-speech-khó-hơn"><a class="header" href="#phần-4--scale-difference-tại-sao-speech-khó-hơn">Phần 4 — Scale Difference: Tại sao Speech khó hơn</a></h2>
+<p>Phần 1-3 đã cho ta thấy cấu trúc tương đồng giữa NLP và Speech. Nhưng có một yếu tố khiến Speech khó hơn về mặt kỹ thuật: <strong>scale của dữ liệu</strong>.</p>
+<h3 id="41-data-rate-cách-nhau-hàng-nghìn-lần"><a class="header" href="#41-data-rate-cách-nhau-hàng-nghìn-lần">4.1 Data rate: cách nhau hàng nghìn lần</a></h3>
+<p>So sánh raw data rate:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">Data rate</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">text</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">4</span><span class="mord text"><span class="mord"> tokens/sec speech</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">vs</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord"><span class="mord text"><span class="mord">Data rate</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">audio</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">16</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">000</span><span class="mord text"><span class="mord"> samples/sec</span></span></span></span></span></span></p>
+<p>Đó là tỉ lệ 4000:1. Cụ thể với 10 giây speech:</p>
+<div class="table-wrapper"><table><thead><tr><th>Metric</th><th>Text</th><th>Audio (16kHz, 16-bit)</th></tr></thead><tbody>
+<tr><td>Raw data</td><td>~20 bytes</td><td>32,000 bytes (320,000 byte cho 10s)</td></tr>
+<tr><td>Unit count</td><td>~40 tokens</td><td>160,000 samples (raw)</td></tr>
+<tr><td>Sequence length sau "tokenization"</td><td>40</td><td>1000 mel frames, 500 Wav2Vec, 750 EnCodec, 125 Mimi</td></tr>
+</tbody></table>
+</div>
+<p>Ngay sau khi tokenize, audio vẫn dài hơn text ~3-25 lần (tuỳ representation chọn). Đây là consequence rõ ràng nhất của information density thấp.</p>
+<h3 id="42-hệ-luỵ-kiến-trúc"><a class="header" href="#42-hệ-luỵ-kiến-trúc">4.2 Hệ luỵ kiến trúc</a></h3>
+<p>Sequence dài hơn → self-attention <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> tốn kém hơn → cần tối ưu kiến trúc.</p>
+<p>Các giải pháp chính:</p>
+<p><strong>4.2.1 Strong downsampling ở encoder</strong></p>
+<p>Whisper dùng 2 convolutional layers stride-2 ở đầu encoder → giảm sequence length 4x trước khi vào Transformer. Conformer dùng subsampling 4x tương tự.</p>
+<p>Wav2Vec 2.0 thì cực đoan hơn: CNN feature extractor giảm 320x (16K samples/sec → 50 fps).</p>
+<p>Tại sao có thể downsample mạnh vậy mà không mất accuracy? Vì information density của audio thấp: nhiều samples liền kề mang gần như cùng thông tin, có thể nén lại không mất mát đáng kể.</p>
+<p><strong>4.2.2 Local attention / chunked attention</strong></p>
+<p>Conformer thay self-attention global bằng convolution local + self-attention. Local convolution xử lý dependencies ngắn (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> 10 frames = 100ms), self-attention xử lý long-range.</p>
+<p>Streaming Conformer dùng chunked attention: chia thành chunks 16-32 frames, attention bidirectional bên trong chunk, causal giữa chunks.</p>
+<p><strong>4.2.3 Causal CNN trong codec</strong></p>
+<p>EnCodec, Mimi đều dùng causal CNN trong encoder và decoder. Causal CNN giữ được streaming property: encoder có thể process audio chunk-by-chunk, decoder có thể generate audio chunk-by-chunk.</p>
+<p>Đây là kỹ thuật mà NLP ít gặp vì text thường không streaming. Speech AI có nhiều "kỹ thuật xử lý tín hiệu" mà NLP không có.</p>
+<h3 id="43-gpu-memory-implications"><a class="header" href="#43-gpu-memory-implications">4.3 GPU memory implications</a></h3>
+<p>Cùng một transformer 1B params, nhưng Speech LM cần xử lý sequence dài hơn:</p>
+<ul>
+<li>LLM text với 4K context: KV cache <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> 4K × 2 × num_layers × hidden_dim × 2 bytes = <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> 2 GB cho LLaMA-7B.</li>
+<li>Speech LM Moshi với 30 giây audio: sequence length <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">∼</span></span></span></span> 375 frames × 8 codebooks = 3000 effective tokens, gần bằng LLM.</li>
+</ul>
+<p>Trên thực tế, Moshi 7B param có inference memory tương đương với LLaMA-7B-Instruct. Nhưng nếu dùng EnCodec ở 75 fps thay vì Mimi 12.5 fps, sequence length sẽ 6x dài hơn, memory bùng nổ.</p>
+<p>Đây là một lý do quan trọng khiến Mimi (12.5 fps) có giá trị engineering lớn: nó giúp Speech LLM tiến gần hơn tới memory profile của text LLM thay vì tăng 6-10 lần.</p>
+<h3 id="44-training-compute"><a class="header" href="#44-training-compute">4.4 Training compute</a></h3>
+<p>Whisper Large-v3 trained trên 680,000 giờ audio (~78 năm dữ liệu). Mỗi giờ = 100 fps × 3600 frames = 360,000 mel frames. Tổng dataset: ~244 tỷ mel frames.</p>
+<p>So sánh: LLaMA-3 8B trained trên ~15 trillion tokens.</p>
+<p>Speech dataset nhỏ hơn nhưng mỗi sample "đắt" hơn để xử lý (Mel preprocessing, longer sequences). Tổng compute training Whisper-Large-v3 và LLaMA-3 8B tương đương nhau, khoảng 1-2 triệu H100 GPU-hours.</p>
+<blockquote>
+<p><strong>⚠️ Latency warning quan trọng</strong></p>
+<p>Audio sequence dài hơn text ~25× ở mel frame level. Self-attention <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">L</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span> trở thành bottleneck nghiêm trọng. Đây là lý do Conformer kết hợp convolution (local) với attention (global), và tại sao streaming ASR cần kiến trúc đặc biệt.</p>
+<p>Nếu bạn đang debug performance của Speech model và thấy chậm hơn LM cùng kích thước, đó là consequence trực tiếp của data rate gap. Các optimization như flash attention, KV cache compression, codec ở fps thấp đều quan trọng hơn ở Speech so với NLP.</p>
+</blockquote>
+<h2 id="phần-5--architecture-taxonomy"><a class="header" href="#phần-5--architecture-taxonomy">Phần 5 — Architecture Taxonomy</a></h2>
+<p>Để giúp bạn map các kiến trúc cụ thể vào bức tranh lớn, đây là taxonomy của Speech AI architectures, sắp xếp theo thời kỳ phát triển.</p>
+<h3 id="51-era-1-hybrid-hmm--dnn--lịch-sử"><a class="header" href="#51-era-1-hybrid-hmm--dnn--lịch-sử">5.1 Era 1: Hybrid (HMM + DNN) — lịch sử</a></h3>
+<p>Trước 2015, ASR chủ yếu dùng kiến trúc "hybrid":</p>
+<ol>
+<li><strong>GMM-HMM</strong> modeling phonemes và alignment.</li>
+<li><strong>DNN</strong> (3-7 layers feedforward) classify frames into phonemes/senones.</li>
+<li><strong>Decoder</strong> (WFST-based) tìm transcription tối ưu.</li>
+</ol>
+<p>Đây là pipeline phức tạp, nhiều bộ phận riêng biệt (acoustic model, language model, lexicon, decoder). Cần nhiều domain expertise.</p>
+<p>Ngày nay, kiến trúc này hầu như đã bị thay thế bởi end-to-end. Chỉ còn dùng trong một số domain niche (legacy system, very low-resource languages).</p>
+<blockquote>
+<p><strong>NLP analogy</strong>: tương tự kiến trúc "feature engineering + linear model + heuristic" thời kỳ trước Transformer. Hybrid speech = feature-engineered speech.</p>
+</blockquote>
+<h3 id="52-era-2-end-to-end-ctc-attention-rnn-t--2015-2020"><a class="header" href="#52-era-2-end-to-end-ctc-attention-rnn-t--2015-2020">5.2 Era 2: End-to-End (CTC, Attention, RNN-T) — 2015-2020</a></h3>
+<p>End-to-end approach: một neural network duy nhất biến audio → text, train end-to-end với một loss function.</p>
+<p>Ba paradigm chính:</p>
+<p><strong>5.2.1 CTC (Connectionist Temporal Classification)</strong></p>
+<p>Output mỗi frame một character (có thể là blank). Loss marginalize over alignments. Sẽ giải thích kỹ ở Chương 4.</p>
+<ul>
+<li>Pros: simple, parallelizable, streaming-friendly.</li>
+<li>Cons: assume conditional independence between outputs (no LM bias built-in).</li>
+</ul>
+<p><strong>5.2.2 Attention-based encoder-decoder (LAS, Listen-Attend-Spell)</strong></p>
+<p>Encoder process audio, decoder attention vào encoder, autoregressive generate transcript. Tương đương seq2seq cho ASR.</p>
+<ul>
+<li>Pros: strong LM bias (decoder is itself a LM).</li>
+<li>Cons: not streaming-friendly (full attention global), exposure bias.</li>
+</ul>
+<p><strong>5.2.3 RNN-T (RNN-Transducer)</strong></p>
+<p>Combine CTC's per-frame output với attention's autoregressive nature. Three components: encoder (audio), predictor (history of outputs), joiner (combine). Streaming-friendly + LM bias.</p>
+<ul>
+<li>Pros: kết hợp streaming với output dependency, accuracy mạnh trong nhiều thiết lập.</li>
+<li>Cons: complex training, slower convergence.</li>
+</ul>
+<p>Sẽ giải thích kỹ cả ba ở Chương 4.</p>
+<blockquote>
+<p><strong>NLP analogy</strong>:</p>
+<ul>
+<li>CTC ≈ token-level classification (NER-style).</li>
+<li>Attention encoder-decoder ≈ T5/BART.</li>
+<li>RNN-T ≈ kiến trúc đặc thù speech (không có analogy hoàn hảo trong NLP).</li>
+</ul>
+</blockquote>
+<h3 id="53-era-3-self-supervised-pretrain--fine-tune-2020-2023"><a class="header" href="#53-era-3-self-supervised-pretrain--fine-tune-2020-2023">5.3 Era 3: Self-supervised pretrain + fine-tune (2020-2023)</a></h3>
+<p>Wav2Vec 2.0 (2020), HuBERT (2021), WavLM (2022): pretrain backbone trên unlabeled audio, fine-tune cho downstream task.</p>
+<p>Pipeline:</p>
+<ol>
+<li>Pretrain Wav2Vec 2.0 trên 60K giờ unlabeled audio.</li>
+<li>Fine-tune với CTC loss trên 100 giờ labeled (LibriSpeech).</li>
+<li>Đạt WER rất cạnh tranh trên LibriSpeech trong thiết lập được công bố, dù dùng ít labeled data hơn nhiều so với các hệ thống supervised quy mô lớn.</li>
+</ol>
+<p>Đây là minh chứng rằng <strong>self-supervised pretraining + một lượng labeled data nhỏ</strong> có thể cạnh tranh rất mạnh với supervised training truyền thống trong một số benchmark tiếng Anh. Không nên đọc câu này như một định luật tuyệt đối cho mọi ngôn ngữ và domain.</p>
+<p>Whisper (2022) là counterexample: train hoàn toàn supervised trên 680K giờ. Performance rất mạnh, đặc biệt zero-shot multilingual. Cho thấy "data scaling" cũng có giá trị riêng.</p>
+<p>Ngày nay (2026), production system thường lai cả hai: pretrained backbone + fine-tune trên large labeled corpus.</p>
+<blockquote>
+<p><strong>NLP analogy</strong>: era 3 song song với era BERT + fine-tune (2018-2020). Cùng paradigm shift.</p>
+</blockquote>
+<h3 id="54-era-4-speech-llms-2023"><a class="header" href="#54-era-4-speech-llms-2023">5.4 Era 4: Speech LLMs (2023+)</a></h3>
+<p>Năm 2023-2024 là thời điểm Speech AI gặp LLM. Ba paradigm chính:</p>
+<p><strong>5.4.1 Codec-based Speech LLM (AudioLM, VALL-E, Moshi)</strong></p>
+<p>Codec tokens (EnCodec, Mimi) làm "tokenizer", một Transformer LM (GPT-style) làm engine. Audio → codec tokens → LM → codec tokens → audio.</p>
+<ul>
+<li>VALL-E (2023): TTS với 3-sec voice cloning.</li>
+<li>AudioLM (2023): audio continuation (cho 3 giây speech, sinh 30 giây tiếp).</li>
+<li>Moshi (2024): full-duplex dialogue (nghe + nói đồng thời).</li>
+</ul>
+<p><strong>5.4.2 Embedding/Omni-based Multimodal LLM (Qwen2-Audio, Qwen2.5-Omni, Qwen3-Omni, Gemini)</strong></p>
+<p>Audio encoder (Wav2Vec, Whisper encoder, hoặc dedicated) → continuous embeddings → adapter (linear) → LLM (frozen hoặc fine-tune). Output là text.</p>
+<ul>
+<li>Qwen2-Audio (2024): understanding audio (caption, QA, classification).</li>
+<li>Qwen2.5-Omni (2025): unified text + audio + image + video trong kiến trúc Thinker-Talker.</li>
+<li>Qwen3-Omni (2025): MoE Thinker-Talker, hỗ trợ Vietnamese speech input theo README chính thức, speech output tiếng Việt chưa nằm trong danh sách chính thức.</li>
+<li>Gemini 2.0 (2025): native multimodal, streaming.</li>
+</ul>
+<p><strong>5.4.3 Hybrid (Whisper + LLM)</strong></p>
+<p>Whisper transcribe → text → LLM xử lý → text output → TTS. Pipeline classical, nhưng vẫn dùng rộng rãi cho production (giảm cost, dễ debug, mỗi component riêng biệt).</p>
+<ul>
+<li>ElevenLabs voice agents.</li>
+<li>LiveKit + GPT + Cartesia.</li>
+<li>Vapi.ai.</li>
+</ul>
+<blockquote>
+<p><strong>NLP analogy</strong>: era 4 song song với era LLM. Speech LLM = "LLM has gone multimodal".</p>
+</blockquote>
+<h3 id="55-cây-taxonomy-tổng-hợp"><a class="header" href="#55-cây-taxonomy-tổng-hợp">5.5 Cây taxonomy tổng hợp</a></h3>
+<pre class="mermaid">flowchart TD
+    ROOT[&quot;Speech AI Models&quot;]
+    ROOT --&gt; E1[&quot;Era 1: Hybrid HMM-DNN&lt;br&gt;2010-2015&quot;]
+    ROOT --&gt; E2[&quot;Era 2: End-to-End ASR&lt;br&gt;2015-2020&quot;]
+    ROOT --&gt; E3[&quot;Era 3: Self-supervised Speech&lt;br&gt;2020-2023&quot;]
+    ROOT --&gt; E4[&quot;Era 4: Speech LLMs / Omni&lt;br&gt;2023+&quot;]
+
+    E1 --&gt; KALDI[&quot;Kaldi-style pipelines&quot;]
+    E1 --&gt; HMM[&quot;DNN-HMM hybrid&quot;]
+    E2 --&gt; CTC[&quot;CTC: DeepSpeech, Jasper&quot;]
+    E2 --&gt; LAS[&quot;Attention: LAS&quot;]
+    E2 --&gt; RNNT[&quot;RNN-T: streaming ASR&quot;]
+    E3 --&gt; W2V[&quot;Wav2Vec 2.0&quot;]
+    E3 --&gt; HUB[&quot;HuBERT / WavLM&quot;]
+    E3 --&gt; XLS[&quot;XLS-R multilingual&quot;]
+    E4 --&gt; CODEC[&quot;Codec-based: AudioLM, VALL-E, Moshi&quot;]
+    E4 --&gt; EMB[&quot;Embedding/Omni: Qwen2-Audio, Qwen3-Omni, Gemini&quot;]
+    E4 --&gt; HYB[&quot;Hybrid: Whisper + LLM + TTS&quot;]
+</pre>
+<p>Cuốn sách này sẽ đi qua tất cả các era, nhưng nhấn mạnh Era 4 (Speech LLMs) vì đây là nhóm mô hình đang phát triển nhanh và cũng là điểm mà độc giả nền tảng NLP/LLM thường quan tâm nhất.</p>
+<h2 id="phần-6--code-so-sánh-ba-biểu-diễn-cụ-thể"><a class="header" href="#phần-6--code-so-sánh-ba-biểu-diễn-cụ-thể">Phần 6 — Code: So sánh ba biểu diễn cụ thể</a></h2>
+<p>Phần này là một code walkthrough chi tiết để bạn cảm nhận sự khác biệt giữa ba con đường biểu diễn audio đã thảo luận ở Phần 2. Bạn nên đọc kỹ comments và chạy thử trên Colab hoặc Jupyter để hiểu rõ.</p>
+<h3 id="61-bài-toán-đơn-giản"><a class="header" href="#61-bài-toán-đơn-giản">6.1 Bài toán đơn giản</a></h3>
+<p>Cho một waveform 1 giây ở 16 kHz (chuẩn speech), so sánh kích thước và rate của:</p>
+<ol>
+<li>Raw waveform.</li>
+<li>Mel spectrogram.</li>
+<li>Wav2Vec 2.0 features (giả lập).</li>
+<li>EnCodec tokens.</li>
+<li>Mimi tokens (giả lập).</li>
+</ol>
+<h3 id="62-implementation"><a class="header" href="#62-implementation">6.2 Implementation</a></h3>
+<pre><code class="language-python">import torch
+from torch import Tensor
+
+
+def compare_representations(
+    duration_sec: float = 1.0,
+    sample_rate: int = 16000,
+) -&gt; dict[str, dict]:
+    """So sánh kích thước năm biểu diễn audio cho 1 đoạn duration_sec giây.
+
+    Args:
+        duration_sec: Độ dài audio (giây)
+        sample_rate: Tần số lấy mẫu (Hz)
+
+    Returns:
+        Dictionary chứa shape, total values, bytes, fps của từng biểu diễn
+    """
+    n_samples: int = int(duration_sec * sample_rate)
+
+    # 1. Raw waveform (int16): chuẩn để lưu trữ
+    raw_shape = (n_samples,)
+    raw_size_bytes = n_samples * 2  # int16 = 2 bytes
+    raw_fps = sample_rate
+
+    # 2. Mel spectrogram (float32)
+    n_mels: int = 80
+    hop_length: int = 160  # 10 ms frames
+    n_frames: int = n_samples // hop_length
+    mel_shape = (n_mels, n_frames)
+    mel_size_bytes = n_mels * n_frames * 4
+    mel_fps = sample_rate // hop_length
+
+    # 3. Wav2Vec 2.0 features (float32, giả lập)
+    ssl_fps: int = 50  # 50 frames/sec (320x downsampling)
+    ssl_dim: int = 768  # hidden dimension
+    ssl_frames: int = int(duration_sec * ssl_fps)
+    ssl_shape = (ssl_frames, ssl_dim)
+    ssl_size_bytes = ssl_frames * ssl_dim * 4
+
+    # 4. EnCodec 75 fps × 8 codebooks (int32)
+    encodec_fps: int = 75
+    n_codebooks: int = 8
+    encodec_frames: int = int(duration_sec * encodec_fps)
+    encodec_shape = (n_codebooks, encodec_frames)
+    encodec_size_bytes = n_codebooks * encodec_frames * 4  # int32
+
+    # 5. Mimi 12.5 fps × 8 codebooks (int32)
+    mimi_fps: int = 12  # round down for cleanness
+    mimi_frames: int = int(duration_sec * mimi_fps)
+    mimi_shape = (n_codebooks, mimi_frames)
+    mimi_size_bytes = n_codebooks * mimi_frames * 4
+
+    return {
+        "raw_waveform": {
+            "shape": raw_shape,
+            "total_values": n_samples,
+            "size_bytes": raw_size_bytes,
+            "fps": raw_fps,
+            "lm_friendly": False,
+        },
+        "mel_spectrogram": {
+            "shape": mel_shape,
+            "total_values": n_mels * n_frames,
+            "size_bytes": mel_size_bytes,
+            "fps": mel_fps,
+            "lm_friendly": False,
+        },
+        "wav2vec2_features": {
+            "shape": ssl_shape,
+            "total_values": ssl_frames * ssl_dim,
+            "size_bytes": ssl_size_bytes,
+            "fps": ssl_fps,
+            "lm_friendly": False,
+        },
+        "encodec_tokens": {
+            "shape": encodec_shape,
+            "total_values": n_codebooks * encodec_frames,
+            "size_bytes": encodec_size_bytes,
+            "fps": encodec_fps,
+            "lm_friendly": True,
+        },
+        "mimi_tokens": {
+            "shape": mimi_shape,
+            "total_values": n_codebooks * mimi_frames,
+            "size_bytes": mimi_size_bytes,
+            "fps": mimi_fps,
+            "lm_friendly": True,
+        },
+    }
+
+
+# So sánh cho 1 giây audio
+result = compare_representations(duration_sec=1.0)
+
+print(f"{'Representation':&lt;20} {'Shape':&lt;20} {'Values':&gt;10} {'Bytes':&gt;10} {'FPS':&gt;6} {'LM?':&gt;5}")
+print("-" * 75)
+for name, info in result.items():
+    shape_str = str(info['shape'])
+    print(f"{name:&lt;20} {shape_str:&lt;20} "
+          f"{info['total_values']:&gt;10,} "
+          f"{info['size_bytes']:&gt;10,} "
+          f"{info['fps']:&gt;6} "
+          f"{str(info['lm_friendly']):&gt;5}")
+</code></pre>
+<p>Output mong đợi (cho 1 giây audio ở 16 kHz):</p>
+<pre><code>Representation       Shape                    Values      Bytes    FPS   LM?
+---------------------------------------------------------------------------
+raw_waveform         (16000,)                 16,000     32,000  16000  False
+mel_spectrogram      (80, 100)                 8,000     32,000    100  False
+wav2vec2_features    (50, 768)                38,400    153,600     50  False
+encodec_tokens       (8, 75)                     600      2,400     75   True
+mimi_tokens          (8, 12)                      96        384     12   True
+</code></pre>
+<h3 id="63-phân-tích-output"><a class="header" href="#63-phân-tích-output">6.3 Phân tích output</a></h3>
+<p>Quan sát quan trọng:</p>
+<ol>
+<li>
+<p><strong>Mel spectrogram nhỏ hơn raw waveform về số values</strong> (8000 vs 16000) nhưng cùng size về bytes (do float32 vs int16, factor 2x).</p>
+</li>
+<li>
+<p><strong>Wav2Vec 2.0 features có MORE total values và bytes hơn cả raw waveform</strong>. Trông như "tốn hơn" nhưng đây là features có ngữ nghĩa cao hơn nhiều, dùng cho downstream tasks.</p>
+</li>
+<li>
+<p><strong>EnCodec compress mạnh nhất về bytes</strong>: chỉ 2.4 KB cho 1 giây so với 32 KB raw. Compression 13x.</p>
+</li>
+<li>
+<p><strong>Mimi compress còn mạnh hơn</strong>: 384 bytes cho 1 giây. Compression 83x. Đây là chìa khoá cho speech LLM hiệu quả.</p>
+</li>
+<li>
+<p><strong>LM-friendly</strong>: chỉ codec tokens là discrete và dùng được LM trực tiếp. Mel và Wav2Vec features cần thêm bước quantization (mất chất lượng).</p>
+</li>
+</ol>
+<h3 id="64-mở-rộng-ánh-xạ-sang-llm-token-rate"><a class="header" href="#64-mở-rộng-ánh-xạ-sang-llm-token-rate">6.4 Mở rộng: ánh xạ sang LLM-token rate</a></h3>
+<p>Nếu coi mỗi "tuple" của codec (8 codebooks tại một time step) là một "token", ta có:</p>
+<ul>
+<li>EnCodec ở 75 fps: 75 tokens/sec → 10 giây = 750 tokens. So với text 10s speech ≈ 30-40 tokens, gấp ~20x.</li>
+<li>Mimi ở 12.5 fps: 12.5 tokens/sec → 10 giây = 125 tokens. Gấp ~3-4x text rate. Đây gần như tỉ lệ "lý tưởng" để LLM xử lý audio hiệu quả.</li>
+</ul>
+<p>Bạn có thể bắt đầu thấy vì sao kỹ thuật engineering của Mimi (rate thấp + quality cao) là một cải tiến quan trọng cho Speech LLM realtime.</p>
+<h2 id="phần-7--limitations--open-problems"><a class="header" href="#phần-7--limitations--open-problems">Phần 7 — Limitations &amp; Open Problems</a></h2>
+<p>Mọi tổng quan đều cần một phần thẳng thắn về giới hạn của công nghệ hiện tại. Phần này phân tích các điểm yếu quan trọng của Speech AI ở thời điểm 2026.</p>
+<h3 id="71-codec-tokens-chưa-hoàn-toàn-lossless"><a class="header" href="#71-codec-tokens-chưa-hoàn-toàn-lossless">7.1 Codec tokens chưa hoàn toàn lossless</a></h3>
+<p>EnCodec ở 6 kbps và Mimi ở 1.1 kbps đều có chút artifact perceptual. Tai người nghe kỹ vẫn nhận ra "tổng hợp" thay vì "tự nhiên". Đây là vấn đề khó vì lossless audio compression (FLAC) cần bitrate cao hơn nhiều (~700 kbps cho 16 kHz speech).</p>
+<p>Hệ luỵ: Speech LLM output qua codec decoder không bao giờ đạt fidelity của recording gốc. Đối với một số ứng dụng (audiobook, dialogue chatbot) đây không phải vấn đề lớn. Đối với ứng dụng yêu cầu cao (music, professional voice acting) cần kỹ thuật khác (diffusion-based vocoder, neural vocoder cao chất lượng như BigVGAN).</p>
+<h3 id="72-streaming-vs-offline-tradeoff"><a class="header" href="#72-streaming-vs-offline-tradeoff">7.2 Streaming vs offline tradeoff</a></h3>
+<p>Offline ASR (Whisper) có thể nhìn toàn bộ audio trước khi transcribe → accuracy cao, latency tệ.</p>
+<p>Streaming ASR (RNN-T với chunked attention) chỉ nhìn được 100-300 ms tương lai → latency thấp, accuracy thấp hơn 5-10% WER.</p>
+<p>Trade-off này chưa có giải pháp lý tưởng. Mọi production system phải chọn một mode. Đây là một active research area (Mamba state-space model có thể là answer, đang được explore).</p>
+<h3 id="73-vietnamese-specific-challenges"><a class="header" href="#73-vietnamese-specific-challenges">7.3 Vietnamese-specific challenges</a></h3>
+<p>Tiếng Việt có một số đặc thù khiến Speech AI khó hơn English:</p>
+<p><strong>7.3.1 Thanh điệu (tonal)</strong></p>
+<p>Tiếng Việt có 6 thanh điệu (ngang, huyền, sắc, hỏi, ngã, nặng). Cùng phụ âm và nguyên âm, khác thanh → khác nghĩa hoàn toàn ("ma", "má", "mà", "mả", "mã", "mạ").</p>
+<p>Model trained chủ yếu trên English (Whisper, Wav2Vec 2.0) thường không capture tốt thanh điệu. PhoWhisper fine-tune Whisper cho Vietnamese, kết quả cải thiện ~30% WER trên VLSP test set.</p>
+<p><strong>7.3.2 Low resource</strong></p>
+<p>Compared with English (Whisper trained on 680K giờ tiếng Anh), Vietnamese chỉ có khoảng 5-10K giờ public corpus (CommonVoice, VLSP, VivosCorpus). Ít hơn 50x.</p>
+<p>Hệ luỵ: cần techniques như semi-supervised pseudo-labeling, multilingual transfer (XLS-R), hoặc data augmentation tích cực. Chương 16-17 sẽ đào sâu.</p>
+<p><strong>7.3.3 Code-switching</strong></p>
+<p>Người Việt thường code-switch giữa Việt và Anh ("Tôi sẽ build cái dashboard này"). Model train chỉ trên Vietnamese clean text thường thất bại với code-switched speech. Đây là open problem chưa có giải pháp tốt.</p>
+<h3 id="74-multimodal-alignment"><a class="header" href="#74-multimodal-alignment">7.4 Multimodal alignment</a></h3>
+<p>Speech LLMs (Qwen2-Audio, GPT-4o) học audio + text trong cùng model, nhưng alignment giữa hai modality vẫn imperfect. Ví dụ:</p>
+<ul>
+<li>Model có thể hallucinate transcription (như LLM hallucinate facts).</li>
+<li>Voice cloning có thể "tốt một câu, lỗi câu tiếp theo".</li>
+<li>Long-form audio (&gt;5 phút) thường mất coherence.</li>
+</ul>
+<p>Đây không phải vấn đề kỹ thuật cụ thể có thể giải bằng kiến trúc mới, mà là consequence của training dynamics chưa hoàn hảo. Nhiều research đang focus vào RLHF cho speech, DPO cho TTS, etc.</p>
+<h3 id="75-compute--cost"><a class="header" href="#75-compute--cost">7.5 Compute / cost</a></h3>
+<p>Một số hệ thống streaming TTS hiện đại công bố latency khoảng vài trăm mili-giây, nhưng chi phí theo ký tự hoặc theo phút vẫn có thể lớn khi nhân lên quy mô call center. Với 1 triệu cuộc hội thoại, khác biệt nhỏ ở cost per turn có thể chuyển thành hàng nghìn USD mỗi ngày.</p>
+<p>So sánh với text LLM (khoảng 0.0001 USD per token, generate vài trăm token per response), audio interaction đắt hơn khoảng 10-100 lần. Đây là rào cản kinh tế cho widespread deployment.</p>
+<p>Các codec tốc độ thấp như Mimi giúp giảm đáng kể lượng token/audio cần xử lý, nhưng chi phí thực tế còn phụ thuộc hardware, batching, latency target và orchestration. Vì vậy, mọi ước lượng cost cho voice agent cần được benchmark lại trên workload cụ thể.</p>
+<h2 id="phần-8--tóm-tắt--hướng-đi-tiếp-theo"><a class="header" href="#phần-8--tóm-tắt--hướng-đi-tiếp-theo">Phần 8 — Tóm tắt &amp; Hướng đi tiếp theo</a></h2>
+<h3 id="81-những-bài-học-chính"><a class="header" href="#81-những-bài-học-chính">8.1 Những bài học chính</a></h3>
+<p>Chương 1 đã thiết lập 5 ý tưởng cốt lõi mà bạn cần mang theo khi đọc tiếp:</p>
+<ol>
+<li>
+<p><strong>Speech AI = NLP + tokenizer cho audio</strong>. Mọi kiến thức Transformer của bạn áp dụng được. Khác biệt nằm ở bước biến đổi continuous signal → discrete-semantic units.</p>
+</li>
+<li>
+<p><strong>Có ba con đường biểu diễn audio</strong>, mỗi cái với trade-off riêng:</p>
+<ul>
+<li>Mel spectrogram (handcrafted, deterministic, không LM-friendly).</li>
+<li>Wav2Vec 2.0 features (learned, continuous, không LM-friendly).</li>
+<li>Codec tokens (learned, discrete, LM-FRIENDLY).</li>
+</ul>
+</li>
+<li>
+<p><strong>Codec tokens (EnCodec, Mimi) là cầu nối quan trọng nhất</strong> đến speech LLMs. Đây là analogy đẹp nhất với BPE: cùng concept "biến input thô thành integer tokens", chỉ khác tokenizer được trained.</p>
+</li>
+<li>
+<p><strong>Scale của audio cao hơn text nhiều bậc</strong> (~4000× raw samples/sec). Hệ luỵ kiến trúc: cần downsampling mạnh, cần local/chunked attention, cần kỹ thuật streaming.</p>
+</li>
+<li>
+<p><strong>Speech AI đang ở Era 4 (Speech LLMs)</strong> với các paradigms: codec-based (Moshi, VALL-E), embedding-based (Qwen2-Audio), hybrid pipeline (Whisper + LLM + TTS). Bạn cần biết mỗi paradigm khi đọc paper hoặc design system.</p>
+</li>
+</ol>
+<h3 id="82-nlpspeech-concept-bridge--final-words"><a class="header" href="#82-nlpspeech-concept-bridge--final-words">8.2 NLP↔Speech Concept Bridge — final words</a></h3>
+<p>Quay lại câu hỏi mở đầu: tại sao một data scientist NLP cần học Speech AI?</p>
+<p>Bây giờ bạn có thể trả lời cụ thể hơn:</p>
+<ul>
+<li>Vì cùng paradigm Transformer, kiến thức không bị vứt bỏ.</li>
+<li>Vì các kỹ thuật của bạn (fine-tuning, RLHF, LoRA, quantization) áp dụng trực tiếp.</li>
+<li>Vì Speech LLM và voice-first AI đang phát triển nhanh, nên năng lực này có giá trị nghề nghiệp cao.</li>
+<li>Vì các sản phẩm voice-first (Moshi, GPT-4o) đang là wave mới của UX.</li>
+</ul>
+<p>Mọi chương tiếp theo của cuốn sách sẽ đào sâu chi tiết cụ thể, nhưng bạn đã có "map" để định hướng. Bookmark Bảng 3.1 — đó là tham chiếu chính khi bạn đọc các chương sau và gặp thuật ngữ lạ.</p>
+<h3 id="821-checklist-tự-kiểm-tra-sau-chương-1"><a class="header" href="#821-checklist-tự-kiểm-tra-sau-chương-1">8.2.1 Checklist tự kiểm tra sau Chương 1</a></h3>
+<p>Trước khi sang Chương 2, hãy tự trả lời ngắn gọn:</p>
+<ol>
+<li>Vì sao raw waveform không thể được xem như token sequence kiểu NLP?</li>
+<li>Mel spectrogram giữ thông tin gì và bỏ thông tin gì?</li>
+<li>Wav2Vec/HuBERT khác BPE ở điểm nào?</li>
+<li>Vì sao codec tokens là điều kiện quan trọng cho Speech LLM generative?</li>
+<li>Nếu xây dựng voice agent tiếng Việt, bạn chọn cascaded pipeline hay native Speech LLM trước? Vì sao?</li>
+<li>Với một hệ thống realtime, representation nào làm giảm token rate hiệu quả nhất trong các lựa chọn đã học?</li>
+</ol>
+<p>Nếu chưa trả lời được, hãy quay lại Phần 2 và bảng mapping ở Phần 3. Các chương sau sẽ dùng lại những khái niệm này liên tục.</p>
+<h3 id="83-lộ-trình-đọc-tiếp"><a class="header" href="#83-lộ-trình-đọc-tiếp">8.3 Lộ trình đọc tiếp</a></h3>
+<p>Tuỳ background và mục tiêu của bạn:</p>
+<p><strong>Nếu bạn từ LLM/GPT research (audio LM, multimodal)</strong>:</p>
+<ul>
+<li>Bỏ qua Chương 2-3 (foundation signal processing). Đọc nhanh để hiểu vocabulary.</li>
+<li>Đào sâu Chương 11-13 (Speech LLMs, Multimodal, Full-Duplex).</li>
+<li>Quay lại Chương 8-10 (TTS) nếu cần generate audio.</li>
+</ul>
+<p><strong>Nếu bạn từ NLP/BERT research (transfer learning, fine-tuning)</strong>:</p>
+<ul>
+<li>Đọc Chương 2-3 để có foundation.</li>
+<li>Đào sâu Chương 4-5 (ASR foundations + modern ASR).</li>
+<li>Tham khảo Chương 6 (Whisper case study).</li>
+</ul>
+<p><strong>Nếu bạn từ CV/Vision (cần multimodal)</strong>:</p>
+<ul>
+<li>Đọc Chương 2 kỹ (audio fundamentals tương tự image processing).</li>
+<li>Skim Chương 3 (representations).</li>
+<li>Đào sâu Chương 12 (Multimodal Omni — Qwen3-Omni, GPT-Realtime, Gemini Live).</li>
+</ul>
+<p><strong>Nếu bạn cần triển khai production ngay</strong>:</p>
+<ul>
+<li>Đọc Chương 6 (Whisper) + Chương 7 (Streaming ASR).</li>
+<li>Đào sâu Chương 18-20 (Training frameworks, Inference engines, Production systems).</li>
+<li>Bookmark Chương 16-17 nếu deploy cho thị trường Việt Nam.</li>
+</ul>
+<p><strong>Đọc toàn bộ cuốn sách (comprehensive)</strong>:</p>
+<ul>
+<li>Đi tuần tự Chương 0 đến Chương 21.</li>
+<li>Mỗi chương dành 2-3 giờ đọc kỹ và chạy code.</li>
+<li>Tổng thời gian: khoảng 60-80 giờ cho exposure đầy đủ.</li>
+</ul>
+<h3 id="84-mở-đầu-cho-chương-2"><a class="header" href="#84-mở-đầu-cho-chương-2">8.4 Mở đầu cho Chương 2</a></h3>
+<p>Chương 1 đã build the "big picture map". Chương 2 sẽ là chương đầu tiên đi sâu vào kỹ thuật cụ thể: <strong>xử lý tín hiệu âm thanh fundamentals</strong> (DFT, STFT, Mel filterbank, MFCC).</p>
+<p>Đây là chương nặng về toán và DSP nhất của cuốn sách. Nếu bạn đến từ NLP, có thể bạn chưa quen với spectral analysis. Chương 2 sẽ giải thích từ ground up, kèm analogy NLP và CV mỗi khi có thể.</p>
+<p>Mục tiêu Chương 2: sau khi đọc xong, bạn có thể nhìn vào một mel spectrogram và "đọc" được nó (cũng như cách bạn đọc word embedding cosine similarity visualization). Đây là một skill cơ bản cho mọi speech engineer.</p>
+<hr />
+<h2 id="tài-liệu-tham-khảo"><a class="header" href="#tài-liệu-tham-khảo">Tài liệu tham khảo</a></h2>
+<ol>
+<li>Défossez, A. et al. (2024). "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue". arXiv:2410.00037.</li>
+<li>Chu, Y. et al. (2023). "Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models". arXiv:2311.07919.</li>
+<li>Xu, J. et al. (2025). "Qwen2.5-Omni Technical Report". arXiv:2503.20215.</li>
+<li>Qwen Team (2025). "Qwen3-Omni Technical Report". arXiv:2509.17765; GitHub QwenLM/Qwen3-Omni.</li>
+<li>Baevski, A. et al. (2020). "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations". NeurIPS 2020.</li>
+<li>Hsu, W. et al. (2021). "HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units". IEEE/ACM TASLP.</li>
+<li>Wang, C. et al. (2023). "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers". arXiv:2301.02111 (VALL-E).</li>
+<li>Borsos, Z. et al. (2023). "AudioLM: A Language Modeling Approach to Audio Generation". IEEE/ACM TASLP.</li>
+<li>Défossez, A. et al. (2022). "High Fidelity Neural Audio Compression". arXiv:2210.13438 (EnCodec).</li>
+<li>Gulati, A. et al. (2020). "Conformer: Convolution-augmented Transformer for Speech Recognition". Interspeech 2020.</li>
+<li>Radford, A. et al. (2022). "Robust Speech Recognition via Large-Scale Weak Supervision". OpenAI Whisper.</li>
+<li>Nguyen, T. et al. (2024). "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition". arXiv preprint.</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part0/00-foundations-review.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part1/02-audio-fundamentals.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part0/00-foundations-review.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part1/02-audio-fundamentals.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

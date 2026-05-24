@@ -1,0 +1,300 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Tài liệu tham khảo - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="references.html" class="active">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/references.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="tài-liệu-tham-khảo"><a class="header" href="#tài-liệu-tham-khảo">Tài liệu Tham khảo</a></h1>
+<h2 id="mục-đích"><a class="header" href="#mục-đích">Mục đích</a></h2>
+<p>Trang này tập hợp các tham khảo cốt lõi xuyên suốt cuốn sách, tổ chức theo chủ đề. Mỗi chương cũng có section "Tài liệu tham khảo" riêng ở cuối, dành cho các paper và tài liệu chi tiết của chương đó. Trang này phục vụ như index tổng để người đọc dễ định vị các nguồn quan trọng nhất.</p>
+<h2 id="sách-giáo-trình-nền-tảng"><a class="header" href="#sách-giáo-trình-nền-tảng">Sách giáo trình nền tảng</a></h2>
+<ul>
+<li>Jurafsky, D. và Martin, J. H. (2024). <em>Speech and Language Processing</em> (SLP3). Stanford. <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a>.</li>
+<li>Rabiner, L. R. và Schafer, R. W. (2010). <em>Theory and Applications of Digital Speech Processing</em>. Pearson.</li>
+<li>Huang, X., Acero, A., và Hon, H. W. (2001). <em>Spoken Language Processing</em>. Prentice Hall.</li>
+<li>Aalto University. <em>Speech Processing Book</em>. <a href="https://speechprocessingbook.aalto.fi/">https://speechprocessingbook.aalto.fi/</a>.</li>
+</ul>
+<h2 id="asr-automatic-speech-recognition"><a class="header" href="#asr-automatic-speech-recognition">ASR (Automatic Speech Recognition)</a></h2>
+<ul>
+<li>Graves, A. và cộng sự (2006). "Connectionist Temporal Classification". <em>ICML</em>.</li>
+<li>Graves, A. (2012). "Sequence Transduction with Recurrent Neural Networks". arXiv:1211.3711.</li>
+<li>Gulati, A. và cộng sự (2020). "Conformer: Convolution-augmented Transformer for Speech Recognition". <em>Interspeech</em>.</li>
+<li>Radford, A. và cộng sự (2022). "Robust Speech Recognition via Large-Scale Weak Supervision" (Whisper). <em>ICML</em>.</li>
+<li>Yao, Z. và cộng sự (2023). "Zipformer: A Faster and Better Encoder for ASR". <em>ICLR 2024</em>.</li>
+</ul>
+<h2 id="tts-và-voice-cloning"><a class="header" href="#tts-và-voice-cloning">TTS và Voice Cloning</a></h2>
+<ul>
+<li>Wang, Y. và cộng sự (2017). "Tacotron: Towards End-to-End Speech Synthesis". <em>Interspeech</em>.</li>
+<li>Ren, Y. và cộng sự (2021). "FastSpeech 2: Fast and High-Quality End-to-End Text to Speech". <em>ICLR</em>.</li>
+<li>Kim, J. và cộng sự (2021). "Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech" (VITS). <em>ICML</em>.</li>
+<li>Wang, C. và cộng sự (2023). "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers" (VALL-E). arXiv:2301.02111.</li>
+<li>Chen, Y. và cộng sự (2024). "F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching". arXiv:2410.06885.</li>
+</ul>
+<h2 id="audio-codecs"><a class="header" href="#audio-codecs">Audio Codecs</a></h2>
+<ul>
+<li>van den Oord, A. và cộng sự (2017). "Neural Discrete Representation Learning" (VQ-VAE). <em>NeurIPS</em>.</li>
+<li>Défossez, A. và cộng sự (2022). "High Fidelity Neural Audio Compression" (EnCodec). <em>TMLR</em>.</li>
+<li>Kumar, R. và cộng sự (2024). "High-Fidelity Audio Compression with Improved RVQGAN" (DAC). <em>NeurIPS</em>.</li>
+<li>Défossez, A. và cộng sự (2024). "Mimi: A Low-Latency Streaming Audio Codec". arXiv:2410.00037.</li>
+</ul>
+<h2 id="self-supervised-speech-learning"><a class="header" href="#self-supervised-speech-learning">Self-Supervised Speech Learning</a></h2>
+<ul>
+<li>Baevski, A. và cộng sự (2020). "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations". <em>NeurIPS</em>.</li>
+<li>Hsu, W. N. và cộng sự (2021). "HuBERT: Self-Supervised Speech Representation Learning". <em>IEEE TASLP</em>.</li>
+<li>Chen, S. và cộng sự (2022). "WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing". <em>IEEE JSTSP</em>.</li>
+</ul>
+<h2 id="speech-llms-và-multimodal"><a class="header" href="#speech-llms-và-multimodal">Speech LLMs và Multimodal</a></h2>
+<ul>
+<li>Borsos, Z. và cộng sự (2023). "AudioLM: A Language Modeling Approach to Audio Generation". <em>IEEE TASLP</em>.</li>
+<li>Chu, Y. và cộng sự (2023). "Qwen-Audio". arXiv:2311.07919.</li>
+<li>Défossez, A. và cộng sự (2024). "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue". arXiv:2410.00037.</li>
+<li>Xu, J. và cộng sự (2025). "Qwen2.5-Omni Technical Report". arXiv:2503.20215.</li>
+<li>Qwen Team (2025). "Qwen3-Omni Technical Report". arXiv:2509.17765; GitHub QwenLM/Qwen3-Omni.</li>
+<li>Qwen Team (2026). "Qwen3.5-Omni Technical Report".</li>
+<li>OpenAI (2025). "Introducing gpt-realtime and Realtime API updates for production voice agents". <a href="https://openai.com/index/introducing-gpt-realtime">https://openai.com/index/introducing-gpt-realtime</a>.</li>
+</ul>
+<h2 id="speech-translation"><a class="header" href="#speech-translation">Speech Translation</a></h2>
+<ul>
+<li>Communication, S. và cộng sự (2023). "SeamlessM4T: Massively Multilingual and Multimodal Machine Translation". arXiv:2308.11596.</li>
+<li>Barrault, L. và cộng sự (2023). "Joint speech and text machine translation for up to 100 languages" (Seamless v2). <em>Nature</em>.</li>
+</ul>
+<h2 id="vietnamese-speech"><a class="header" href="#vietnamese-speech">Vietnamese Speech</a></h2>
+<ul>
+<li>Luong, H. T. và Vu, H. Q. (2016). "A Non-Expert Kaldi Recipe for Vietnamese Speech Recognition". <em>SLTU Workshop</em>.</li>
+<li>Le, T. T., Nguyen, L. T., và Nguyen, D. Q. (2024). "PhoWhisper: Automatic Speech Recognition for Vietnamese". <em>ICLR Tiny Papers</em>.</li>
+<li>Nguyen, D. Q. và Nguyen, A. T. (2020). "PhoBERT: Pre-trained Language Models for Vietnamese". <em>EMNLP Findings</em>.</li>
+</ul>
+<h2 id="training-frameworks-và-production"><a class="header" href="#training-frameworks-và-production">Training Frameworks và Production</a></h2>
+<ul>
+<li>Zhang, B. và cộng sự (2022). "WeNet 2.0: More Productive End-to-End Speech Recognition Toolkit". <em>Interspeech</em>.</li>
+<li>Watanabe, S. và cộng sự (2018). "ESPnet: End-to-End Speech Processing Toolkit". <em>Interspeech</em>.</li>
+<li>Kuchaiev, O. và cộng sự (2019). "NeMo: A Toolkit for Building AI Applications Using Neural Modules". arXiv:1909.09577.</li>
+<li>Ravanelli, M. và cộng sự (2021). "SpeechBrain: A General-Purpose Speech Toolkit". arXiv:2106.04624.</li>
+<li>Kwon, W. và cộng sự (2023). "Efficient Memory Management for Large Language Model Serving with PagedAttention" (vLLM). <em>SOSP</em>.</li>
+</ul>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="appendices/appendix-f-tool-comparison.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="appendices/appendix-f-tool-comparison.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/custom.js"></script>
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

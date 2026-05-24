@@ -1,0 +1,321 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>E. Vietnamese Resources - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html" class="active"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/appendices/appendix-e-vietnamese-resources.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="phụ-lục-e-vietnamese-speech-resources"><a class="header" href="#phụ-lục-e-vietnamese-speech-resources">Phụ lục E: Vietnamese Speech Resources</a></h1>
+<h2 id="mục-đích"><a class="header" href="#mục-đích">Mục đích</a></h2>
+<p>Phụ lục E tập hợp các tài nguyên Speech AI cho tiếng Việt một cách có hệ thống, để người đọc có thể nhanh chóng tra cứu dataset, model, framework, API thương mại, và benchmark cộng đồng. Đây là reference material; nội dung phân tích chi tiết về tiếng Việt nằm trong Chương 16 (Vietnamese Speech Processing) và Chương 17 (Vietnamese Datasets và Benchmarks).</p>
+<p>Mỗi mục được note theo các trường: tên, mô tả ngắn, link công khai, license, ghi chú thực dụng.</p>
+<h2 id="tài-nguyên-tiếng-việt-cho-speech-ai"><a class="header" href="#tài-nguyên-tiếng-việt-cho-speech-ai">Tài nguyên Tiếng Việt cho Speech AI</a></h2>
+<p>Phụ lục này tổng hợp toàn bộ tài nguyên (datasets, models, tools, APIs) cho speech processing tiếng Việt.</p>
+<h2 id="a-datasets"><a class="header" href="#a-datasets">A. Datasets</a></h2>
+<h3 id="asr-datasets"><a class="header" href="#asr-datasets">ASR Datasets</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Giờ</th><th>License</th><th>Link</th></tr></thead><tbody>
+<tr><td>VLSP 2020 ASR</td><td>100h</td><td>Research</td><td>vlsp.org.vn</td></tr>
+<tr><td>VLSP 2021 ASR</td><td>100h</td><td>Research</td><td>vlsp.org.vn</td></tr>
+<tr><td>CommonVoice vi</td><td>~50h</td><td>CC-0</td><td>commonvoice.mozilla.org</td></tr>
+<tr><td>VIVOS</td><td>15h</td><td>CC-BY-SA</td><td>ailab.hcmus.edu.vn</td></tr>
+<tr><td>VietSuperSpeech</td><td>12h</td><td>MIT</td><td>github.com/nickviet/VietSuperSpeech</td></tr>
+<tr><td>FPT OpenSpeech</td><td>25h</td><td>Research</td><td>fpt.ai</td></tr>
+<tr><td>BKAI-NAVER</td><td>100h</td><td>Research</td><td>bkai.ai</td></tr>
+</tbody></table>
+</div>
+<h3 id="tts-datasets"><a class="header" href="#tts-datasets">TTS Datasets</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Giờ</th><th>License</th><th>Chất lượng</th></tr></thead><tbody>
+<tr><td>VietSuperSpeech</td><td>12h</td><td>MIT</td><td>Studio 24-bit 48kHz</td></tr>
+<tr><td>InfoRe TTS</td><td>20h</td><td>Research</td><td>Studio</td></tr>
+<tr><td>VNTTS</td><td>10h</td><td>Research</td><td>Studio</td></tr>
+</tbody></table>
+</div>
+<h3 id="nlp-datasets-hỗ-trợ-speech"><a class="header" href="#nlp-datasets-hỗ-trợ-speech">NLP Datasets (hỗ trợ Speech)</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Mô tả</th><th>Link</th></tr></thead><tbody>
+<tr><td>PhoBERT corpus</td><td>20GB Vietnamese text</td><td>github.com/VinAIResearch/PhoBERT</td></tr>
+<tr><td>VnCoreNLP</td><td>Word segmentation, POS</td><td>github.com/vncorenlp/VnCoreNLP</td></tr>
+<tr><td>ViNewsQA</td><td>Question answering</td><td>Vietnamese QA dataset</td></tr>
+</tbody></table>
+</div>
+<h2 id="b-pretrained-models"><a class="header" href="#b-pretrained-models">B. Pretrained Models</a></h2>
+<h3 id="asr-models"><a class="header" href="#asr-models">ASR Models</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>HuggingFace ID</th><th>Size</th><th>WER</th></tr></thead><tbody>
+<tr><td>PhoWhisper-small</td><td>vinai/PhoWhisper-small</td><td>244M</td><td>~12%</td></tr>
+<tr><td>PhoWhisper-medium</td><td>vinai/PhoWhisper-medium</td><td>769M</td><td>~9%</td></tr>
+<tr><td>PhoWhisper-large</td><td>vinai/PhoWhisper-large</td><td>1.5B</td><td>~7%</td></tr>
+<tr><td>Wav2Vec2-vi</td><td>nguyenvulebinh/wav2vec2-base-vi</td><td>95M</td><td>~15%</td></tr>
+<tr><td>XLSR-Vietnamese</td><td>Various community</td><td>317M</td><td>~12%</td></tr>
+</tbody></table>
+</div>
+<h3 id="tts-models"><a class="header" href="#tts-models">TTS Models</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Source</th><th>Kiến trúc</th></tr></thead><tbody>
+<tr><td>VietTTS</td><td>github.com/NTT123/vietTTS</td><td>VITS</td></tr>
+<tr><td>Coqui TTS (vi)</td><td>Community fine-tune</td><td>VITS/Tacotron 2</td></tr>
+</tbody></table>
+</div>
+<h2 id="c-apis--services"><a class="header" href="#c-apis--services">C. APIs &amp; Services</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Service</th><th>ASR</th><th>TTS</th><th>Pricing</th><th>Docs</th></tr></thead><tbody>
+<tr><td>FPT.AI</td><td>Có</td><td>Có</td><td>Freemium</td><td>fpt.ai/speech</td></tr>
+<tr><td>Zalo AI</td><td>Có</td><td>Có</td><td>Freemium</td><td>zalo.ai</td></tr>
+<tr><td>Viettel AI</td><td>Có</td><td>Có</td><td>Enterprise</td><td>viettelai.vn</td></tr>
+<tr><td>Google Cloud STT</td><td>Có</td><td>Có</td><td>Pay-per-use</td><td>cloud.google.com</td></tr>
+<tr><td>Azure Speech</td><td>Có</td><td>Có</td><td>Pay-per-use</td><td>azure.microsoft.com</td></tr>
+</tbody></table>
+</div>
+<h2 id="d-tools--libraries"><a class="header" href="#d-tools--libraries">D. Tools &amp; Libraries</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tool</th><th>Mục đích</th><th>Vietnamese Support</th></tr></thead><tbody>
+<tr><td>VnCoreNLP</td><td>Word segmentation</td><td>Native</td></tr>
+<tr><td>Underthesea</td><td>NLP toolkit</td><td>Native</td></tr>
+<tr><td>PhoNLP</td><td>Multi-task NLP</td><td>Native</td></tr>
+<tr><td>VietTTS</td><td>Text-to-Speech</td><td>Native</td></tr>
+<tr><td>faster-whisper</td><td>ASR inference</td><td>Via PhoWhisper</td></tr>
+</tbody></table>
+</div>
+<h2 id="e-competitions--workshops"><a class="header" href="#e-competitions--workshops">E. Competitions &amp; Workshops</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Event</th><th>Tổ chức</th><th>Tần suất</th><th>Topics</th></tr></thead><tbody>
+<tr><td>VLSP</td><td>Vietnamese NLP/Speech community</td><td>Hàng năm</td><td>ASR, TTS, NLP</td></tr>
+<tr><td>Zalo AI Challenge</td><td>VNG/Zalo</td><td>Hàng năm</td><td>Various AI tasks</td></tr>
+<tr><td>FPT AI Challenge</td><td>FPT</td><td>Không định kỳ</td><td>Speech, NLP</td></tr>
+</tbody></table>
+</div>
+<h2 id="f-research-groups"><a class="header" href="#f-research-groups">F. Research Groups</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Nhóm</th><th>Affiliation</th><th>Focus</th></tr></thead><tbody>
+<tr><td>VinAI Research</td><td>Vingroup</td><td>ASR, NLP, Computer Vision</td></tr>
+<tr><td>Zalo AI Lab</td><td>VNG Corporation</td><td>Speech, NLP, Recommendation</td></tr>
+<tr><td>FPT.AI Research</td><td>FPT Corporation</td><td>Full-stack AI</td></tr>
+<tr><td>BKAI Lab</td><td>Hanoi University of Science and Technology</td><td>Speech, NLP</td></tr>
+<tr><td>AILAB</td><td>VNUHCM University of Science</td><td>Speech, NLP</td></tr>
+<tr><td>VietAI</td><td>Non-profit</td><td>Education, Open-source</td></tr>
+<tr><td>NTT123 (VietTTS)</td><td>Independent</td><td>TTS</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendices/appendix-d-code.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../appendices/appendix-f-tool-comparison.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendices/appendix-d-code.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../appendices/appendix-f-tool-comparison.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

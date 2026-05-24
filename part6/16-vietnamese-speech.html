@@ -1,0 +1,656 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 16: Vietnamese Speech - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html" class="active"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part6/16-vietnamese-speech.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-16-vietnamese-speech-processing"><a class="header" href="#chương-16-vietnamese-speech-processing">Chương 16: Vietnamese Speech Processing</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Tiếng Việt là một ngôn ngữ đặc thù cho Speech AI: tính tonal (6 thanh điệu phân biệt nghĩa), ba phương ngữ chính, cùng sự bùng nổ của code-switching Việt-Anh trong bối cảnh công nghệ tạo ra thách thức mà các mô hình đa ngôn ngữ chuẩn thường không xử lý tốt. Whisper-large-v3 đạt WER khoảng 17% trên VLSP 2020 Task-1, trong khi PhoWhisper-large (VinAI fine-tune trên 844 giờ Việt) giảm xuống khoảng 10.8% (giảm khoảng 35%, theo Le và cộng sự, ICLR Tiny Papers 2024). Khoảng cách này minh hoạ tầm quan trọng của fine-tuning cho ngôn ngữ ít tài nguyên.</p>
+<p>Chương này phân tích các đặc thù kỹ thuật của tiếng Việt ảnh hưởng đến thiết kế ASR, TTS, voice agent, cùng bức tranh ngành trong nước (VinAI, ZaloAI, FPT.AI, VinFast, Trusting Social, Viettel AI) và những khoảng trống còn lại đáng quan tâm cho startup và team product.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: đặc điểm ngôn ngữ học tiếng Việt và hệ quả cho ASR/TTS.</li>
+<li><strong>Phần 2</strong>: thanh điệu và cách mô hình cần capture pitch contour.</li>
+<li><strong>Phần 3</strong>: phương ngữ Bắc, Trung, Nam và tác động đến data balance.</li>
+<li><strong>Phần 4</strong>: code-switching Việt-Anh trong bối cảnh thuật ngữ kỹ thuật.</li>
+<li><strong>Phần 5</strong>: text normalization, G2P, xử lý chữ viết tiếng Việt.</li>
+<li><strong>Phần 6</strong>: PhoWhisper, kết quả fine-tune Whisper cho tiếng Việt.</li>
+<li><strong>Phần 7</strong>: bức tranh ngành voice AI tại Việt Nam và các khoảng trống.</li>
+</ul>
+</blockquote>
+<h2 id="phần-1--Đặc-điểm-ngôn-ngữ-học-của-tiếng-việt"><a class="header" href="#phần-1--Đặc-điểm-ngôn-ngữ-học-của-tiếng-việt">Phần 1 — Đặc điểm ngôn ngữ học của tiếng Việt</a></h2>
+<h3 id="hệ-thống-thanh-điệu"><a class="header" href="#hệ-thống-thanh-điệu">Hệ thống Thanh điệu</a></h3>
+<p>Tiếng Việt là <strong>tonal language</strong> với 6 thanh điệu (lexical tones). Thay đổi thanh điệu thay đổi nghĩa hoàn toàn:</p>
+<div class="table-wrapper"><table><thead><tr><th>Thanh</th><th>Tên</th><th>Ký hiệu</th><th>Ví dụ</th><th>F0 Pattern</th></tr></thead><tbody>
+<tr><td>1</td><td>Ngang (level)</td><td>không dấu</td><td>ma (ghost)</td><td>Mid-level, flat</td></tr>
+<tr><td>2</td><td>Sắc (rising)</td><td>´</td><td>má (cheek)</td><td>Rising</td></tr>
+<tr><td>3</td><td>Huyền (falling)</td><td>`</td><td>mà (but)</td><td>Low falling</td></tr>
+<tr><td>4</td><td>Hỏi (dipping-rising)</td><td>̉</td><td>mả (tomb)</td><td>Falling then rising</td></tr>
+<tr><td>5</td><td>Ngã (rising-glottalized)</td><td>˜</td><td>mã (code)</td><td>Rising with glottal break</td></tr>
+<tr><td>6</td><td>Nặng (falling-glottalized)</td><td>̣</td><td>mạ (rice seedling)</td><td>Low falling, short</td></tr>
+</tbody></table>
+</div>
+<p>: 6 thanh điệu tiếng Việt <a id="tbl-vietnamese-tones"></a></p>
+<blockquote>
+<p><strong>📝 Tone = Fundamental Frequency (F0) Contour</strong></p>
+<p>Mỗi thanh điệu tương ứng với một <strong>F0 contour</strong> (đường biến thiên tần số cơ bản) đặc trưng. F0 là đặc trưng quan trọng nhất cần capture trong cả ASR và TTS cho tiếng Việt:</p>
+<p><a id="eq-tone-f0"></a></p>
+<p>$$
+\text{Tone} \leftrightarrow F0(t), \quad t \in [t_{\text{onset}}, t_{\text{offset}}]
+$$</p>
+<p>F0 range điển hình:</p>
+<ul>
+<li>Nam: 85–180 Hz</li>
+<li>Nữ: 165–300 Hz</li>
+</ul>
+</blockquote>
+<h3 id="thách-thức-cho-asr"><a class="header" href="#thách-thức-cho-asr">Thách thức cho ASR</a></h3>
+<p><strong>Hỏi-Ngã Merger (thanh Hỏi và thanh Ngã):</strong></p>
+<p>Trong phương ngữ Nam Bộ, thanh Hỏi (falling-rising) và thanh Ngã (rising-glottalized) <strong>hợp nhất</strong> thành một thanh:</p>
+<p><a id="eq-hoi-nga-merger"></a></p>
+<p>$$
+\text{Bắc Bộ: } \underbrace{\text{mả}}<em>{\text{Hỏi}} \neq \underbrace{\text{mã}}</em>{\text{Ngã}} \qquad \text{Nam Bộ: } \underbrace{\text{mả} \approx \text{mã}}_{\text{merged}}
+$$</p>
+<p>Điều này nghĩa là ASR model phải:</p>
+<ol>
+<li>Nhận diện thanh điệu từ F0 contour</li>
+<li>Xử lý variation theo phương ngữ</li>
+<li>Dùng context để disambiguate khi cần</li>
+</ol>
+<h3 id="ba-phương-ngữ-chính"><a class="header" href="#ba-phương-ngữ-chính">Ba Phương ngữ Chính</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Đặc điểm</th><th>Bắc Bộ (Hà Nội)</th><th>Trung Bộ (Huế)</th><th>Nam Bộ (Sài Gòn)</th></tr></thead><tbody>
+<tr><td>Số thanh phân biệt</td><td>6</td><td>5</td><td>5</td></tr>
+<tr><td>Hỏi-Ngã</td><td>Phân biệt rõ</td><td>Có xu hướng merger</td><td><strong>Merged</strong></td></tr>
+<tr><td>Phụ âm đầu</td><td>/z/ trong "da"</td><td>/j/ trong "da"</td><td>/j/ trong "da"</td></tr>
+<tr><td>Phụ âm cuối</td><td>/-k/, /-t/, /-p/ rõ</td><td>Biến thể</td><td>Có thể nuốt</td></tr>
+<tr><td>Ngữ điệu</td><td>Flat, formal</td><td>Melodic</td><td>Expressive</td></tr>
+</tbody></table>
+</div>
+<p>: Ba phương ngữ chính tiếng Việt <a id="tbl-vietnamese-dialects"></a></p>
+<blockquote>
+<p><strong>⚠️ Latency Warning</strong></p>
+<p>Dialect-specific models cho kết quả tốt hơn, nhưng cần <strong>3 models riêng biệt</strong> → 3× VRAM và complexity. Production approach: train <strong>1 unified model</strong> với dialect labels, fine-tune per-dialect nếu cần.</p>
+</blockquote>
+<h2 id="vietnamese-asr"><a class="header" href="#vietnamese-asr">Vietnamese ASR</a></h2>
+<h3 id="datasets"><a class="header" href="#datasets">Datasets</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Giờ</th><th>Loại</th><th>Dialect</th><th>Open?</th></tr></thead><tbody>
+<tr><td>VIVOS</td><td>15h</td><td>Read speech</td><td>Bắc</td><td>✓</td></tr>
+<tr><td>VLSP (2018–2020)</td><td>100h+</td><td>Broadcast, conversation</td><td>Mixed</td><td>Partial</td></tr>
+<tr><td>FPT Open Speech</td><td>27h</td><td>Read speech</td><td>Bắc, Nam</td><td>✓</td></tr>
+<tr><td>CommonVoice (vi)</td><td>~50h</td><td>Crowdsourced</td><td>Mixed</td><td>✓</td></tr>
+<tr><td>Internal datasets</td><td>1000h+</td><td>Call center, meetings</td><td>Mixed</td><td>✗</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese ASR datasets <a id="tbl-vi-asr-datasets"></a></p>
+<h3 id="approaches"><a class="header" href="#approaches">Approaches</a></h3>
+<p><strong>Approach 1: Fine-tune Whisper</strong></p>
+<p><a id="eq-whisper-vi"></a></p>
+<p>$$
+\text{Whisper Large-v3} \xrightarrow{\text{Fine-tune trên Vietnamese data}} \text{Whisper-Vi}
+$$</p>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Whisper fine-tuning for Vietnamese"
+import torch
+from torch import Tensor
+
+
+def prepare_whisper_vietnamese_training(
+    audio_paths: list[str],
+    transcriptions: list[str],
+    max_duration_sec: float = 30.0,
+    sample_rate: int = 16000,
+) -&gt; dict[str, list]:
+    """Prepare training data for Whisper Vietnamese fine-tuning.
+
+    Args:
+        audio_paths: Paths to audio files
+        transcriptions: Corresponding Vietnamese transcriptions
+        max_duration_sec: Maximum audio duration
+        sample_rate: Target sample rate
+
+    Returns:
+        dataset: Dictionary with processed examples
+    """
+    # Vietnamese special considerations:
+    # 1. Normalize Unicode (NFC normalization for diacritics)
+    # 2. Handle tone marks consistently
+    # 3. Lowercase (Vietnamese is case-sensitive for proper nouns)
+
+    import unicodedata
+
+    processed_texts: list[str] = []
+    for text in transcriptions:
+        # NFC normalization, critical for Vietnamese diacritics
+        normalized: str = unicodedata.normalize("NFC", text)
+        processed_texts.append(normalized)
+
+    # Whisper uses special tokens
+    # &lt;|startoftranscript|&gt;&lt;|vi|&gt;&lt;|transcribe|&gt;&lt;|notimestamps|&gt;...text...&lt;|endoftext|&gt;
+    prefix_tokens: str = "&lt;|startoftranscript|&gt;&lt;|vi|&gt;&lt;|transcribe|&gt;&lt;|notimestamps|&gt;"
+
+    return {
+        "audio_paths": audio_paths,
+        "texts": processed_texts,
+        "language": "vi",
+        "task": "transcribe",
+    }
+</code></pre>
+<p><strong>Approach 2: Wav2Vec 2.0 + CTC</strong></p>
+<p><a id="eq-xlsr-vi"></a></p>
+<p>$$
+\text{XLSR-53 (multilingual Wav2Vec 2.0)} \xrightarrow{\text{CTC fine-tune}} \text{Vietnamese ASR}
+$$</p>
+<ul>
+<li>XLSR-53: Pre-trained on 56K hours, 53 languages</li>
+<li>Fine-tune với CTC loss trên Vietnamese data</li>
+<li>Character-level vocabulary (chữ cái + dấu thanh)</li>
+</ul>
+<p><strong>Approach 3: Conformer + RNN-T (Production)</strong></p>
+<p><a id="eq-conformer-vi"></a></p>
+<p>$$
+\text{Conformer Encoder} + \text{RNN-T Decoder} \xrightarrow{\text{Train from scratch}} \text{Streaming Vietnamese ASR}
+$$</p>
+<h3 id="vietnamese-wer-results"><a class="header" href="#vietnamese-wer-results">Vietnamese WER Results</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Dataset</th><th>WER</th></tr></thead><tbody>
+<tr><td>Kaldi GMM-HMM <sup class="footnote-reference"><a href="#luong2016non">1</a></sup></td><td>VIVOS</td><td>28.1%</td></tr>
+<tr><td>Wav2Vec 2.0 (XLSR fine-tune)</td><td>VIVOS</td><td>9.8%</td></tr>
+<tr><td>Whisper Large-v3</td><td>VIVOS</td><td>8.2%</td></tr>
+<tr><td>Whisper Large-v3 (fine-tuned)</td><td>VIVOS</td><td><strong>5.1%</strong></td></tr>
+<tr><td>Conformer-RNN-T (from scratch)</td><td>Internal 1000h</td><td><strong>4.5%</strong></td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese ASR results <a id="tbl-vi-asr-results"></a></p>
+<h2 id="vietnamese-tts"><a class="header" href="#vietnamese-tts">Vietnamese TTS</a></h2>
+<h3 id="thách-thức-cho-tts"><a class="header" href="#thách-thức-cho-tts">Thách thức cho TTS</a></h3>
+<ol>
+<li><strong>Tone generation</strong>: Mỗi âm tiết phải có đúng F0 contour</li>
+<li><strong>Coarticulation</strong>: Ảnh hưởng giữa các âm liên tiếp</li>
+<li><strong>Prosody</strong>: Nhấn mạnh, nghi vấn, cảm thán</li>
+<li><strong>Polyphone</strong>: Cùng chữ viết, phát âm khác theo context</li>
+</ol>
+<h3 id="text-processing-pipeline-cho-tiếng-việt"><a class="header" href="#text-processing-pipeline-cho-tiếng-việt">Text Processing Pipeline cho Tiếng Việt</a></h3>
+<pre class="mermaid">flowchart LR
+    RAW[&quot;Raw Vietnamese text&quot;] --&gt; UNI[&quot;Unicode normalization&lt;br&gt;NFC/NFKC&quot;]
+    UNI --&gt; TN[&quot;Text normalization&lt;br&gt;numbers, dates, abbreviations&quot;]
+    TN --&gt; SEG[&quot;Word / syllable segmentation&quot;]
+    SEG --&gt; G2P[&quot;Vietnamese G2P&lt;br&gt;initial, rhyme, tone&quot;]
+    G2P --&gt; PROS[&quot;Prosody features&lt;br&gt;phrase breaks, emphasis&quot;]
+    PROS --&gt; TTS[&quot;TTS acoustic model&quot;]
+    TTS --&gt; WAV[&quot;Vietnamese speech waveform&quot;]
+</pre>
+<p><strong>Hình:</strong> Text processing cho TTS tiếng Việt cần giữ thanh điệu, dấu tiếng Việt và ranh giới âm tiết nhất quán. Nếu normalization sai ở bước đầu, acoustic model phía sau thường không thể tự sửa lỗi.</p>
+<h3 id="vietnamese-g2p"><a class="header" href="#vietnamese-g2p">Vietnamese G2P</a></h3>
+<p>Vietnamese grapheme-to-phoneme tương đối <strong>regular</strong> (gần 1:1 mapping) so với English, nhưng có edge cases:</p>
+<div class="table-wrapper"><table><thead><tr><th>Challenge</th><th>Example</th><th>Issue</th></tr></thead><tbody>
+<tr><td>Polyphone "gi"</td><td>"gì" vs "giá"</td><td>/z/ vs /z/ (dialect-dependent)</td></tr>
+<tr><td>Regional variants</td><td>"v" in "vào"</td><td>/v/ (Bắc) vs /j/ (Nam)</td></tr>
+<tr><td>Tone sandhi</td><td>"không" in questions</td><td>Tone may shift in context</td></tr>
+<tr><td>Foreign words</td><td>"email", "marketing"</td><td>Need English pronunciation rules</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese G2P challenges <a id="tbl-vi-g2p"></a></p>
+<h3 id="tts-models-cho-tiếng-việt"><a class="header" href="#tts-models-cho-tiếng-việt">TTS Models cho Tiếng Việt</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Approach</th><th>Quality</th><th>Speed</th><th>Open?</th></tr></thead><tbody>
+<tr><td>VITS (Vietnamese fine-tune)</td><td>End-to-end</td><td>Good</td><td>Fast</td><td>✓</td></tr>
+<tr><td>FastSpeech 2 + HiFi-GAN</td><td>Two-stage</td><td>Good</td><td>Fast</td><td>✓</td></tr>
+<tr><td>F5-TTS (Vietnamese)</td><td>Flow matching</td><td><strong>Excellent</strong></td><td>Medium</td><td>✓</td></tr>
+<tr><td>Zalo TTS</td><td>Proprietary</td><td>Excellent</td><td>Fast</td><td>✗</td></tr>
+<tr><td>FPT.AI TTS</td><td>Proprietary</td><td>Excellent</td><td>Fast</td><td>✗</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese TTS models <a id="tbl-vi-tts-models"></a></p>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Vietnamese text normalization"
+
+
+def normalize_vietnamese_text(text: str) -&gt; str:
+    """Normalize Vietnamese text for TTS.
+
+    Handles: numbers, abbreviations, special characters.
+
+    Args:
+        text: Raw Vietnamese text
+
+    Returns:
+        normalized: Normalized text ready for G2P
+    """
+    import re
+    import unicodedata
+
+    # Step 1: Unicode NFC normalization
+    text = unicodedata.normalize("NFC", text)
+
+    # Step 2: Number to words (simplified)
+    number_words: dict[str, str] = {
+        "0": "không", "1": "một", "2": "hai", "3": "ba",
+        "4": "bốn", "5": "năm", "6": "sáu", "7": "bảy",
+        "8": "tám", "9": "chín", "10": "mười",
+    }
+
+    # Step 3: Common abbreviations
+    abbreviations: dict[str, str] = {
+        "TP.HCM": "thành phố hồ chí minh",
+        "TPHCM": "thành phố hồ chí minh",
+        "VN": "việt nam",
+        "VND": "việt nam đồng",
+        "AI": "ây ai",
+        "ML": "em eo",
+        "NLP": "en eo pi",
+        "km": "ki lô mét",
+        "kg": "ki lô gam",
+    }
+
+    for abbr, expansion in abbreviations.items():
+        text = text.replace(abbr, expansion)
+
+    # Step 4: Remove special characters, keep Vietnamese diacritics
+    text = re.sub(r"[^\w\sàáạảãâầấậẩẫăằắặẳẵèéẹẻẽêềếệểễ"
+                  r"ìíịỉĩòóọỏõôồốộổỗơờớợởỡùúụủũưừứựửữ"
+                  r"ỳýỵỷỹđ]", " ", text.lower())
+
+    # Step 5: Collapse whitespace
+    text = re.sub(r"\s+", " ", text).strip()
+
+    return text
+
+
+# Example
+raw: str = "Tôi có 3 con mèo, giá 50.000đ/con ở TP.HCM"
+normalized: str = normalize_vietnamese_text(raw)
+print(f"Input:  {raw}")
+print(f"Output: {normalized}")
+</code></pre>
+<h2 id="vietnamese-voice-cloning"><a class="header" href="#vietnamese-voice-cloning">Vietnamese Voice Cloning</a></h2>
+<h3 id="zero-shot-cloning"><a class="header" href="#zero-shot-cloning">Zero-Shot Cloning</a></h3>
+<p>VALL-E và F5-TTS có thể clone giọng Việt chỉ với <strong>3 giây</strong> audio prompt:</p>
+<p><a id="eq-vi-cloning"></a></p>
+<p>$$
+\text{[Text Vietnamese]} + \text{[3s Audio Prompt]} \xrightarrow{\text{F5-TTS}} \text{[Cloned Voice Audio]}
+$$</p>
+<p><strong>Thách thức đặc thù:</strong></p>
+<ul>
+<li>Tone accuracy: Model phải generate đúng F0 contour cho 6 thanh</li>
+<li>Speaker preservation: Giữ timbre trong khi thay đổi content</li>
+<li>Code-switching: Vietnamese + English trong cùng utterance</li>
+</ul>
+<h3 id="speaker-embedding-for-vietnamese"><a class="header" href="#speaker-embedding-for-vietnamese">Speaker Embedding for Vietnamese</a></h3>
+<p><a id="eq-speaker-embedding"></a></p>
+<p>$$
+\mathbf{s} = \text{SpeakerEncoder}(\text{reference audio}), \quad \mathbf{s} \in \mathbb{R}^{256}
+$$</p>
+<p>Speaker encoder cần capture:</p>
+<ul>
+<li>Vocal tract characteristics (speaker identity)</li>
+<li><strong>Tonal range</strong> (mỗi người có range F0 khác nhau)</li>
+<li><strong>Dialect markers</strong> (Bắc/Trung/Nam)</li>
+<li>Speaking rate</li>
+</ul>
+<h2 id="vietnamese-speech-datasets--resources"><a class="header" href="#vietnamese-speech-datasets--resources">Vietnamese Speech Datasets &amp; Resources</a></h2>
+<h3 id="open-source-resources"><a class="header" href="#open-source-resources">Open-Source Resources</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Resource</th><th>Type</th><th>Description</th></tr></thead><tbody>
+<tr><td>VIVOS</td><td>ASR corpus</td><td>15h, read speech, Northern Vietnamese</td></tr>
+<tr><td>VinBigData VLSP</td><td>ASR corpus</td><td>Competition data, mixed dialects</td></tr>
+<tr><td>CommonVoice vi</td><td>ASR corpus</td><td>Crowdsourced, ~50h</td></tr>
+<tr><td>underthesea</td><td>NLP toolkit</td><td>Word segmentation, POS tagging</td></tr>
+<tr><td>vPhon</td><td>G2P tool</td><td>Vietnamese phonetic transcription</td></tr>
+<tr><td>Vinorm</td><td>Text normalizer</td><td>Vietnamese text normalization</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese speech resources <a id="tbl-vi-resources"></a></p>
+<h3 id="evaluation-metrics-for-vietnamese"><a class="header" href="#evaluation-metrics-for-vietnamese">Evaluation Metrics for Vietnamese</a></h3>
+<p><strong>ASR:</strong></p>
+<ul>
+<li><strong>WER</strong>: Standard, nhưng cần careful word segmentation (tiếng Việt viết cách âm tiết)</li>
+<li><strong>SER</strong> (Syllable Error Rate): Phù hợp hơn vì tiếng Việt syllable-timed</li>
+<li><strong>Tone Accuracy</strong>: % thanh điệu đúng (metric riêng cho tonal languages)</li>
+</ul>
+<p><strong>TTS:</strong></p>
+<ul>
+<li><strong>MOS</strong> (Mean Opinion Score): 1–5 scale, human evaluation</li>
+<li><strong>Tone MOS</strong>: Đánh giá riêng cho tone naturalness</li>
+<li><strong>Speaker Similarity</strong>: Cosine similarity of speaker embeddings</li>
+</ul>
+<h2 id="phần-mở-rộng--vietnamese-speech-ai-industry-landscape"><a class="header" href="#phần-mở-rộng--vietnamese-speech-ai-industry-landscape">Phần Mở rộng — Vietnamese Speech AI Industry Landscape</a></h2>
+<p>Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam, đồng thời đưa ra đánh giá thận trọng dựa trên thông tin công khai. Với các hệ thống thương mại không công bố benchmark đầy đủ, phần này chỉ nên được xem như bản đồ hệ sinh thái, không phải leaderboard tuyệt đối.</p>
+<h3 id="vinai-vinbigdata--nghiên-cứu-mở-và-baseline-tiếng-việt"><a class="header" href="#vinai-vinbigdata--nghiên-cứu-mở-và-baseline-tiếng-việt">VinAI (VinBigData) — nghiên cứu mở và baseline tiếng Việt</a></h3>
+<p><strong>Sản phẩm chính</strong>:</p>
+<ul>
+<li><strong>PhoWhisper</strong> (ICLR Tiny Papers 2024): Whisper fine-tuned trên 844h Vietnamese audio. Tác giả: Thanh-Thien Le, Linh The Nguyen, Dat Quoc Nguyen.</li>
+<li><strong>ViVi</strong>: voice assistant cho VinFast cars.</li>
+<li><strong>PhoBERT, PhoGPT</strong>: text-only Vietnamese language models.</li>
+<li><strong>vinai/vibert-tts</strong>: open-source Vietnamese TTS.</li>
+</ul>
+<p><strong>Datasets used</strong>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Size</th><th>Source</th></tr></thead><tbody>
+<tr><td>CMV-Vi (Common Voice Vietnamese)</td><td>14h</td><td>Mozilla</td></tr>
+<tr><td>VIVOS</td><td>14h</td><td>UPHC</td></tr>
+<tr><td>VLSP 2020 Task-1</td><td>240h</td><td>VLSP</td></tr>
+<tr><td>VinAI private</td><td>586h</td><td>Internal collection</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>844h</strong></td><td></td></tr>
+</tbody></table>
+</div>
+<p><strong>Performance</strong> (per ICLR 2024 paper):</p>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>CMV-Vi WER</th><th>VIVOS WER</th><th>VLSP-T1 WER</th></tr></thead><tbody>
+<tr><td>Whisper-medium (baseline)</td><td>14.2%</td><td>19.8%</td><td>22.1%</td></tr>
+<tr><td>Whisper-large-v3</td><td>11.1%</td><td>15.3%</td><td>17.4%</td></tr>
+<tr><td>PhoWhisper-medium</td><td>8.4%</td><td>11.2%</td><td>13.1%</td></tr>
+<tr><td><strong>PhoWhisper-large</strong></td><td><strong>6.9%</strong></td><td><strong>9.4%</strong></td><td><strong>10.8%</strong></td></tr>
+</tbody></table>
+</div>
+<p><strong>Đánh giá thận trọng</strong>: theo kết quả được công bố trong paper PhoWhisper, PhoWhisper-large là một baseline open-source mạnh cho Vietnamese ASR và cải thiện rõ so với Whisper-large-v3 trên các split được báo cáo. Khi dùng cho sản phẩm, vẫn cần đánh giá lại trên dữ liệu nội bộ có đúng domain, phương ngữ và điều kiện nhiễu của hệ thống.</p>
+<h3 id="zaloai--consumer-voice-products"><a class="header" href="#zaloai--consumer-voice-products">ZaloAI — Consumer voice products</a></h3>
+<p><strong>Sản phẩm</strong>:</p>
+<ul>
+<li><strong>KiKi assistant</strong>: voice assistant trong app Zalo.</li>
+<li><strong>ZaloPay voice</strong>: voice commands cho ZaloPay payment app.</li>
+<li><strong>Internal ASR/TTS</strong>: Vietnamese-focused, not public.</li>
+</ul>
+<p><strong>Đánh giá chất lượng</strong>: các sản phẩm của ZaloAI đã được kiểm chứng trong môi trường consumer quy mô lớn. Tuy nhiên, do không có benchmark công khai đầy đủ, ta chỉ có thể kết luận rằng hệ thống phù hợp với các domain command hẹp như thanh toán, điều hướng hoặc thao tác trong ứng dụng, thay vì suy rộng sang mọi bài toán ASR/TTS tiếng Việt.</p>
+<p><strong>Hạn chế</strong>: closed-source, không có public model weights.</p>
+<h3 id="fptai--commercial-apis"><a class="header" href="#fptai--commercial-apis">FPT.AI — Commercial APIs</a></h3>
+<p><strong>Sản phẩm</strong>:</p>
+<ul>
+<li><strong>FPT Speech ASR</strong>: REST/streaming API cho Vietnamese speech-to-text.</li>
+<li><strong>FPT Voice TTS</strong>: multiple voices Vietnamese.</li>
+<li><strong>FPT.AI Conversation</strong>: chatbot platform với voice integration.</li>
+</ul>
+<p><strong>Pricing</strong>: dạng subscription hoặc enterprise contract; cần kiểm tra trực tiếp với nhà cung cấp ở thời điểm triển khai.</p>
+<p><strong>Đánh giá chất lượng</strong>: phù hợp với tiếng Việt sạch và các kịch bản enterprise phổ biến. Với code-switching, tiếng ồn mạnh hoặc domain chuyên ngành, vẫn cần pilot nội bộ trước khi chọn làm baseline production.</p>
+<h3 id="vinfast-in-car-voice"><a class="header" href="#vinfast-in-car-voice">VinFast (in-car voice)</a></h3>
+<p>In-car voice assistant cho VinFast vehicles:</p>
+<ul>
+<li>Wake-word: "Ok VinFast" (custom KWS).</li>
+<li>ASR: in-house Vietnamese model (likely fine-tuned from VinAI base).</li>
+<li>LLM: không có thông tin công khai đầy đủ về cấu hình production.</li>
+<li>TTS: Vietnamese neural TTS, multiple voices.</li>
+</ul>
+<p><strong>Use cases</strong>: navigation, climate control, music, calling.</p>
+<h3 id="trusting-social--voice-biometrics"><a class="header" href="#trusting-social--voice-biometrics">Trusting Social — Voice biometrics</a></h3>
+<p>Specialized in voice biometrics for KYC (Know Your Customer):</p>
+<ul>
+<li><strong>Voice ID</strong>: speaker verification cho banking, insurance.</li>
+<li><strong>Multimodal KYC</strong>: voice + face + ID document.</li>
+</ul>
+<p>Các giải pháp voice biometrics của nhóm này thuộc lớp identity verification, không phải general-purpose voice AI, nhưng vẫn là một mảnh quan trọng của hệ sinh thái speech tại Việt Nam.</p>
+<h3 id="viettel-ai--telecom-focused"><a class="header" href="#viettel-ai--telecom-focused">Viettel AI — Telecom-focused</a></h3>
+<p>Viettel (largest Vietnamese telco) has internal AI division:</p>
+<ul>
+<li>ASR cho call center transcription.</li>
+<li>TTS cho IVR systems.</li>
+<li>Vietnamese-focused, but mostly internal use.</li>
+</ul>
+<h3 id="Đánh-giá-thận-trọng-vietnamese-voice-ai-ở-thời-điểm-2026"><a class="header" href="#Đánh-giá-thận-trọng-vietnamese-voice-ai-ở-thời-điểm-2026">Đánh giá thận trọng: Vietnamese voice AI ở thời điểm 2026</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Capability</th><th>Status</th><th>Practical baseline</th></tr></thead><tbody>
+<tr><td>Vietnamese ASR (clean)</td><td>Tương đối trưởng thành</td><td>PhoWhisper-large cho baseline mở; API thương mại cần benchmark lại theo domain</td></tr>
+<tr><td>Vietnamese ASR (noisy)</td><td>Đang cải thiện</td><td>Fine-tune với noise augmentation và dữ liệu domain-specific</td></tr>
+<tr><td>Vietnamese TTS (natural)</td><td>Có baseline dùng được</td><td>Cần human evaluation nội bộ trước production</td></tr>
+<tr><td>Vietnamese voice cloning</td><td>Chưa ổn định như tiếng Anh</td><td>Fine-tune model multilingual, kiểm soát consent và abuse risk</td></tr>
+<tr><td>Vietnamese wake-word</td><td>Custom for each product</td><td>Picovoice Porcupine custom or DIY</td></tr>
+<tr><td>Vietnamese voice agent</td><td>Cascaded pipeline khả thi, end-to-end còn mới</td><td>ASR + LLM + TTS với benchmark latency và cost riêng</td></tr>
+<tr><td>Vietnamese Speech LLM</td><td>Đang bắt kịp</td><td>Dùng model multimodal làm baseline, nhưng phải kiểm tra năng lực audio tiếng Việt riêng</td></tr>
+</tbody></table>
+</div>
+<h3 id="major-gaps-and-opportunities"><a class="header" href="#major-gaps-and-opportunities">Major gaps and opportunities</a></h3>
+<ol>
+<li><strong>Vietnamese-native voice cloning</strong> với prompt rất ngắn vẫn chưa có benchmark công khai mạnh như tiếng Anh.</li>
+<li><strong>Vietnamese TTS biểu cảm</strong> cho cảm xúc, nhịp điệu và phong cách nói vẫn còn thiếu dữ liệu đánh giá công khai.</li>
+<li><strong>Code-switching ASR benchmark</strong> chính thức cho Việt-Anh là nhu cầu thực tế để so sánh model một cách công bằng.</li>
+<li><strong>On-device Vietnamese ASR</strong> dưới 50 MB cho mobile vẫn là khoảng trống quan trọng vì các model Whisper/PhoWhisper quá lớn cho nhiều thiết bị biên.</li>
+<li><strong>Vietnamese voice agent SDK</strong> tích hợp sẵn ASR, TTS, endpointing, evaluation và compliance sẽ giúp giảm chi phí triển khai cho team sản phẩm.</li>
+</ol>
+<hr />
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>Challenge</th><th>Solution</th></tr></thead><tbody>
+<tr><td>Tones (6)</td><td>F0 contour critical</td><td>Pitch predictor, tone embedding</td></tr>
+<tr><td>Dialects (3+)</td><td>Phoneme/tone variation</td><td>Unified model + dialect labels</td></tr>
+<tr><td>Hỏi-Ngã merger</td><td>Ambiguity in Southern</td><td>Context-based disambiguation</td></tr>
+<tr><td>Text normalization</td><td>Numbers, abbreviations</td><td>Rule-based + dictionary</td></tr>
+<tr><td>G2P</td><td>Mostly regular, some polyphones</td><td>Rule-based + exceptions</td></tr>
+<tr><td>Data scarcity</td><td>Limited labeled data</td><td>Transfer learning (Whisper, XLSR)</td></tr>
+<tr><td>Industry landscape</td><td>Multiple players (VinAI, ZaloAI, FPT, VinFast)</td><td>Mature for cascaded ASR, gaps in voice cloning and on-device</td></tr>
+<tr><td>Vietnamese voice agent</td><td>Cascaded works</td><td>PhoWhisper + GPT + ElevenLabs Multilingual stack</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese speech processing summary <a id="tbl-vi-summary"></a></p>
+<p>Chương 17 sẽ tiếp tục với <strong>Vietnamese Datasets và Benchmarks</strong>: VLSP, VIVOS, Common Voice Vietnamese, PhoWhisper datasets, và các benchmark cho ASR, TTS, voice agent tiếng Việt.</p>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="luong2016non"><sup class="footnote-definition-label">1</sup>
+<p>Luong, Hieu-Thi and Vu, Hai-Quan, "A Non-Expert Kaldi Recipe for Vietnamese Speech Recognition System", Workshop on Spoken Language Technologies for Under-resourced Languages</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part5/21-wake-word-detection.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part6/17-vietnamese-datasets.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part5/21-wake-word-detection.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part6/17-vietnamese-datasets.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

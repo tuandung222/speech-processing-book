@@ -1,0 +1,852 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 20: Production Systems - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html" class="active"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part7/20-production-systems.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-20-production-speech-systems"><a class="header" href="#chương-20-production-speech-systems">Chương 20: Production Speech Systems</a></h1>
+<h2 id="mở-đầu-vì-sao-train-được-model-tốt-chưa-đồng-nghĩa-với-triển-khai-được-sản-phẩm-tốt"><a class="header" href="#mở-đầu-vì-sao-train-được-model-tốt-chưa-đồng-nghĩa-với-triển-khai-được-sản-phẩm-tốt">Mở đầu: Vì sao “train được model tốt” chưa đồng nghĩa với “triển khai được sản phẩm tốt”</a></h2>
+<p>Trong môi trường nghiên cứu, một hệ thống speech thường được đánh giá bằng benchmark có dữ liệu sạch, protocol cố định và metric rõ ràng như WER, MOS hoặc real-time factor. Khi đưa hệ thống đó vào sản phẩm, điều kiện vận hành thay đổi căn bản: người dùng nói qua microphone kém, có tiếng ồn nền, ngắt lời giữa chừng, code-switch giữa tiếng Việt và tiếng Anh, hoặc sử dụng thiết bị mạng không ổn định. Vì vậy, một model đạt kết quả tốt trong phòng thí nghiệm vẫn có thể tạo trải nghiệm kém nếu latency cao, endpointing sai, chi phí inference vượt ngân sách, hoặc observability không đủ để truy vết lỗi.</p>
+<p>Chương này đặt trọng tâm vào khoảng cách giữa <strong>model quality</strong> và <strong>product quality</strong>. Thay vì chỉ hỏi “WER thấp đến đâu?”, ta cần hỏi thêm: p95 latency là bao nhiêu, hệ thống chịu được bao nhiêu phiên đồng thời, chi phí trên mỗi phút hội thoại là gì, fallback hoạt động ra sao khi một vendor lỗi, và team vận hành sẽ debug một cuộc gọi thất bại bằng dữ liệu nào. Đây là những câu hỏi quyết định khả năng triển khai voice AI trong doanh nghiệp.</p>
+<p>Mục tiêu của chương là cung cấp một khung phân tích thực dụng cho production speech systems: latency budget, cost economics, observability, deployment patterns, failure modes, và các trade-off thường không xuất hiện đầy đủ trong paper.</p>
+<blockquote>
+<p><strong>📝 Cấu trúc chương</strong></p>
+<p>Phần 1-2: production constraints reality (latency, concurrency, cost, SLA).
+Phần 3-4: architecture chi tiết cho voice agent đa năng + latency optimization.
+Phần 5-6: real production stacks (case studies từ ElevenLabs, Cartesia, Deepgram, OpenAI Realtime) + cost engineering.
+Phần 7-8: deployment patterns + observability.
+Phần 9: production pitfalls và root cause analysis.
+Phần 10: Vietnamese production reality (ZaloAI, VinAI, Trusting Social context).
+Phần 11: recommended starter stack + summary.</p>
+</blockquote>
+<blockquote>
+<p><strong>Lưu ý về số liệu</strong></p>
+<p>Các con số trong chương này được diễn giải từ nguồn công khai như pricing pages, tài liệu kỹ thuật, bài viết engineering hoặc talk công khai. Những giá trị mang tính ước lượng sẽ được ghi rõ là <code>estimated</code> hoặc <code>approximate</code>. Khi không có dữ liệu công khai đáng tin cậy, chương này sẽ nói rõ “không có public data” thay vì suy đoán.</p>
+</blockquote>
+<hr />
+<h2 id="phần-1--production-constraints-reality-check"><a class="header" href="#phần-1--production-constraints-reality-check">Phần 1 — Production Constraints Reality Check</a></h2>
+<p>Khi chuyển từ môi trường nghiên cứu sang production, bốn ràng buộc thường tạo khác biệt lớn nhất là latency, concurrency, cost và SLA. Phần này phân tích từng ràng buộc theo cách có thể dùng để thiết kế hệ thống thật.</p>
+<h3 id="11-latency-con-người-không-kiên-nhẫn-như-benchmark"><a class="header" href="#11-latency-con-người-không-kiên-nhẫn-như-benchmark">1.1 Latency: con người không kiên nhẫn như benchmark</a></h3>
+<p>Trong nghiên cứu, latency đôi khi được báo cáo gián tiếp qua real-time factor, ví dụ xử lý 10 giờ audio trong 1 giờ tương ứng RTF 0.1. Chỉ số này đo <strong>throughput</strong>, không đo trực tiếp <strong>interactive latency</strong> mà người dùng cảm nhận trong hội thoại.</p>
+<p>Trong sản phẩm voice agent, latency nên được đo từ thời điểm người dùng kết thúc lượt nói đến khi họ nghe được phản hồi đầu tiên. Trong hội thoại tự nhiên giữa người với người, khoảng ngắt giữa hai lượt nói thường rất ngắn, nên khi voice AI vượt 1 giây, độ trễ đã bắt đầu trở nên rõ ràng. Khi vượt 2 giây, nhiều người dùng sẽ lặp lại câu hỏi hoặc rời bỏ tương tác.</p>
+<p>Bảng sau tóm tắt một cách thực dụng mối liên hệ giữa latency và cảm nhận của người dùng:</p>
+<div class="table-wrapper"><table><thead><tr><th>Latency</th><th>Cảm nhận của người dùng</th></tr></thead><tbody>
+<tr><td>&lt; 200 ms</td><td>Như đối thoại người với người (natural turn-taking)</td></tr>
+<tr><td>200-500 ms</td><td>Chấp nhận được, bắt đầu có cảm giác hơi trễ</td></tr>
+<tr><td>500 ms-1 s</td><td>Cảm giác hệ thống đang suy nghĩ, độ trễ đã rõ</td></tr>
+<tr><td>1-2 s</td><td>Người dùng bắt đầu mất nhịp hội thoại</td></tr>
+<tr><td>&gt; 2 s</td><td>Người dùng có xu hướng lặp lại yêu cầu hoặc rời bỏ tương tác</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>Vì sao mốc 200 ms thường được nhắc đến?</strong></p>
+<p>Nghiên cứu về turn-taking trong hội thoại (Stivers et al., 2009) cho thấy khoảng ngắt giữa hai lượt nói của con người thường quanh vài trăm mili-giây, với trung vị xấp xỉ 200 ms trong nhiều ngôn ngữ. Đây không phải một ngưỡng cứng, nhưng là mốc tham chiếu hữu ích khi thiết kế voice agent tương tác thời gian thực.</p>
+<p>Vì vậy, production voice agents thường đặt mục tiêu dưới 1 giây cho phản hồi đầu tiên. Mỗi 100 ms giảm được ở endpointing, ASR, LLM hoặc TTS đều có thể cải thiện đáng kể cảm nhận hội thoại.</p>
+</blockquote>
+<h3 id="12-concurrency-từ-một-phiên-thử-nghiệm-đến-hàng-nghìn-phiên-đồng-thời"><a class="header" href="#12-concurrency-từ-một-phiên-thử-nghiệm-đến-hàng-nghìn-phiên-đồng-thời">1.2 Concurrency: từ một phiên thử nghiệm đến hàng nghìn phiên đồng thời</a></h3>
+<p>Trong thử nghiệm nghiên cứu, ta thường đánh giá từng sample hoặc từng batch offline. Trong production, hệ thống phải phục vụ hàng trăm đến hàng nghìn phiên đồng thời, và điều này tạo ra các hệ quả kiến trúc rất cụ thể:</p>
+<ol>
+<li><strong>GPU sharing</strong>: một GPU H100 có thể phục vụ bao nhiêu phiên Whisper streaming phụ thuộc mạnh vào batch scheduler, context length, precision và model size. Con số thực tế phải được đo bằng load test, không suy ra trực tiếp từ benchmark offline.</li>
+<li><strong>Memory pressure</strong>: KV cache cho ASR streaming, LLM và TTS có thể tăng nhanh theo số phiên. Ví dụ 100 phiên, mỗi phiên dùng khoảng 200 MB trạng thái trung gian, đã tiêu thụ khoảng 20 GB RAM. Vì vậy cần quản lý bộ nhớ theo trang, offloading hoặc giới hạn context hợp lý.</li>
+<li><strong>Network bandwidth</strong>: một stream audio 16 kHz, 16-bit mono tương đương khoảng 256 kbps trước nén. Với 1000 phiên đồng thời, băng thông thô có thể lên tới khoảng 250 Mbps. Thiết kế production cần tính cả overhead WebRTC, retransmission và region routing.</li>
+<li><strong>Database/queue throughput</strong>: nếu log mọi partial transcript vào database, 1000 phiên đồng thời với 4 bản ghi mỗi giây tạo ra 4000 writes/sec. Đây là tải lớn với một instance Postgres đơn lẻ nếu không có batching, queue hoặc sampling.</li>
+</ol>
+<h3 id="13-cost-economics-quyết-định-khả-thi"><a class="header" href="#13-cost-economics-quyết-định-khả-thi">1.3 Cost: economics quyết định khả thi</a></h3>
+<p>Voice AI agent có cấu trúc chi phí phức tạp hơn text chatbot vì mỗi phút hội thoại kích hoạt nhiều lớp hạ tầng: WebRTC, VAD, ASR, LLM, TTS, logging và orchestration.</p>
+<p><strong>Per-minute cost cho voice agent đa năng (estimated từ public pricing tháng 11/2025)</strong>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Component</th><th>Vendor (example)</th><th>Cost/min</th></tr></thead><tbody>
+<tr><td>WebRTC infrastructure</td><td>LiveKit</td><td>0.002-0.005 USD</td></tr>
+<tr><td>Streaming ASR</td><td>Deepgram Nova-3</td><td>0.0036 USD</td></tr>
+<tr><td>LLM (GPT-4o-mini, 1 round per 5 sec)</td><td>OpenAI</td><td>~0.005-0.015 USD</td></tr>
+<tr><td>Streaming TTS</td><td>Cartesia Sonic</td><td>~0.005-0.020 USD (depends on chars)</td></tr>
+<tr><td>Voice agent orchestration</td><td>Vapi.ai bundle</td><td>0.05 USD</td></tr>
+<tr><td><strong>TỔNG ESTIMATE</strong></td><td>(various)</td><td><strong>~0.05-0.15 USD/min</strong></td></tr>
+</tbody></table>
+</div>
+<p>Nếu một người dùng nói 30 phút mỗi ngày trong 30 ngày, tổng thời lượng là 900 phút/tháng. Với chi phí ước lượng 0.10 USD/phút, chi phí hạ tầng riêng cho voice đã khoảng 90 USD/tháng cho mỗi người dùng. Đây là mức cao so với nhiều sản phẩm subscription dạng text, vì vậy bài toán monetization và cost reduction phải được đặt từ đầu.</p>
+<p><strong>Ý nghĩa thực tế</strong>: để voice AI phù hợp với consumer mass market, chi phí cần giảm đáng kể. Các hướng như codec bitrate thấp, on-device inference, mô hình nhỏ chuyên biệt và caching theo phiên đều nhằm giảm bandwidth, cloud inference và chi phí orchestration.</p>
+<h3 id="14-sla-999-và-downtime-planning"><a class="header" href="#14-sla-999-và-downtime-planning">1.4 SLA: 99.9% và downtime planning</a></h3>
+<p>Khách hàng enterprise thường kỳ vọng SLA 99.9% (downtime khoảng 43 phút/tháng) hoặc 99.99% (khoảng 4 phút/tháng). Với voice AI, mục tiêu này khó hơn web API thông thường vì:</p>
+<ul>
+<li>GPU instances có failure rate cao hơn CPU.</li>
+<li>Streaming sessions khó khôi phục mượt mà khi server restart giữa cuộc gọi.</li>
+<li>Multi-region failover khó với stateful conversations.</li>
+</ul>
+<p>Các chiến lược thực dụng gồm:</p>
+<ol>
+<li><strong>Multi-region active-active</strong>: deploy ở 2+ regions, route based on health.</li>
+<li><strong>Graceful degradation</strong>: nếu cloud LLM down, fallback to canned responses.</li>
+<li><strong>Session state replication</strong>: replicate session state cross-region (Redis cluster).</li>
+<li><strong>Health checks ở mọi layer</strong>: WebRTC, ASR, LLM, TTS, mỗi cái có readiness probe riêng.</li>
+</ol>
+<hr />
+<h2 id="phần-2--end-to-end-architecture-cho-voice-agent"><a class="header" href="#phần-2--end-to-end-architecture-cho-voice-agent">Phần 2 — End-to-End Architecture cho Voice Agent</a></h2>
+<p>Bây giờ vào kiến trúc cụ thể. Đây là blueprint cho voice agent đa năng, được dùng bởi Vapi, ElevenLabs, LiveKit + custom stacks.</p>
+<h3 id="21-pipeline-tổng-quan"><a class="header" href="#21-pipeline-tổng-quan">2.1 Pipeline tổng quan</a></h3>
+<pre class="mermaid">flowchart TD
+    MIC[&quot;User microphone&quot;] --&gt; C[&quot;WebRTC client&lt;br&gt;browser, mobile, phone&quot;]
+    C --&gt; W[&quot;WebRTC server&lt;br&gt;LiveKit, Daily, Twilio&quot;]
+    W --&gt; VAD[&quot;VAD&lt;br&gt;speech / silence&quot;]
+    VAD --&gt; END[&quot;Endpointing&lt;br&gt;end-of-utterance&quot;]
+    END --&gt; ASR[&quot;Streaming ASR&quot;]
+    ASR --&gt; LLM[&quot;LLM stage&lt;br&gt;function calling, RAG, state tracking&quot;]
+    LLM --&gt; TTS[&quot;Streaming TTS&quot;]
+    TTS --&gt; W
+    W --&gt; SPK[&quot;User speaker&quot;]
+    ASR -. partial transcript .-&gt; OBS[&quot;Observability&lt;br&gt;logs, traces, metrics&quot;]
+    LLM -. tool calls .-&gt; TOOLS[&quot;External tools&lt;br&gt;CRM, database, ticketing&quot;]
+</pre>
+<p><strong>Hình:</strong> Pipeline voice agent production là một hệ thống streaming end-to-end. Mỗi cạnh trong sơ đồ đều có latency, failure mode và telemetry riêng; vì vậy tối ưu production cần quan sát toàn bộ chuỗi thay vì chỉ tối ưu model ASR hoặc TTS riêng lẻ.</p>
+<h3 id="22-voice-activity-detection-vad"><a class="header" href="#22-voice-activity-detection-vad">2.2 Voice Activity Detection (VAD)</a></h3>
+<p>VAD là bước đầu tiên: detect khi user đang nói (vs silent). Tại sao cần?</p>
+<ol>
+<li><strong>Save compute</strong>: không gửi silent audio đến ASR.</li>
+<li><strong>Detect end of utterance</strong>: combined với endpointing.</li>
+<li><strong>Detect interruptions</strong>: nếu user nói khi AI đang nói, cần barge-in handling.</li>
+</ol>
+<p><strong>Popular VAD options</strong>:</p>
+<ul>
+<li><strong>Silero VAD</strong> (open source): 100ms windows, very accurate, dùng được trên CPU.</li>
+<li><strong>WebRTC VAD</strong> (Google): rất nhanh nhưng kém accurate hơn.</li>
+<li><strong>Picovoice Cobra</strong> (commercial): proprietary, optimized cho on-device.</li>
+</ul>
+<p>VAD output là binary signal "speech / not speech" per audio frame (typically 10-30ms).</p>
+<h3 id="23-endpointing"><a class="header" href="#23-endpointing">2.3 Endpointing</a></h3>
+<p>Endpointing đặc biệt khó. Cần distinguish:</p>
+<ul>
+<li>Pause ngắn giữa words (continue listening): ~100-300ms.</li>
+<li>Pause cuối câu (begin processing): ~500-1500ms.</li>
+<li>User confusion / hesitation (continue listening): vary.</li>
+</ul>
+<p>Strategy thường dùng:</p>
+<ol>
+<li><strong>Silence-based threshold</strong>: end nếu silence &gt; X ms (X = 500-1500 tuỳ adjust per user).</li>
+<li><strong>Acoustic features</strong>: detect falling intonation (end of statement) vs rising (question incomplete).</li>
+<li><strong>LLM-based</strong>: send partial transcript to LLM, ask "is this complete utterance?". Slow nhưng accurate.</li>
+</ol>
+<p>Modern voice agents use hybrid: silence threshold + LLM check for edge cases.</p>
+<h3 id="24-streaming-asr-pipeline-details"><a class="header" href="#24-streaming-asr-pipeline-details">2.4 Streaming ASR pipeline details</a></h3>
+<p>Cho streaming ASR, có 2 output types:</p>
+<ul>
+<li><strong>Interim</strong> (partial): low-confidence, updates frequently (every 100-200ms).</li>
+<li><strong>Final</strong>: high-confidence, only emitted khi endpoint detected.</li>
+</ul>
+<p>LLM được prompt khi final result available. Interim results dùng để hiển thị "you said: ..." UI feedback.</p>
+<h3 id="25-llm-stage-với-function-calling"><a class="header" href="#25-llm-stage-với-function-calling">2.5 LLM stage với function calling</a></h3>
+<p>LLM stage không chỉ generate text response. Modern voice agents support:</p>
+<ol>
+<li><strong>Function calling</strong>: agent gọi tools (book appointment, query database, send email).</li>
+<li><strong>RAG</strong>: retrieve context từ knowledge base trước khi answer.</li>
+<li><strong>State tracking</strong>: maintain conversation state across turns.</li>
+<li><strong>Persona conditioning</strong>: system prompt với personality, brand voice.</li>
+</ol>
+<p>Cost optimization: dùng smaller models (GPT-4o-mini, Claude Haiku) cho most queries, escalate to larger only khi cần.</p>
+<h3 id="26-streaming-tts-với-streaming-output"><a class="header" href="#26-streaming-tts-với-streaming-output">2.6 Streaming TTS với streaming output</a></h3>
+<p>TTS phải start outputting audio ngay khi text bắt đầu generate, không chờ LLM finish. Đây là <strong>streaming-to-streaming pipeline</strong>.</p>
+<pre><code class="language-python">async def stream_response(user_audio_stream):
+    async for partial_transcript in streaming_asr(user_audio_stream):
+        yield ("interim", partial_transcript)
+    
+    final_transcript = await wait_for_final()
+    yield ("final", final_transcript)
+    
+    async for text_chunk in llm_stream(final_transcript):
+        async for audio_chunk in tts_stream(text_chunk):
+            yield ("audio", audio_chunk)
+</code></pre>
+<p>Latency-critical: TTS first byte phải đến trước khi LLM finish generating, để user nghe response ngay.</p>
+<h3 id="27-interruption-handling-barge-in"><a class="header" href="#27-interruption-handling-barge-in">2.7 Interruption handling (barge-in)</a></h3>
+<p>Khi user nói khi AI đang phát, cần:</p>
+<ol>
+<li>Stop TTS playback immediately.</li>
+<li>Cancel current LLM generation.</li>
+<li>Start ASR on new user audio.</li>
+<li>Resume conversation flow with new context.</li>
+</ol>
+<p>Đây là một trong những điểm khó nhất của full-duplex voice agents. Moshi giải quyết bằng dual-stream architecture native. Cascaded systems phải handle manually qua state machine.</p>
+<hr />
+<h2 id="phần-3--latency-optimization-deep-dive"><a class="header" href="#phần-3--latency-optimization-deep-dive">Phần 3 — Latency Optimization Deep Dive</a></h2>
+<p>Cho voice agent, latency là king. Phần này về các techniques để giảm latency.</p>
+<h3 id="31-latency-budget-allocation"><a class="header" href="#31-latency-budget-allocation">3.1 Latency budget allocation</a></h3>
+<p>Cho target tổng &lt; 1 sec end-to-end, breakdown typical:</p>
+<div class="table-wrapper"><table><thead><tr><th>Stage</th><th>Budget</th></tr></thead><tbody>
+<tr><td>Audio capture + WebRTC roundtrip</td><td>50-100 ms</td></tr>
+<tr><td>VAD + Endpointing</td><td>100-300 ms</td></tr>
+<tr><td>Streaming ASR (final result)</td><td>200-400 ms</td></tr>
+<tr><td>LLM first token</td><td>200-500 ms</td></tr>
+<tr><td>TTS first byte</td><td>75-200 ms</td></tr>
+<tr><td>Audio playback + WebRTC roundtrip</td><td>50-100 ms</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>675-1600 ms</strong></td></tr>
+</tbody></table>
+</div>
+<p>Khó đạt sub-second consistently. Aim for p50 &lt; 1s, p95 &lt; 1.5s, p99 &lt; 3s.</p>
+<h3 id="32-first-byte-latency-vs-end-to-end-latency"><a class="header" href="#32-first-byte-latency-vs-end-to-end-latency">3.2 First-byte latency vs end-to-end latency</a></h3>
+<p>Distinguish hai metrics:</p>
+<ul>
+<li><strong>First-byte (FB)</strong>: time from "user finished speaking" to "first audio sample of response plays".</li>
+<li><strong>End-to-end (E2E)</strong>: time from "user start speaking" to "AI finished response".</li>
+</ul>
+<p>FB matters cho UX (user perceive "responsiveness"). E2E matters cho throughput (sessions per second per server).</p>
+<p>Optimize FB by:</p>
+<ol>
+<li>Speculative LLM execution (predict response before user finish).</li>
+<li>Streaming TTS với rất low first-byte (Cartesia Flash ~75ms).</li>
+<li>Pre-fetch common responses (greetings, fallbacks).</li>
+</ol>
+<h3 id="33-speculative-decoding-for-tts"><a class="header" href="#33-speculative-decoding-for-tts">3.3 Speculative decoding for TTS</a></h3>
+<p>Cho LLM-driven voice agent, LLM thường output text faster than TTS can speak. Bạn có thể:</p>
+<ol>
+<li>Generate full LLM response.</li>
+<li>Send to TTS in chunks (sentence-by-sentence).</li>
+<li>TTS starts speaking first chunk while later chunks queue.</li>
+</ol>
+<p>Modern TTS (Cartesia Sonic 2) support "predictive" mode: TTS guesses next phoneme while previous is still being generated.</p>
+<h3 id="34-kv-cache-management-cho-streaming"><a class="header" href="#34-kv-cache-management-cho-streaming">3.4 KV cache management cho streaming</a></h3>
+<p>Cho LLM driving voice agent, KV cache grows với conversation length. After 30 minutes of conversation, KV cache có thể 5-10GB. Management strategies:</p>
+<ol>
+<li><strong>Truncation</strong>: drop oldest tokens after X tokens.</li>
+<li><strong>Summarization</strong>: every N turns, summarize history into shorter prompt.</li>
+<li><strong>Memory tiering</strong>: hot tokens in HBM (GPU), warm in DDR (CPU), cold in SSD.</li>
+</ol>
+<p>vLLM PagedAttention được dùng rộng rãi cho efficient KV cache.</p>
+<h3 id="35-mel-to-wave-streaming-pipeline"><a class="header" href="#35-mel-to-wave-streaming-pipeline">3.5 Mel-to-wave streaming pipeline</a></h3>
+<p>Cho TTS streaming, có 2 paths:</p>
+<p><strong>Path A (slower)</strong>: text → mel spectrogram (full sentence) → vocoder → waveform → play.</p>
+<p><strong>Path B (faster, streaming)</strong>: text → mel mel-chunk-by-chunk → streaming vocoder → waveform chunks → play immediately.</p>
+<p>Cartesia Sonic, ElevenLabs Flash dùng Path B với latency 75-200ms first byte.</p>
+<h3 id="36-gpu-warm-start"><a class="header" href="#36-gpu-warm-start">3.6 GPU warm-start</a></h3>
+<p>Cold-start một LLM instance trên GPU có thể tốn 30-60 sec. Cho voice agent:</p>
+<ol>
+<li>Keep instances warm (always-on).</li>
+<li>Multi-instance pre-warmed pool.</li>
+<li>Predict load và scale ahead.</li>
+</ol>
+<p>Tools: Triton Inference Server, KServe, custom orchestrator.</p>
+<hr />
+<h2 id="phần-4--real-production-stacks-case-studies"><a class="header" href="#phần-4--real-production-stacks-case-studies">Phần 4 — Real Production Stacks (Case Studies)</a></h2>
+<p>Phần này khảo sát các production stacks thực tế. Tất cả info từ public docs, blog posts, conference talks. Không có insider info.</p>
+<h3 id="41-elevenlabs-conversational-ai"><a class="header" href="#41-elevenlabs-conversational-ai">4.1 ElevenLabs Conversational AI</a></h3>
+<p>ElevenLabs cung cấp full voice agent platform:</p>
+<ul>
+<li><strong>ASR</strong>: in-house ASR (model details không public).</li>
+<li><strong>LLM</strong>: bring-your-own (OpenAI, Anthropic, Google) hoặc ElevenLabs default.</li>
+<li><strong>TTS</strong>: ElevenLabs Multilingual v2, Flash v2 (75ms first byte).</li>
+<li><strong>Orchestration</strong>: ElevenLabs Conversational AI platform.</li>
+</ul>
+<p>Pricing (public per nov 2025): starts at 0.08-0.12 USD/min for voice agent (bundled).</p>
+<h3 id="42-cartesia-sonic"><a class="header" href="#42-cartesia-sonic">4.2 Cartesia Sonic</a></h3>
+<p>Cartesia focus on TTS specifically, có Sonic và Sonic 2:</p>
+<ul>
+<li><strong>Sonic</strong>: streaming TTS, 75-150ms first byte.</li>
+<li><strong>Sonic 2</strong> (2024): improved naturalness, voice cloning với 3-sec sample.</li>
+<li><strong>Use case</strong>: pair with any ASR (Deepgram) + any LLM.</li>
+</ul>
+<p>Pricing: 0.022 USD/1k chars (Sonic), 0.04 USD/1k chars (Sonic 2).</p>
+<h3 id="43-deepgram-aura--nova"><a class="header" href="#43-deepgram-aura--nova">4.3 Deepgram Aura + Nova</a></h3>
+<p>Deepgram offers full stack:</p>
+<ul>
+<li><strong>Nova-3 ASR</strong>: streaming, multilingual, 0.0036 USD/min.</li>
+<li><strong>Aura-2 TTS</strong>: streaming, ~100-200ms first byte.</li>
+<li><strong>Voice Agent API</strong>: bundled STT + LLM + TTS với orchestration.</li>
+</ul>
+<p>Pricing voice agent: ~0.05 USD/min (bundled).</p>
+<h3 id="44-openai-realtime-api-gpt-realtime-aug-2025"><a class="header" href="#44-openai-realtime-api-gpt-realtime-aug-2025">4.4 OpenAI Realtime API (GPT-Realtime, Aug 2025)</a></h3>
+<p>OpenAI direct speech-to-speech via single model:</p>
+<ul>
+<li><strong>Model</strong>: gpt-realtime (GA Aug 2025).</li>
+<li><strong>Features</strong>: MCP server support, image input, SIP phone calling.</li>
+<li><strong>Latency</strong>: target sub-500ms (per public docs).</li>
+<li><strong>Pricing</strong>: ~0.03 USD/min input + 0.06 USD/min output.</li>
+</ul>
+<p>Differences vs cascaded: GPT-Realtime is single model, no separate ASR/LLM/TTS stages. Better naturalness và faster latency, but harder to debug và less control.</p>
+<h3 id="45-livekit--pipecat--vapiai-open-source-stack"><a class="header" href="#45-livekit--pipecat--vapiai-open-source-stack">4.5 LiveKit + Pipecat + Vapi.ai open-source stack</a></h3>
+<p>For developers wanting full control:</p>
+<ul>
+<li><strong>LiveKit</strong>: WebRTC infrastructure (open source, self-host or cloud).</li>
+<li><strong>Pipecat</strong>: pipeline framework cho voice agent (open source, Python).</li>
+<li><strong>Vapi.ai</strong>: voice agent platform (commercial, but with self-host option).</li>
+</ul>
+<p>Stack example:</p>
+<pre><code>LiveKit (WebRTC) → Pipecat orchestrator → 
+  Deepgram (ASR) → 
+  OpenAI GPT-4o-mini (LLM) → 
+  Cartesia (TTS) → 
+LiveKit (playback)
+</code></pre>
+<p>Total cost: ~0.05 USD/min if using cloud APIs, lower if self-hosting components.</p>
+<h3 id="46-moshi-self-host"><a class="header" href="#46-moshi-self-host">4.6 Moshi self-host</a></h3>
+<p>Cho team muốn fully open-source và self-host:</p>
+<ul>
+<li><strong>Model</strong>: Moshi 7.6B params, single end-to-end speech-to-speech.</li>
+<li><strong>Hardware</strong>: 1x A100 80GB or 2x A100 40GB cho realtime.</li>
+<li><strong>Latency</strong>: ~200ms theoretical, ~300ms practical.</li>
+<li><strong>Setup</strong>: pip install moshi, requires PyTorch + MLX (Mac).</li>
+<li><strong>Limitations</strong>: English only, smaller knowledge base than GPT-4.</li>
+</ul>
+<p>Use case: research, learning, or specific deployment với strict data privacy.</p>
+<hr />
+<h2 id="phần-5--cost-engineering"><a class="header" href="#phần-5--cost-engineering">Phần 5 — Cost Engineering</a></h2>
+<p>Voice AI cost structure unique và đáng quan tâm.</p>
+<h3 id="51-llm-inference-cost-breakdown"><a class="header" href="#51-llm-inference-cost-breakdown">5.1 LLM inference cost breakdown</a></h3>
+<p>Cho voice agent typical 30-phút conversation:</p>
+<ul>
+<li>User utterances: ~50 total, avg 5 sec each (250 sec total).</li>
+<li>AI responses: ~50 total, avg 10 sec each (500 sec total).</li>
+<li>LLM context: builds up to ~2000-5000 tokens by end.</li>
+</ul>
+<p>Cost per session:</p>
+<ul>
+<li>GPT-4o-mini input tokens: ~50 turns × ~500 tokens context = 25000 tokens = 0.15 × 25000/M = 0.004 USD.</li>
+<li>GPT-4o-mini output tokens: ~50 turns × ~50 tokens response = 2500 tokens = 0.60 × 2500/M = 0.0015 USD.</li>
+<li>LLM total per session: ~0.005-0.010 USD.</li>
+</ul>
+<p>Per minute: ~0.003-0.005 USD chỉ riêng LLM.</p>
+<h3 id="52-tts-cost-per-character"><a class="header" href="#52-tts-cost-per-character">5.2 TTS cost per character</a></h3>
+<p>TTS cost = chars synthesized × rate.</p>
+<p>Average voice agent response ~50 words ~250 chars. 50 responses × 250 chars = 12,500 chars per session.</p>
+<ul>
+<li>Cartesia Sonic: 12,500 / 1000 × 0.022 = 0.275 USD per 30-min session.</li>
+<li>ElevenLabs Flash: 12,500 / 1000 × 0.18 = 2.25 USD per 30-min session (much more expensive).</li>
+</ul>
+<p>Per minute: Cartesia ~0.009 USD, ElevenLabs ~0.075 USD. ElevenLabs justified by voice quality.</p>
+<h3 id="53-asr-cost-per-minute"><a class="header" href="#53-asr-cost-per-minute">5.3 ASR cost per minute</a></h3>
+<p>Most ASR providers price per minute of input audio (input = user speaking time, ~50% of session = 15 min):</p>
+<ul>
+<li>Deepgram Nova-3: 15 × 0.0036 = 0.054 USD per session.</li>
+<li>AssemblyAI: 15 × 0.0067 = 0.10 USD per session.</li>
+</ul>
+<p>Per minute: ~0.002-0.003 USD.</p>
+<h3 id="54-gpu-utilization-optimization"><a class="header" href="#54-gpu-utilization-optimization">5.4 GPU utilization optimization</a></h3>
+<p>If self-hosting:</p>
+<ul>
+<li>Batched inference (process multiple sessions simultaneously) saves 2-5x cost.</li>
+<li>Quantization (INT8 ASR, fp8 TTS) saves 2-3x memory enable more sessions per GPU.</li>
+<li>Speculative decoding cho LLM saves 1.5-2x latency.</li>
+</ul>
+<p>Real cost savings example (self-host vs API):</p>
+<ul>
+<li>1000 hours/month voice usage.</li>
+<li>API cost (Vapi.ai): 1000 × 60 × 0.10 = 6000 USD/month.</li>
+<li>Self-host (4× A100 80GB at AWS): ~5000 USD/month + engineering overhead.</li>
+</ul>
+<p>Self-host break-even ~10,000 hours/month. Below that, API cheaper.</p>
+<h3 id="55-quantization-cho-speech-models"><a class="header" href="#55-quantization-cho-speech-models">5.5 Quantization cho speech models</a></h3>
+<p>Quantization strategies:</p>
+<ul>
+<li><strong>Whisper INT8</strong>: 2x memory, 1.5x speed, &lt;0.5% WER degradation.</li>
+<li><strong>TTS fp8</strong>: 2x memory, 1.8x speed, MOS drop ~0.1 (acceptable).</li>
+<li><strong>LLM INT4 (AWQ, GPTQ)</strong>: 4x memory, 2x speed, slight quality loss.</li>
+</ul>
+<p>Use cases for production:</p>
+<ol>
+<li>Edge deployment (mobile): INT8 or smaller for size.</li>
+<li>High throughput servers: fp8 or INT8 for cost.</li>
+<li>Low-latency endpoints: keep fp16 for max accuracy, scale horizontally.</li>
+</ol>
+<hr />
+<h2 id="phần-6--deployment-patterns"><a class="header" href="#phần-6--deployment-patterns">Phần 6 — Deployment Patterns</a></h2>
+<p>Pattern selection phụ thuộc constraints: latency, cost, privacy, scale.</p>
+<h3 id="61-cloud-managed-apis"><a class="header" href="#61-cloud-managed-apis">6.1 Cloud (managed APIs)</a></h3>
+<p><strong>Pros</strong>: zero infrastructure, scale on demand, pay per use.
+<strong>Cons</strong>: vendor lock-in, recurring cost, data privacy concerns.
+<strong>Best for</strong>: startups, prototypes, low-volume production.</p>
+<h3 id="62-cloud-self-hosted"><a class="header" href="#62-cloud-self-hosted">6.2 Cloud (self-hosted)</a></h3>
+<p>Deploy own models on AWS/GCP/Azure GPUs.</p>
+<p><strong>Pros</strong>: control, customization, potentially cheaper at scale.
+<strong>Cons</strong>: ops overhead, infrastructure expertise required.
+<strong>Best for</strong>: enterprise with ML team, high-volume.</p>
+<h3 id="63-on-prem-deployment"><a class="header" href="#63-on-prem-deployment">6.3 On-prem deployment</a></h3>
+<p>Self-hosted on customer hardware (datacenter).</p>
+<p><strong>Pros</strong>: full data privacy, compliance (GDPR, HIPAA), one-time hardware cost.
+<strong>Cons</strong>: high initial investment, hardware maintenance, ops team needed.
+<strong>Best for</strong>: healthcare, government, defense, financial services.</p>
+<h3 id="64-edge-deployment-mobile-embedded"><a class="header" href="#64-edge-deployment-mobile-embedded">6.4 Edge deployment (mobile, embedded)</a></h3>
+<p>Run inference on user device.</p>
+<p><strong>Pros</strong>: zero network latency, full privacy, no cloud cost per use.
+<strong>Cons</strong>: limited model size, battery drain, OS-specific optimization.
+<strong>Best for</strong>: wake-word detection, on-device assistants (Siri, Google Assistant local mode).</p>
+<p>Tools: TFLite, ONNX Runtime Mobile, Core ML (Apple), MediaPipe.</p>
+<h3 id="65-multi-region-for-low-latency"><a class="header" href="#65-multi-region-for-low-latency">6.5 Multi-region for low latency</a></h3>
+<p>Voice latency matters globally. Multi-region strategy:</p>
+<ol>
+<li>Deploy inference servers ở US-East, EU-West, AP-Southeast minimum.</li>
+<li>Route user to nearest region (Anycast IP or DNS-based).</li>
+<li>Replicate models across regions (S3 cross-region replication).</li>
+<li>Session state in region (Redis cluster per region).</li>
+</ol>
+<p>Typical latency reduction: 100-300ms cho cross-continent users.</p>
+<hr />
+<h2 id="phần-7--observability--ab-testing"><a class="header" href="#phần-7--observability--ab-testing">Phần 7 — Observability &amp; A/B Testing</a></h2>
+<p>Cannot improve what cannot measure. Production voice systems cần extensive observability.</p>
+<h3 id="71-latency-monitoring"><a class="header" href="#71-latency-monitoring">7.1 Latency monitoring</a></h3>
+<p>Track p50, p95, p99 for each stage:</p>
+<ul>
+<li>WebRTC RTT.</li>
+<li>VAD trigger time.</li>
+<li>ASR final result time.</li>
+<li>LLM first token time.</li>
+<li>LLM full response time.</li>
+<li>TTS first byte time.</li>
+<li>TTS full audio time.</li>
+<li>End-to-end perceived latency.</li>
+</ul>
+<p>Tools: Datadog, Grafana, custom Prometheus.</p>
+<h3 id="72-wer-monitoring-sample-based"><a class="header" href="#72-wer-monitoring-sample-based">7.2 WER monitoring (sample-based)</a></h3>
+<p>Cannot calculate WER realtime (need ground truth). Strategy:</p>
+<ol>
+<li>Sample 1% of sessions for human transcription.</li>
+<li>Calculate WER against human transcript.</li>
+<li>Alert if WER &gt; threshold (e.g., 15% in noisy environments, 5% in clean).</li>
+</ol>
+<p>Tools: Snorkel, Label Studio, internal annotation platforms.</p>
+<h3 id="73-user-side-metrics"><a class="header" href="#73-user-side-metrics">7.3 User-side metrics</a></h3>
+<p>What matters most:</p>
+<ul>
+<li><strong>Completion rate</strong>: % conversations user finished without abandoning.</li>
+<li><strong>CSAT</strong>: post-conversation rating (1-5 stars).</li>
+<li><strong>Resolution rate</strong>: % conversations that resolved user issue.</li>
+<li><strong>NPS</strong>: Net Promoter Score (would recommend?).</li>
+</ul>
+<p>These correlate with business outcomes more than WER does.</p>
+<h3 id="74-voice-quality-monitoring-mos-proxy"><a class="header" href="#74-voice-quality-monitoring-mos-proxy">7.4 Voice quality monitoring (MOS proxy)</a></h3>
+<p>DNSMOS or UTMOS can predict MOS without human rating:</p>
+<pre><code class="language-python">from dnsmos import DNSMOS
+
+dnsmos = DNSMOS()
+sample_audio = load_tts_output()
+mos_score = dnsmos.predict(sample_audio)
+# Track distribution of mos_score over time
+</code></pre>
+<p>Alert if avg MOS drops &gt; 0.3 (indicating quality regression).</p>
+<h3 id="75-ab-testing-infrastructure"><a class="header" href="#75-ab-testing-infrastructure">7.5 A/B testing infrastructure</a></h3>
+<p>Voice agent A/B test khó hơn web A/B test vì:</p>
+<ol>
+<li>Session-level (not page-level).</li>
+<li>Long sessions ↔ slow signal.</li>
+<li>Multiple components to test (ASR vs LLM vs TTS).</li>
+</ol>
+<p>Best practices:</p>
+<ul>
+<li>A/B test ONE component at a time.</li>
+<li>Run for minimum 2 weeks (capture weekly patterns).</li>
+<li>Statistical power: minimum 1000 sessions per arm.</li>
+<li>Metric: completion rate + CSAT, not WER (WER doesn't correlate strongly with UX).</li>
+</ul>
+<hr />
+<h2 id="phần-8--common-production-pitfalls-và-root-cause-analysis"><a class="header" href="#phần-8--common-production-pitfalls-và-root-cause-analysis">Phần 8 — Common Production Pitfalls và Root Cause Analysis</a></h2>
+<p>Phần này tổng hợp các lỗi thường gặp khi triển khai voice AI trong production. Mỗi nhóm lỗi được diễn giải theo hướng root cause analysis để người đọc có thể thiết kế logging, monitoring và fallback phù hợp.</p>
+<h3 id="81-whisper-hallucination-in-silence-periods"><a class="header" href="#81-whisper-hallucination-in-silence-periods">8.1 Whisper hallucination in silence periods</a></h3>
+<p><strong>Symptom</strong>: Whisper output "Thank you for watching" or "Subscribe to the channel" khi input là pure silence.</p>
+<p><strong>Cause</strong>: Training data từ YouTube includes lots of "subscribe" outros. Whisper learned association silence ↔ generic closing phrases.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>VAD pre-filter (don't send silence to Whisper).</li>
+<li>Confidence threshold (drop low-confidence outputs).</li>
+<li>Word-level confidence rather than utterance-level.</li>
+</ol>
+<h3 id="82-voice-cloning-drift"><a class="header" href="#82-voice-cloning-drift">8.2 Voice cloning drift</a></h3>
+<p><strong>Symptom</strong>: Voice clone sounds correct cho first 5 seconds, then gradually drift to different voice.</p>
+<p><strong>Cause</strong>: Streaming TTS cumulative error in voice embedding.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Re-anchor voice embedding every N seconds (re-prompt with original sample).</li>
+<li>Use VALL-E style model với explicit voice token at start of each chunk.</li>
+</ol>
+<h3 id="83-streaming-tts-clickspops"><a class="header" href="#83-streaming-tts-clickspops">8.3 Streaming TTS clicks/pops</a></h3>
+<p><strong>Symptom</strong>: Audible "click" sound when TTS chunks join together.</p>
+<p><strong>Cause</strong>: Phase discontinuity at chunk boundaries (waveform doesn't match).</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Crossfade chunks (small overlap with linear blending).</li>
+<li>Use phase-aware vocoder (HiFi-GAN with continuous phase).</li>
+<li>Generate slightly overlapping chunks.</li>
+</ol>
+<h3 id="84-cold-start-gpu-latency"><a class="header" href="#84-cold-start-gpu-latency">8.4 Cold-start GPU latency</a></h3>
+<p><strong>Symptom</strong>: First inference takes 30-60 sec, subsequent are 100ms.</p>
+<p><strong>Cause</strong>: GPU kernel compilation, model loading, JIT warmup.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Pre-warm GPU instances (run sample inference at startup).</li>
+<li>Always-on pool (don't scale to zero).</li>
+<li>Trigger predictive scaling before traffic spike.</li>
+</ol>
+<h3 id="85-memory-leak-in-streaming-sessions"><a class="header" href="#85-memory-leak-in-streaming-sessions">8.5 Memory leak in streaming sessions</a></h3>
+<p><strong>Symptom</strong>: After 30 minutes of streaming, memory usage grows linearly until OOM.</p>
+<p><strong>Cause</strong>: KV cache or streaming buffer not freed when session ends.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Strict session lifecycle (explicit cleanup on disconnect).</li>
+<li>Memory profiling (use py-spy or similar).</li>
+<li>Periodic garbage collection of inactive sessions.</li>
+</ol>
+<h3 id="86-code-switching-breaks-asr"><a class="header" href="#86-code-switching-breaks-asr">8.6 Code-switching breaks ASR</a></h3>
+<p><strong>Symptom</strong>: Vietnamese ASR outputs garbage khi user say English brand names.</p>
+<p><strong>Cause</strong>: ASR vocabulary doesn't include English tokens, model tries to phonetically transcribe.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Multilingual ASR (Whisper handles natively).</li>
+<li>Vocab augmentation (add common English words to Vietnamese ASR vocab).</li>
+<li>LM rescoring with mixed-language LM.</li>
+</ol>
+<h3 id="87-echo-cancellation-issues"><a class="header" href="#87-echo-cancellation-issues">8.7 Echo cancellation issues</a></h3>
+<p><strong>Symptom</strong>: AI hears its own voice as user input, gets confused.</p>
+<p><strong>Cause</strong>: Speaker output reaches microphone, no echo cancellation.</p>
+<p><strong>Solution</strong>:</p>
+<ol>
+<li>Use AEC (Acoustic Echo Cancellation) library: WebRTC built-in, Speex.</li>
+<li>Hardware echo cancellation on supported devices (smart speakers).</li>
+<li>Detect AI voice characteristics, filter out.</li>
+</ol>
+<hr />
+<h2 id="phần-9--vietnamese-production-reality"><a class="header" href="#phần-9--vietnamese-production-reality">Phần 9 — Vietnamese Production Reality</a></h2>
+<p>Specific to Vietnamese market.</p>
+<h3 id="91-voice-ai-ecosystem-vietnam-2026"><a class="header" href="#91-voice-ai-ecosystem-vietnam-2026">9.1 Voice AI ecosystem Vietnam 2026</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Công ty</th><th>Sản phẩm</th><th>Approach</th></tr></thead><tbody>
+<tr><td><strong>VinAI/VinBigData</strong></td><td>PhoWhisper, ViVi</td><td>Open-source models, fine-tune Whisper on 844h Vi data</td></tr>
+<tr><td><strong>ZaloAI</strong></td><td>KiKi assistant, ZaloPay voice</td><td>In-house ASR, private models</td></tr>
+<tr><td><strong>FPT.AI</strong></td><td>FPT Speech</td><td>Commercial API, in-house ASR/TTS</td></tr>
+<tr><td><strong>VinFast</strong></td><td>In-car voice</td><td>OEM voice assistant, partnership likely</td></tr>
+<tr><td><strong>Trusting Social</strong></td><td>Voice biometrics, KYC</td><td>Identity verification via voice</td></tr>
+<tr><td><strong>Viettel AI</strong></td><td>Various B2B</td><td>Telecom-oriented, large infrastructure</td></tr>
+</tbody></table>
+</div>
+<h3 id="92-vietnamese-specific-challenges"><a class="header" href="#92-vietnamese-specific-challenges">9.2 Vietnamese-specific challenges</a></h3>
+<ol>
+<li><strong>Tonal language</strong>: 6 tones, mispronunciation = wrong meaning. ASR must capture tones accurately.</li>
+<li><strong>Three regional dialects</strong>: Bắc, Trung, Nam có significant phonetic differences. Most models train mostly Bắc.</li>
+<li><strong>Code-switching</strong>: heavy mixing Vi + En in tech/business contexts.</li>
+<li><strong>Limited data</strong>: &lt;1000h public Vi speech data (vs &gt;100K hours English).</li>
+</ol>
+<h3 id="93-production-stack-recommendation-cho-vietnamese-voice-agent"><a class="header" href="#93-production-stack-recommendation-cho-vietnamese-voice-agent">9.3 Production stack recommendation cho Vietnamese voice agent</a></h3>
+<p>Realistic recommendation cho startup Vietnam:</p>
+<ol>
+<li><strong>ASR</strong>: PhoWhisper-large (open source, free, ~5-8% WER on clean Vi).</li>
+<li><strong>LLM</strong>: GPT-4o-mini or Claude Haiku (commercial, ~0.005 USD/min for voice agent typical context).</li>
+<li><strong>TTS</strong>: ElevenLabs Multilingual v2 (has Vi voices, ~0.075 USD/min).</li>
+<li><strong>Orchestration</strong>: Vapi.ai or LiveKit + Pipecat self-host.</li>
+<li><strong>WebRTC</strong>: LiveKit (open source).</li>
+</ol>
+<p>Total cost: ~0.10-0.15 USD/min. Acceptable cho B2B use case (banking customer service, healthcare).</p>
+<h3 id="94-open-challenges-for-vietnamese-voice-ai"><a class="header" href="#94-open-challenges-for-vietnamese-voice-ai">9.4 Open challenges for Vietnamese voice AI</a></h3>
+<ul>
+<li><strong>Vietnamese-native TTS</strong>: cần voice quality, prosody và emotion tự nhiên hơn cho từng phương ngữ, thay vì chỉ dựa vào model multilingual tổng quát.</li>
+<li><strong>On-device Vietnamese ASR</strong>: cần model distilled dưới khoảng 50 MB cho mobile và embedded devices, vì các biến thể Whisper/PhoWhisper còn quá lớn cho nhiều thiết bị biên.</li>
+<li><strong>Code-switching benchmark</strong>: hiện chưa có benchmark công khai mạnh cho Vi-En code-switched speech, trong khi nhu cầu production rất rõ ở call center, giáo dục và fintech.</li>
+<li><strong>Vietnamese voice cloning</strong>: cần benchmark, consent workflow và abuse prevention nghiêm túc trước khi đưa vào sản phẩm cho celebrity voice, brand voice hoặc customer support voice.</li>
+</ul>
+<hr />
+<h2 id="phần-10--recommended-starter-stack--roadmap"><a class="header" href="#phần-10--recommended-starter-stack--roadmap">Phần 10 — Recommended Starter Stack &amp; Roadmap</a></h2>
+<p>Cho team mới bắt đầu build voice agent:</p>
+<h3 id="101-tier-1--prototype-1-week-to-working-demo"><a class="header" href="#101-tier-1--prototype-1-week-to-working-demo">10.1 Tier 1 — Prototype (1 week to working demo)</a></h3>
+<ul>
+<li>WebRTC: LiveKit Cloud (free tier).</li>
+<li>ASR: Deepgram Nova-3 (1500 free hours).</li>
+<li>LLM: OpenAI GPT-4o-mini (cheap).</li>
+<li>TTS: Cartesia Sonic (start with their free tier).</li>
+<li>Glue code: Pipecat framework.</li>
+</ul>
+<p>Goal: working demo trong 1 tuần. Cost: ~10-50 USD trong tháng đầu.</p>
+<h3 id="102-tier-2--production-mvp-1-3-months-to-first-paying-customers"><a class="header" href="#102-tier-2--production-mvp-1-3-months-to-first-paying-customers">10.2 Tier 2 — Production MVP (1-3 months to first paying customers)</a></h3>
+<ul>
+<li>Add monitoring: Datadog or self-host Grafana.</li>
+<li>Add fallback responses cho LLM downtime.</li>
+<li>Add session state replication (Redis).</li>
+<li>Add basic A/B testing infrastructure.</li>
+</ul>
+<p>Goal: 99% uptime, &lt; 1.5s p95 latency, support 100 concurrent users.</p>
+<h3 id="103-tier-3--scale-6-months-large-customer-base"><a class="header" href="#103-tier-3--scale-6-months-large-customer-base">10.3 Tier 3 — Scale (6+ months, large customer base)</a></h3>
+<ul>
+<li>Multi-region deployment.</li>
+<li>Self-host some components for cost savings.</li>
+<li>Build internal eval team for WER monitoring.</li>
+<li>Add advanced features (interruption handling, function calling).</li>
+</ul>
+<p>Goal: 99.9% uptime, support 1000+ concurrent, cost &lt; 0.05 USD/min.</p>
+<h3 id="104-roadmap-for-cost-reduction"><a class="header" href="#104-roadmap-for-cost-reduction">10.4 Roadmap for cost reduction</a></h3>
+<p>Path to sub-0.05 USD/min voice agent:</p>
+<ol>
+<li><strong>Self-host Whisper INT8</strong>: replace API ASR, save 0.0036 → 0.001 USD/min.</li>
+<li><strong>Self-host smaller LLM</strong> (Llama 3 8B, Qwen 2.5 7B): replace GPT-4o-mini, save ~50%.</li>
+<li><strong>Self-host TTS</strong> (XTTS, Coqui): replace ElevenLabs, save ~80%.</li>
+</ol>
+<p>End state: ~0.02-0.04 USD/min, but with significant ops overhead.</p>
+<hr />
+<h2 id="phần-11--tóm-tắt--bài-học"><a class="header" href="#phần-11--tóm-tắt--bài-học">Phần 11 — Tóm tắt &amp; Bài học</a></h2>
+<h3 id="111-những-bài-học-chính"><a class="header" href="#111-những-bài-học-chính">11.1 Những bài học chính</a></h3>
+<ol>
+<li>
+<p><strong>Production speech systems sống trong thế giới khác hẳn academic</strong>: latency p99 quan trọng hơn average WER, cost dominates accuracy improvements, code-switching và noise dominate clean benchmarks.</p>
+</li>
+<li>
+<p><strong>Latency budget &lt; 1.5s cho voice agent đa năng</strong> là khó nhưng achievable với streaming everything (ASR, LLM, TTS).</p>
+</li>
+<li>
+<p><strong>Cost per minute là metric trung tâm</strong>: 0.05-0.15 USD/min cho voice agent typical, có thể giảm xuống 0.02 USD/min với heavy self-hosting.</p>
+</li>
+<li>
+<p><strong>Choose stack theo scale</strong>: cloud APIs for &lt; 10,000 hours/month, self-host above that.</p>
+</li>
+<li>
+<p><strong>Observability quan trọng hơn fancy models</strong>: monitoring latency, sampling WER, tracking CSAT mới là measurable quality.</p>
+</li>
+<li>
+<p><strong>Common pitfalls có solutions known</strong>: hallucination, drift, clicks, cold-start, code-switching đều có patterns mature để giải quyết.</p>
+</li>
+<li>
+<p><strong>Vietnamese voice AI ecosystem đang trưởng</strong>: VinAI mở source, ZaloAI/FPT có commercial APIs, opportunity còn nhiều cho Vi-native quality.</p>
+</li>
+</ol>
+<h3 id="112-lưu-ý-về-phạm-vi-số-liệu"><a class="header" href="#112-lưu-ý-về-phạm-vi-số-liệu">11.2 Lưu ý về phạm vi số liệu</a></h3>
+<ul>
+<li>Mọi con số trong chương này là estimates từ public sources, không phải insider data.</li>
+<li>Vendors thay đổi pricing thường xuyên, verify trước khi commit budget.</li>
+<li>Production stacks thay đổi nhanh; một cấu hình được xem là frontier ở tháng 11/2025 có thể đã lỗi thời giữa năm 2026.</li>
+</ul>
+<h3 id="113-chương-tiếp-theo"><a class="header" href="#113-chương-tiếp-theo">11.3 Chương tiếp theo</a></h3>
+<p>Chương 21 (mới) sẽ deep dive về Wake-Word Detection, một bài toán specific nhưng cực kỳ quan trọng cho voice products (Siri, Alexa, Google Assistant). Production engineering of wake-word systems share nhiều principle với voice agent nhưng có unique challenges về power budget và edge deployment.</p>
+<hr />
+<h2 id="tài-liệu-tham-khảo"><a class="header" href="#tài-liệu-tham-khảo">Tài liệu tham khảo</a></h2>
+<ol>
+<li>Stivers, T. et al. (2009). Universals and cultural variation in turn-taking in conversation. PNAS.</li>
+<li>OpenAI (Aug 2025). Introducing gpt-realtime and Realtime API updates for production voice agents. <a href="https://openai.com/index/introducing-gpt-realtime">https://openai.com/index/introducing-gpt-realtime</a>.</li>
+<li>ElevenLabs (2025). Conversational AI documentation. <a href="https://elevenlabs.io/docs/conversational-ai">https://elevenlabs.io/docs/conversational-ai</a>.</li>
+<li>Cartesia (2024). Sonic 2 release notes.</li>
+<li>Deepgram (2025). Aura-2 TTS launch. <a href="https://deepgram.com/learn">https://deepgram.com/learn</a>.</li>
+<li>Vapi.ai (2025). Voice agent pricing. <a href="https://vapi.ai/pricing">https://vapi.ai/pricing</a>.</li>
+<li>LiveKit (2024). LiveKit Agents framework documentation. <a href="https://docs.livekit.io/agents">https://docs.livekit.io/agents</a>.</li>
+<li>Kyutai (2024). Moshi technical report.</li>
+<li>VinAI (2024). PhoWhisper paper, ICLR Tiny Papers.</li>
+<li>WebRTC ABE (Acoustic Echo Cancellation) reference implementation in browsers.</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part7/19-inference-engines.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../appendices/appendix-a-notation.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part7/19-inference-engines.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../appendices/appendix-a-notation.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,740 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 11: Speech LLMs - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html" class="active"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part4/11-speech-llms.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-11-speech-language-models"><a class="header" href="#chương-11-speech-language-models">Chương 11: Speech Language Models</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Speech Language Models là điểm hội tụ giữa Speech AI và LLM revolution. Đối với người làm NLP/LLM, đây là lãnh thổ quen thuộc nhất: autoregressive Transformer trên discrete token, KV cache, in-context learning, function calling. Nhưng "token" ở đây không phải BPE text, mà là codec token sinh từ neural audio codec (Chương 10). Hiểu Speech LLM là điều kiện cần để đọc và xây dựng các sản phẩm voice AI hiện đại như Moshi (Kyutai), Qwen3-Omni (Alibaba), GPT-Realtime (OpenAI), Gemini Live (Google).</p>
+<p>Chương này phát triển bốn họ kiến trúc theo trình tự lịch sử và độ phức tạp:</p>
+<ul>
+<li><strong>AudioLM</strong>: hierarchical audio LM, đặt nền móng cho paradigm "audio as language".</li>
+<li><strong>Qwen2-Audio</strong>: speech-aware LLM với Whisper encoder cộng adapter, ASR + understanding + reasoning.</li>
+<li><strong>Moshi</strong>: full-duplex dual-stream Speech LLM, end-to-end speech-to-speech với latency dưới 300 ms.</li>
+<li><strong>Qwen3-Omni và Qwen3.5-Omni</strong>: MoE Thinker-Talker, thuộc nhóm open-source frontier theo các báo cáo công khai năm 2025-2026.</li>
+</ul>
+<p>Đồng thời chương cập nhật các release frontier trong Q4 2025 và năm 2026 (GPT-Realtime, MoshiRAG, Gemini 3 Live), để người đọc có bức tranh đầy đủ về landscape tại thời điểm viết.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: ba cấp độ tích hợp Speech vào LLM (cascaded, speech-aware, end-to-end).</li>
+<li><strong>Phần 2</strong>: AudioLM, hierarchical audio language model.</li>
+<li><strong>Phần 3</strong>: Qwen2-Audio, kiến trúc Whisper encoder cộng adapter cộng LLM.</li>
+<li><strong>Phần 4</strong>: Moshi, full-duplex dual-stream và Depth Transformer.</li>
+<li><strong>Phần 5</strong>: Q4 2025 và 2026 updates (Qwen3-Omni family, GPT-Realtime, MoshiRAG, Gemini Live).</li>
+</ul>
+</blockquote>
+<h2 id="phần-1--từ-text-llm-đến-speech-llm"><a class="header" href="#phần-1--từ-text-llm-đến-speech-llm">Phần 1 — Từ Text LLM đến Speech LLM</a></h2>
+<p>Speech Language Models mở rộng paradigm LLM sang audio modality. Có 3 cấp độ tích hợp:</p>
+<pre class="mermaid">flowchart TD
+    L1[&quot;Level 1: Speech-aware LLM&lt;br&gt;audio input, text output&quot;] --&gt; L2[&quot;Level 2: Speech-to-speech pipeline&lt;br&gt;ASR + LLM + TTS&quot;]
+    L2 --&gt; L3[&quot;Level 3: Native Speech LLM&lt;br&gt;audio tokens in and out&quot;]
+    L1 -. examples .-&gt; E1[&quot;Qwen-Audio, SALMONN&quot;]
+    L2 -. examples .-&gt; E2[&quot;Realtime cascaded agents&quot;]
+    L3 -. examples .-&gt; E3[&quot;Moshi, GPT-Realtime-style systems&quot;]
+</pre>
+<p><strong>Hình:</strong> Ba mức tích hợp speech vào LLM. Mức 1 phù hợp cho audio understanding; mức 2 là kiến trúc production phổ biến; mức 3 hướng tới hội thoại audio native với latency thấp hơn và khả năng biểu cảm tốt hơn.</p>
+<h2 id="audiolm-----hierarchical-audio-language-model"><a class="header" href="#audiolm-----hierarchical-audio-language-model">AudioLM  -  Hierarchical Audio Language Model</a></h2>
+<h3 id="key-insight"><a class="header" href="#key-insight">Key Insight</a></h3>
+<p>AudioLM <sup class="footnote-reference"><a href="#borsos2023audiolm">1</a></sup> là model đầu tiên chứng minh rằng <strong>audio generation = language modeling on discrete tokens</strong>. Sử dụng hierarchical token structure:</p>
+<pre class="mermaid">flowchart LR
+    A[&quot;Waveform&quot;] --&gt; S[&quot;Semantic tokens&lt;br&gt;content / phonetic units&quot;]
+    A --&gt; C[&quot;Coarse acoustic tokens&lt;br&gt;speaker and prosody&quot;]
+    A --&gt; F[&quot;Fine acoustic tokens&lt;br&gt;timbre and detail&quot;]
+    S --&gt; LM1[&quot;Stage 1 LM&lt;br&gt;semantic continuation&quot;]
+    LM1 --&gt; LM2[&quot;Stage 2 LM&lt;br&gt;semantic to coarse acoustic&quot;]
+    LM2 --&gt; LM3[&quot;Stage 3 LM&lt;br&gt;coarse to fine acoustic&quot;]
+    LM3 --&gt; Y[&quot;Generated audio&quot;]
+</pre>
+<p><strong>Hình:</strong> AudioLM dùng hierarchy vì một loại token đơn lẻ không đủ. Semantic tokens giữ nội dung, còn acoustic tokens bổ sung speaker identity, prosody và chi tiết tín hiệu.</p>
+<h3 id="three-stage-generation"><a class="header" href="#three-stage-generation">Three-Stage Generation</a></h3>
+<p><a id="eq-audiolm-stages"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:4.5482em;vertical-align:-2.0241em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.5241em;"><span style="top:-4.6841em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Stage 1:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-3.16em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Stage 2:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-1.6359em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Stage 3:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.0241em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.5241em;"><span style="top:-4.6841em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight" style="margin-right:0.13889em;">T</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathbf">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-3.16em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf">s</span><span class="mclose">)</span></span></span><span style="top:-1.6359em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">5</span><span class="mrel mtight">:</span><span class="mord mtight">12</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathbf">a</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mtight">4</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.0241em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:2.5241em;"><span style="top:-4.6841em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// Semantic token continuation</span></span></span></span><span style="top:-3.16em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// Semantic → coarse acoustic</span></span></span></span><span style="top:-1.6359em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// Coarse → fine acoustic</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.0241em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<p>Mỗi stage là một <strong>autoregressive Transformer</strong>  -  cùng architecture, khác tokenization level.</p>
+<blockquote>
+<p><strong>📝 Tại sao Hierarchical?</strong></p>
+<p>Semantic tokens không đủ để reconstruct audio (missing speaker info). Acoustic tokens quá detailed cho LM (sequence quá dài). Hierarchy cho phép:</p>
+<ol>
+<li>Plan high-level (semantic) trước</li>
+<li>Fill in details (acoustic) sau</li>
+<li>Giữ sequence lengths manageable cho Transformer</li>
+</ol>
+</blockquote>
+<h3 id="audiolm-results"><a class="header" href="#audiolm-results">AudioLM Results</a></h3>
+<ul>
+<li><strong>Speech continuation</strong>: Nghe tự nhiên, maintain speaker identity</li>
+<li><strong>Music generation</strong>: Coherent melodies</li>
+<li><strong>No text conditioning needed</strong>: Purely audio-to-audio</li>
+</ul>
+<h2 id="qwen2-audio-----universal-audio-understanding"><a class="header" href="#qwen2-audio-----universal-audio-understanding">Qwen2-Audio  -  Universal Audio Understanding</a></h2>
+<h3 id="architecture"><a class="header" href="#architecture">Architecture</a></h3>
+<p>Qwen2-Audio <sup class="footnote-reference"><a href="#chu2023qwen2audio">2</a></sup> là Speech-Aware LLM  -  hiểu audio nhưng output text:</p>
+<pre class="mermaid">flowchart LR
+    X[&quot;Audio waveform&quot;] --&gt; M[&quot;Log-mel features&quot;]
+    M --&gt; AE[&quot;Audio encoder&lt;br&gt;Whisper-style&quot;]
+    AE --&gt; AD[&quot;Adapter / projector&quot;]
+    T[&quot;Text prompt&quot;] --&gt; LLM[&quot;LLM decoder&quot;]
+    AD --&gt; LLM
+    LLM --&gt; O[&quot;Text answer&lt;br&gt;ASR, QA, caption, reasoning&quot;]
+</pre>
+<p><strong>Hình:</strong> Qwen2-Audio thuộc nhóm speech-aware LLM: audio được encode thành embedding, adapter đưa embedding vào không gian LLM, và output cuối vẫn là text.</p>
+<h3 id="capabilities"><a class="header" href="#capabilities">Capabilities</a></h3>
+<p>Qwen2-Audio hỗ trợ <strong>đa dạng audio tasks</strong> qua text prompting:</p>
+<div class="table-wrapper"><table><thead><tr><th>Task</th><th>Prompt Example</th><th>Output</th></tr></thead><tbody>
+<tr><td>ASR</td><td>"Transcribe this audio"</td><td>Text transcription</td></tr>
+<tr><td>Translation</td><td>"Translate to English"</td><td>Translated text</td></tr>
+<tr><td>Audio QA</td><td>"What instrument is playing?"</td><td>"Piano"</td></tr>
+<tr><td>Emotion</td><td>"What emotion?"</td><td>"Happy, excited"</td></tr>
+<tr><td>Sound event</td><td>"What sounds do you hear?"</td><td>"Dog barking, rain"</td></tr>
+<tr><td>Speaker ID</td><td>"How many speakers?"</td><td>"2 speakers"</td></tr>
+</tbody></table>
+</div>
+<p>: Qwen2-Audio capabilities <a id="tbl-qwen2-audio-tasks"></a></p>
+<h3 id="training"><a class="header" href="#training">Training</a></h3>
+<p>2-stage training:</p>
+<p><a id="eq-qwen2-training"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Stage 1:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Stage 2:</span></span><span class="mspace" style="margin-right:1em;"></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mord text"><span class="mord">Audio-text alignment</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mord text"><span class="mord">Instruction tuning</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">(freeze LLM, train adapter)</span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">(unfreeze all, multitask)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h2 id="moshi-----full-duplex-speech-dialogue"><a class="header" href="#moshi-----full-duplex-speech-dialogue">Moshi  -  Full-Duplex Speech Dialogue</a></h2>
+<h3 id="what-is-full-duplex"><a class="header" href="#what-is-full-duplex">What is Full-Duplex?</a></h3>
+<pre class="mermaid">sequenceDiagram
+    participant U as User
+    participant A as Voice AI
+    U-&gt;&gt;A: User speaks
+    A--&gt;&gt;U: Wait until end-of-turn
+    A-&gt;&gt;U: AI responds
+    Note over U,A: Half-duplex: mỗi bên thường chờ bên kia kết thúc
+    U-&gt;&gt;A: User starts interrupting
+    A-&gt;&gt;U: AI can adapt while still speaking
+    Note over U,A: Full-duplex: nghe và nói có thể chồng lấp
+</pre>
+<p><strong>Hình:</strong> Half-duplex giống bộ đàm: một bên nói, bên kia chờ. Full-duplex gần hơn với hội thoại tự nhiên vì hệ thống vẫn nghe được người dùng khi đang phát âm thanh.</p>
+<h3 id="architecture-1"><a class="header" href="#architecture-1">Architecture</a></h3>
+<p>Moshi <sup class="footnote-reference"><a href="#defossez2024moshi">3</a></sup> xử lý <strong>2 audio streams song song</strong> (user + AI):</p>
+<pre class="mermaid">flowchart TD
+    U[&quot;User audio stream&quot;] --&gt; MU[&quot;Mimi codec tokens&lt;br&gt;user stream&quot;]
+    AIH[&quot;Previous AI audio&quot;] --&gt; MA[&quot;Mimi codec tokens&lt;br&gt;AI stream&quot;]
+    TXT[&quot;Inner text stream&quot;] --&gt; LM[&quot;Temporal Transformer&quot;]
+    MU --&gt; LM
+    MA --&gt; LM
+    LM --&gt; DT[&quot;Depth Transformer&lt;br&gt;multi-codebook prediction&quot;]
+    DT --&gt; AIO[&quot;Next AI audio tokens&quot;]
+    AIO --&gt; DEC[&quot;Mimi decoder&quot;]
+    DEC --&gt; WAV[&quot;AI speech waveform&quot;]
+</pre>
+<p><strong>Hình:</strong> Moshi xử lý song song user stream, AI stream và text stream nội bộ. Temporal Transformer giữ mạch thời gian, còn Depth Transformer dự đoán các codebook trong cùng một bước audio.</p>
+<h3 id="dual-stream-processing"><a class="header" href="#dual-stream-processing">Dual-Stream Processing</a></h3>
+<p>Moshi processes <strong>2 parallel token streams</strong> tại mỗi time step:</p>
+<p><a id="eq-moshi-dual"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1413em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">AI</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1657em;vertical-align:-0.2744em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.7144em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">user</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2744em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8913em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">AI</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2744em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">t</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>trong đó:</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9114em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">user</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span>: Mimi tokens từ user audio tại time <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0883em;vertical-align:-0.247em;"></span><span class="mord"><span class="mord mathnormal">a</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8413em;"><span style="top:-2.453em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">AI</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.247em;"><span></span></span></span></span></span></span></span></span></span>: Mimi tokens cho AI audio tại time <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span></li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.02691em;">w</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0269em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>: Text token (inner monologue) tại time <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal">t</span></span></span></span></li>
+</ul>
+<h3 id="depth-transformer"><a class="header" href="#depth-transformer">Depth Transformer</a></h3>
+<p>Moshi sử dụng <strong>Depth Transformer</strong> để handle multi-codebook prediction:</p>
+<pre class="mermaid">flowchart LR
+    T1[&quot;Tokens at t-1&quot;] --&gt; TEMP[&quot;Temporal Transformer&lt;br&gt;across time&quot;]
+    TEMP --&gt; H[&quot;Hidden state h_t&quot;]
+    H --&gt; Q1[&quot;Codebook 1&quot;]
+    Q1 --&gt; Q2[&quot;Codebook 2&quot;]
+    Q2 --&gt; Q3[&quot;...&quot;]
+    Q3 --&gt; QN[&quot;Codebook Q&quot;]
+    Q1 --&gt; OUT[&quot;Audio token bundle at t&quot;]
+    QN --&gt; OUT
+</pre>
+<p><strong>Hình:</strong> Temporal Transformer mô hình hoá phụ thuộc theo thời gian; Depth Transformer mô hình hoá phụ thuộc giữa các codebook trong cùng một frame codec.</p>
+<p><a id="eq-depth-transformer"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3.2048em;vertical-align:-1.3524em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8524em;"><span style="top:-4.0572em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.3524em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3524em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8524em;"><span style="top:-4.0572em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">TemporalTransformer</span></span><span class="mopen">(</span><span class="mord"><span class="mord text"><span class="mord">tokens</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span><span class="mrel mtight">:</span><span class="mord mathnormal mtight">t</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span><span style="top:-2.3524em;"><span class="pstrut" style="height:3.0448em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">DepthTransformer</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner">…</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">c</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.0448em;"><span style="top:-2.4542em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span><span style="top:-3.2198em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mopen mtight">(</span><span class="mord mathnormal mtight" style="margin-right:0.03588em;">q</span><span class="mbin mtight">−</span><span class="mord mtight">1</span><span class="mclose mtight">)</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2458em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.3524em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h3 id="inner-monologue"><a class="header" href="#inner-monologue">Inner Monologue</a></h3>
+<p>Moshi có khả năng <strong>text reasoning</strong> đồng thời với speech:</p>
+<p><a id="eq-inner-monologue"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Audio tokens (speech)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Text tokens (reasoning)</span></span></span></span></span></span></p>
+<p>Text stream hoạt động như "inner thought"  -  giúp model plan response trước khi nói.</p>
+<h3 id="moshi-specifications"><a class="header" href="#moshi-specifications">Moshi Specifications</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Parameter</th><th>Value</th></tr></thead><tbody>
+<tr><td>Audio codec</td><td>Mimi (12.5 Hz, 8 codebooks)</td></tr>
+<tr><td>Total parameters</td><td>~7B</td></tr>
+<tr><td>Temporal Transformer</td><td>32 layers, 4096 dim</td></tr>
+<tr><td>Depth Transformer</td><td>6 layers, 1024 dim</td></tr>
+<tr><td>Latency</td><td><strong>~200ms</strong> (end-to-end)</td></tr>
+<tr><td>Training data</td><td>7M hours audio</td></tr>
+<tr><td>Full-duplex</td><td>Yes (simultaneous listen + speak)</td></tr>
+</tbody></table>
+</div>
+<p>: Moshi specifications <a id="tbl-moshi-specs"></a></p>
+<blockquote>
+<p><strong>⚠️ Latency Warning</strong></p>
+<p>Latency breakdown cho Moshi:</p>
+<div class="table-wrapper"><table><thead><tr><th>Component</th><th>Latency</th></tr></thead><tbody>
+<tr><td>Mimi encoder (1 frame)</td><td>80ms (= 1/12.5 Hz)</td></tr>
+<tr><td>Temporal Transformer</td><td>~50ms</td></tr>
+<tr><td>Depth Transformer (8 codebooks)</td><td>~30ms</td></tr>
+<tr><td>Mimi decoder</td><td>~40ms</td></tr>
+<tr><td><strong>Total</strong></td><td><strong>~200ms</strong></td></tr>
+</tbody></table>
+</div>
+<p>200ms là dưới ngưỡng cảm nhận delay trong conversation (~300ms). Đây là breakthrough so với cascaded pipeline (ASR ~1s + LLM ~1s + TTS ~0.5s = <strong>~2.5s</strong>).</p>
+</blockquote>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Simplified dual-stream generation"
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+
+class DualStreamGenerator(nn.Module):
+    """Simplified dual-stream speech generation (Moshi-style).
+
+    Processes user and AI audio streams jointly.
+    """
+
+    def __init__(
+        self,
+        vocab_size: int = 1024,       # codec vocabulary
+        n_codebooks: int = 8,         # RVQ layers
+        d_model: int = 1024,
+        n_heads: int = 16,
+        n_temporal_layers: int = 12,
+        n_depth_layers: int = 4,
+        text_vocab_size: int = 32000,
+    ) -&gt; None:
+        super().__init__()
+        self.n_codebooks: int = n_codebooks
+
+        # Embeddings for user/AI codec tokens
+        self.user_embed = nn.ModuleList([
+            nn.Embedding(vocab_size, d_model // n_codebooks)
+            for _ in range(n_codebooks)
+        ])
+        self.ai_embed = nn.ModuleList([
+            nn.Embedding(vocab_size, d_model // n_codebooks)
+            for _ in range(n_codebooks)
+        ])
+        self.text_embed = nn.Embedding(text_vocab_size, d_model)
+
+        # Temporal transformer (processes time steps)
+        temporal_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=n_heads,
+            dim_feedforward=d_model * 4,
+            batch_first=True,
+        )
+        self.temporal = nn.TransformerEncoder(
+            temporal_layer, num_layers=n_temporal_layers,
+        )
+
+        # Depth transformer (processes codebooks at each time step)
+        depth_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=n_heads // 2,
+            dim_feedforward=d_model * 2,
+            batch_first=True,
+        )
+        self.depth = nn.TransformerEncoder(
+            depth_layer, num_layers=n_depth_layers,
+        )
+
+        # Output heads
+        self.ai_heads = nn.ModuleList([
+            nn.Linear(d_model, vocab_size)
+            for _ in range(n_codebooks)
+        ])
+        self.text_head = nn.Linear(d_model, text_vocab_size)
+
+    def forward_temporal(
+        self,
+        user_tokens: Tensor,    # [B, T, n_codebooks] - int64
+        ai_tokens: Tensor,      # [B, T, n_codebooks] - int64
+        text_tokens: Tensor,    # [B, T] - int64
+    ) -&gt; Tensor:
+        """Temporal transformer: process sequence of time steps.
+
+        Args:
+            user_tokens: User codec tokens [B, T, Q] - int64
+            ai_tokens: AI codec tokens [B, T, Q] - int64
+            text_tokens: Text tokens [B, T] - int64
+
+        Returns:
+            h: Hidden states [B, T, d_model] - float32
+        """
+        B, T, Q = user_tokens.shape
+
+        # Embed and sum codebook embeddings
+        user_emb: Tensor = torch.cat([
+            self.user_embed[q](user_tokens[:, :, q])
+            for q in range(Q)
+        ], dim=-1)  # [B, T, d_model] - float32
+
+        ai_emb: Tensor = torch.cat([
+            self.ai_embed[q](ai_tokens[:, :, q])
+            for q in range(Q)
+        ], dim=-1)  # [B, T, d_model] - float32
+
+        text_emb: Tensor = self.text_embed(text_tokens)
+        # [B, T, d_model] - float32
+
+        # Combine streams
+        combined: Tensor = user_emb + ai_emb + text_emb
+        # [B, T, d_model] - float32
+
+        # Causal mask
+        mask: Tensor = nn.Transformer.generate_square_subsequent_mask(
+            T, device=combined.device,
+        )  # [T, T]
+
+        h: Tensor = self.temporal(combined, mask=mask)
+        # [B, T, d_model] - float32
+        return h
+
+    @torch.no_grad()
+    def generate_step(
+        self,
+        h_t: Tensor,  # [B, 1, d_model] - float32 (temporal output at time t)
+    ) -&gt; tuple[Tensor, Tensor]:
+        """Generate one time step: all codebooks + text token.
+
+        Args:
+            h_t: Temporal hidden state [B, 1, d_model] - float32
+
+        Returns:
+            ai_codes: Predicted AI codec tokens [B, n_codebooks] - int64
+            text_tok: Predicted text token [B] - int64
+        """
+        # Depth transformer processes codebooks sequentially
+        depth_input: Tensor = h_t  # [B, 1, d_model] - float32
+        ai_codes: list[Tensor] = []
+
+        for q in range(self.n_codebooks):
+            depth_out: Tensor = self.depth(depth_input)
+            # [B, q+1, d_model] - float32
+
+            logits_q: Tensor = self.ai_heads[q](
+                depth_out[:, -1, :]
+            )  # [B, vocab] - float32
+            code_q: Tensor = logits_q.argmax(dim=-1)  # [B] - int64
+            ai_codes.append(code_q)
+
+            # Add predicted code embedding for next depth step
+            code_emb: Tensor = self.ai_embed[q](code_q).unsqueeze(1)
+            # [B, 1, d_model//Q] - float32
+            padded: Tensor = torch.zeros_like(h_t)
+            padded[:, :, :code_emb.size(-1)] = code_emb
+            depth_input = torch.cat([depth_input, padded], dim=1)
+
+        # Text token prediction
+        text_logits: Tensor = self.text_head(h_t[:, 0, :])
+        # [B, text_vocab] - float32
+        text_tok: Tensor = text_logits.argmax(dim=-1)  # [B] - int64
+
+        return torch.stack(ai_codes, dim=1), text_tok
+        # [B, Q] - int64, [B] - int64
+</code></pre>
+<h2 id="gpt-4o-voice-mode"><a class="header" href="#gpt-4o-voice-mode">GPT-4o Voice Mode</a></h2>
+<h3 id="capabilities-2024"><a class="header" href="#capabilities-2024">Capabilities (2024)</a></h3>
+<p>GPT-4o voice mode từ OpenAI là first commercial full-duplex Speech LLM:</p>
+<ul>
+<li><strong>End-to-end</strong>: Audio in → Audio out (không qua ASR/TTS cascade)</li>
+<li><strong>Emotion/style control</strong>: Whisper, sing, laugh</li>
+<li><strong>Multilingual</strong>: Realtime translation</li>
+<li><strong>Low latency</strong>: ~300ms response time</li>
+<li><strong>Reasoning</strong>: Full GPT-4 reasoning capabilities</li>
+</ul>
+<h3 id="kiến-trúc-suy-đoán"><a class="header" href="#kiến-trúc-suy-đoán">Kiến trúc (suy đoán)</a></h3>
+<p>Dựa trên thông tin công khai, không nên khẳng định chi tiết nội bộ của GPT-4o Voice như một kiến trúc đã được công bố đầy đủ. Cách diễn giải an toàn hơn là xem hệ thống này như một unified multimodal model có các nhánh encode/decode cho audio và text, được tối ưu cho tương tác thời gian thực.</p>
+<pre class="mermaid">flowchart TD
+    AIN[&quot;Audio input&quot;] --&gt; AE[&quot;Audio encoder&quot;]
+    TIN[&quot;Text / system context&quot;] --&gt; TE[&quot;Text encoder / tokenizer&quot;]
+    AE --&gt; CORE[&quot;Unified multimodal core&lt;br&gt;architecture not fully public&quot;]
+    TE --&gt; CORE
+    CORE --&gt; TD[&quot;Text decoder&quot;]
+    CORE --&gt; AD[&quot;Audio decoder&quot;]
+    TD --&gt; TEXT[&quot;Text tokens / tool calls&quot;]
+    AD --&gt; AOUT[&quot;Streaming speech output&quot;]
+</pre>
+<p><strong>Hình:</strong> Sơ đồ khái niệm cho mô hình voice multimodal thống nhất. Đây không phải reverse engineering chi tiết, mà là cách biểu diễn thận trọng từ các năng lực công khai: audio input, reasoning, tool use và speech output realtime.</p>
+<h2 id="comparison-of-speech-llms"><a class="header" href="#comparison-of-speech-llms">Comparison of Speech LLMs</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Type</th><th>Audio In</th><th>Audio Out</th><th>Full-Duplex</th><th>Latency</th><th>Open?</th></tr></thead><tbody>
+<tr><td>Cascaded (ASR+LLM+TTS)</td><td>Pipeline</td><td>✓</td><td>✓</td><td>✗</td><td>~2.5s</td><td>✓</td></tr>
+<tr><td>Qwen2-Audio</td><td>Speech-aware</td><td>✓</td><td>✗</td><td>✗</td><td>~500ms</td><td>✓</td></tr>
+<tr><td>AudioLM</td><td>Audio LM</td><td>✓</td><td>✓</td><td>✗</td><td>~1s</td><td>✗</td></tr>
+<tr><td>VALL-E</td><td>TTS LM</td><td>✗</td><td>✓</td><td>✗</td><td>~2s</td><td>✗</td></tr>
+<tr><td><strong>Moshi</strong></td><td>Full-duplex</td><td>✓</td><td>✓</td><td><strong>✓</strong></td><td><strong>~200ms</strong></td><td><strong>✓</strong></td></tr>
+<tr><td>GPT-4o Voice</td><td>Full-duplex</td><td>✓</td><td>✓</td><td><strong>✓</strong></td><td><strong>~300ms</strong></td><td>✗</td></tr>
+</tbody></table>
+</div>
+<p>: Speech LLM comparison <a id="tbl-speech-llm-comparison"></a></p>
+<h2 id="phần-mở-rộng-q4-2025--2026-updates-major-releases"><a class="header" href="#phần-mở-rộng-q4-2025--2026-updates-major-releases">Phần Mở rộng: Q4 2025 + 2026 Updates (Major Releases)</a></h2>
+<p>Speech LLMs đã evolve cực nhanh giữa Q4 2025 và 2026. Phần này document các releases mới quan trọng nhất, với specific architectural details và benchmark numbers từ public technical reports.</p>
+<h3 id="qwen-omni-family-alibaba-2024-2026"><a class="header" href="#qwen-omni-family-alibaba-2024-2026">Qwen-Omni family (Alibaba, 2024-2026)</a></h3>
+<p>Alibaba's Qwen team đã release một series Qwen-Omni models, mỗi thế hệ vượt trội thế hệ trước. Đây là dòng open-source quan trọng nhất cho Speech LLM hiện nay.</p>
+<h4 id="qwen2-audio-aug-2024"><a class="header" href="#qwen2-audio-aug-2024">Qwen2-Audio (Aug 2024)</a></h4>
+<ul>
+<li>Audio encoder: Whisper-large encoder.</li>
+<li>Language model: Qwen2-7B-Instruct.</li>
+<li>Adapter: linear projection từ Whisper encoder → Qwen2 embedding space.</li>
+<li>Capabilities: ASR, audio captioning, audio QA, multi-turn conversation.</li>
+<li>License: Apache 2.0, fully open source.</li>
+<li>Limitations: text output only (no speech generation), no streaming.</li>
+</ul>
+<h4 id="qwen25-omni-early-2025"><a class="header" href="#qwen25-omni-early-2025">Qwen2.5-Omni (early 2025)</a></h4>
+<ul>
+<li>Unified architecture: text + audio + image + video trong single transformer.</li>
+<li><strong>Thinker-Talker design</strong>: Thinker (planning + reasoning) sinh text, Talker (synthesis) sinh speech.</li>
+<li>Audio + image + video encoders → Thinker LLM → Talker streaming speech output.</li>
+<li>Streaming capable.</li>
+</ul>
+<h4 id="qwen3-omni-september-2025--major-open-source-release"><a class="header" href="#qwen3-omni-september-2025--major-open-source-release">Qwen3-Omni (September 2025) — major open-source release</a></h4>
+<ul>
+<li>Architecture: MoE (Mixture-of-Experts) Thinker-Talker, gồm Thinker cho multimodal understanding/reasoning và Talker cho streaming speech generation.</li>
+<li>Available variants:
+<ul>
+<li>Qwen3-Omni-30B-A3B-Instruct (text, image, audio, video input; text+audio output).</li>
+<li>Qwen3-Omni-30B-A3B-Thinking (reasoning-oriented, text output).</li>
+<li>Qwen3-Omni-30B-A3B-Captioner (detailed audio captioning).</li>
+</ul>
+</li>
+<li>Languages: 119 text input, 19 speech input (có Vietnamese), 10 speech output (chưa có Vietnamese trong danh sách chính thức).</li>
+<li>Benchmarks: theo technical report của nhóm tác giả, model đạt kết quả dẫn đầu trên nhiều benchmark audio/video; cần đọc từng benchmark theo protocol và thời điểm công bố.</li>
+<li>ASR, audio understanding và voice conversation được báo cáo là cạnh tranh với Gemini 2.5 Pro trên nhiều benchmark công khai; cần benchmark lại khi triển khai thực tế.</li>
+<li>License: Apache 2.0.</li>
+</ul>
+<h4 id="qwen3-omni-flash-dec-2025"><a class="header" href="#qwen3-omni-flash-dec-2025">Qwen3-Omni-Flash (Dec 2025)</a></h4>
+<ul>
+<li>Variant optimized for inference latency.</li>
+<li>Real-time streaming voice output prioritized.</li>
+</ul>
+<h4 id="qwen35-omni-march-2026--frontier-open-source-report"><a class="header" href="#qwen35-omni-march-2026--frontier-open-source-report">Qwen3.5-Omni (March 2026) — frontier open-source report</a></h4>
+<ul>
+<li>Released March 30, 2026.</li>
+<li>Plus variant: theo báo cáo công khai, đạt kết quả dẫn đầu trên nhiều nhóm benchmark audio, audio-video understanding, reasoning và interaction.</li>
+<li>Báo cáo công khai so sánh thuận lợi với một số hệ thống frontier ở các tác vụ audio understanding, reasoning và translation; khi dùng thực tế vẫn cần benchmark lại trên workload riêng.</li>
+<li>Native multimodal processing (text + image + audio + video in single forward pass).</li>
+<li>Streaming speech output realtime.</li>
+</ul>
+<h3 id="openai-voice-stack-updates"><a class="header" href="#openai-voice-stack-updates">OpenAI Voice Stack Updates</a></h3>
+<h4 id="gpt-realtime-august-2025"><a class="header" href="#gpt-realtime-august-2025">GPT-Realtime (August 2025)</a></h4>
+<ul>
+<li>General availability of Realtime API.</li>
+<li>Most advanced speech-to-speech model from OpenAI to date.</li>
+<li>New features: MCP server support, image input, SIP phone calling.</li>
+<li>Better instruction following, tool calling, natural expressive speech.</li>
+<li>Pricing: ~0.03 USD/min input + 0.06 USD/min output.</li>
+</ul>
+<h4 id="basic-voice-mode-retirement-sep-2025"><a class="header" href="#basic-voice-mode-retirement-sep-2025">Basic Voice Mode retirement (Sep 2025)</a></h4>
+<ul>
+<li>OpenAI sunset Basic Voice Mode in favor of Realtime API.</li>
+<li>All voice features now use single end-to-end speech-to-speech model.</li>
+</ul>
+<h3 id="gemini-live-google-2024-2026"><a class="header" href="#gemini-live-google-2024-2026">Gemini Live (Google, 2024-2026)</a></h3>
+<ul>
+<li>Gemini 2.0 Live (2025): streaming voice + video.</li>
+<li>Gemini 3 Live (2026): improved translation, multi-speaker handling.</li>
+<li>Closed source, available via Vertex AI and Gemini API.</li>
+</ul>
+<h3 id="kyutai-updates"><a class="header" href="#kyutai-updates">Kyutai Updates</a></h3>
+<h4 id="moshi-v2-2026"><a class="header" href="#moshi-v2-2026">Moshi v2 (2026)</a></h4>
+<ul>
+<li>Kyutai labs continue iterating on Moshi.</li>
+<li>MoshiRAG (April 2026): asynchronous knowledge retrieval, helps Moshi answer tough questions with help from text LLM.</li>
+<li>MoshiVis: image input support for Moshi while preserving real-time latency.</li>
+</ul>
+<h4 id="pocket-tts"><a class="header" href="#pocket-tts">Pocket TTS</a></h4>
+<ul>
+<li>100M params TTS model.</li>
+<li>Báo cáo của tác giả cho thấy chất lượng cạnh tranh với các model lớn hơn đáng kể trong thiết lập đánh giá được công bố.</li>
+<li>Voice cloning support.</li>
+<li>Real-time streaming.</li>
+</ul>
+<h3 id="updated-frontier-comparison-mid-2026"><a class="header" href="#updated-frontier-comparison-mid-2026">Updated frontier comparison (mid-2026)</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Year</th><th>Params</th><th>Speech-in</th><th>Speech-out</th><th>Full-duplex</th><th>Streaming</th><th>Open Source</th></tr></thead><tbody>
+<tr><td>Qwen2-Audio</td><td>2024</td><td>7B</td><td>✓</td><td>✗</td><td>✗</td><td>✗</td><td>✓</td></tr>
+<tr><td>Qwen2.5-Omni</td><td>2025</td><td>7B</td><td>✓</td><td>✓</td><td>partial</td><td>✓</td><td>✓</td></tr>
+<tr><td>Qwen3-Omni</td><td>Sep 2025</td><td>30B-A3B (MoE)</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Qwen3-Omni-Flash</td><td>Dec 2025</td><td>smaller MoE</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Qwen3.5-Omni Plus</td><td>Mar 2026</td><td>larger MoE</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Moshi v1</td><td>Sep 2024</td><td>7.6B</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>Moshi v2 + MoshiRAG</td><td>Apr 2026</td><td>7.6B + RAG</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td></tr>
+<tr><td>GPT-Realtime</td><td>Aug 2025</td><td>undisclosed</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✗</td></tr>
+<tr><td>Gemini 2.0 Live</td><td>2025</td><td>undisclosed</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✗</td></tr>
+<tr><td>Gemini 3 Live</td><td>2026</td><td>undisclosed</td><td>✓</td><td>✓</td><td>✓</td><td>✓</td><td>✗</td></tr>
+</tbody></table>
+</div>
+<h3 id="key-trends-observed-2024-2026"><a class="header" href="#key-trends-observed-2024-2026">Key trends observed 2024-2026</a></h3>
+<ol>
+<li><strong>MoE architectures dominant</strong>: Qwen3-Omni's MoE Thinker-Talker design provides best efficiency/capability tradeoff.</li>
+<li><strong>Native multimodal converging</strong>: separate audio + image + video encoders are being replaced by unified transformers.</li>
+<li><strong>Open source catching up to closed on selected benchmarks</strong>: các báo cáo Qwen3.5-Omni cho thấy open-source Omni models đang thu hẹp khoảng cách, nhưng cần kiểm chứng theo workload thực tế.</li>
+<li><strong>Latency targets sub-300ms</strong>: all serious systems now target sub-300ms first-byte for natural conversation.</li>
+<li><strong>Tool calling integrated</strong>: GPT-Realtime MCP support, Qwen3-Omni function calling natively.</li>
+<li><strong>RAG for speech</strong>: MoshiRAG demonstrates retrieval-augmented speech LMs as new paradigm.</li>
+</ol>
+<h3 id="practical-recommendations-cho-2026"><a class="header" href="#practical-recommendations-cho-2026">Practical recommendations cho 2026</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Use case</th><th>Recommended model</th></tr></thead><tbody>
+<tr><td>Production voice agent (closed source OK)</td><td>GPT-Realtime hoặc Gemini 3 Live</td></tr>
+<tr><td>Production voice agent (open source preferred)</td><td>Qwen3-Omni-Flash or Moshi v2 self-host</td></tr>
+<tr><td>Multilingual voice agent (Vi support)</td><td>Qwen3.5-Omni (native Vi text), GPT-Realtime</td></tr>
+<tr><td>Edge / mobile deployment</td><td>Moshi (smaller variants), Kyutai Pocket TTS</td></tr>
+<tr><td>Research / fine-tuning</td><td>Qwen3-Omni base, Moshi v2</td></tr>
+<tr><td>Voice cloning</td><td>F5-TTS, VALL-E, Kyutai TTS</td></tr>
+</tbody></table>
+</div>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Evolution</th><th>Model</th><th>Key Innovation</th></tr></thead><tbody>
+<tr><td>Audio → Tokens → LM</td><td>AudioLM</td><td>Hierarchical token LM</td></tr>
+<tr><td>Audio → LLM → Text</td><td>Qwen2-Audio</td><td>Audio adapter for LLM</td></tr>
+<tr><td>Full-duplex dialogue</td><td>Moshi</td><td>Dual-stream + Depth Transformer</td></tr>
+<tr><td>MoE Multimodal</td><td>Qwen3-Omni</td><td>MoE Thinker-Talker, 119 langs</td></tr>
+<tr><td>Native unified multimodal</td><td>Qwen3.5-Omni Plus</td><td>Frontier report; verify per benchmark</td></tr>
+<tr><td>RAG-enhanced speech</td><td>MoshiRAG</td><td>Async knowledge retrieval</td></tr>
+<tr><td>Production closed</td><td>GPT-Realtime</td><td>MCP + SIP phone integration</td></tr>
+</tbody></table>
+</div>
+<p>: Speech LLM evolution timeline 2023-2026 <a id="tbl-speech-llm-summary"></a></p>
+<p>Chương tiếp theo sẽ khám phá <strong>Vietnamese Speech Processing</strong>, thách thức đặc thù của tiếng Việt (6 tones, dialects) và các solutions hiện có.</p>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="borsos2023audiolm"><sup class="footnote-definition-label">1</sup>
+<p>Borsos, Zal{'a}n and Marinier, Rapha{"e}l and others, "AudioLM: A Language Modeling Approach to Audio Generation", IEEE/ACM Transactions on Audio, Speech, and Language Processing</p>
+</div>
+<div class="footnote-definition" id="chu2023qwen2audio"><sup class="footnote-definition-label">2</sup>
+<p>Chu, Yunfei and Xu, Jin and Zhou, Xiaohuan and others, "Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models", arXiv preprint arXiv:2311.07919</p>
+</div>
+<div class="footnote-definition" id="defossez2024moshi"><sup class="footnote-definition-label">3</sup>
+<p>D{'e}fossez, Alexandre and Musicant, Laurent and others, "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue", arXiv preprint arXiv:2410.00037</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part3/10-audio-codecs.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part4/12-multimodal-omni.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part3/10-audio-codecs.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part4/12-multimodal-omni.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

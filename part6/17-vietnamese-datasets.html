@@ -1,0 +1,448 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 17: Vietnamese Datasets - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html" class="active"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part6/17-vietnamese-datasets.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-17-vietnamese-datasets-và-benchmarks"><a class="header" href="#chương-17-vietnamese-datasets-và-benchmarks">Chương 17: Vietnamese Datasets và Benchmarks</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Speech AI cho tiếng Việt phụ thuộc vào data: data lớn, đa dạng, có labeling chất lượng. Chương này tập hợp các dataset, benchmark, và resource công khai cho ASR, TTS, voice agent tiếng Việt, kèm đánh giá thực dụng về điểm mạnh, hạn chế, và mức độ phù hợp với từng use case.</p>
+<p>Đối với team product làm voice AI tại Việt Nam, chương này trả lời các câu hỏi cụ thể:</p>
+<ul>
+<li>Có những dataset ASR tiếng Việt nào public? VLSP 2020, VIVOS, Common Voice Vietnamese, FPT data có gì khác nhau? Tổng số giờ bao nhiêu?</li>
+<li>Benchmark nào được dùng để so sánh model? Những kết quả công khai nên được đọc trong bối cảnh nào?</li>
+<li>Có dataset cho code-switching Việt-Anh không? Cho emotion? Cho speaker recognition?</li>
+<li>Dataset thương mại có gì? Giá bao nhiêu? License ra sao?</li>
+</ul>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: ASR datasets (VLSP, VIVOS, Common Voice Vi, FPT, VinAI private).</li>
+<li><strong>Phần 2</strong>: TTS datasets và voice corpora.</li>
+<li><strong>Phần 3</strong>: benchmark VLSP và các benchmark cộng đồng.</li>
+<li><strong>Phần 4</strong>: PhoWhisper case study, kết quả công khai.</li>
+<li><strong>Phần 5</strong>: gaps và opportunities (code-switching benchmark, emotion, speaker for Vi).</li>
+</ul>
+</blockquote>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Chương này tổng hợp toàn bộ <strong>datasets</strong>, <strong>benchmarks</strong>, <strong>models</strong>, và <strong>hệ sinh thái</strong> speech processing tại Việt Nam. Mục tiêu: cung cấp bản đồ đầy đủ để data scientists biết có gì available và cần gì để xây dựng hệ thống speech AI cho tiếng Việt.</p>
+<blockquote>
+<p><strong>📝 Thách thức riêng của Tiếng Việt</strong></p>
+<ul>
+<li><strong>6 thanh điệu</strong> (sắc, huyền, hỏi, ngã, nặng, ngang) - tonal language</li>
+<li><strong>3 phương ngữ chính</strong> (Bắc, Trung, Nam) với khác biệt lớn về phát âm</li>
+<li><strong>Thiếu dữ liệu labeled</strong> so với English, Mandarin</li>
+<li><strong>Code-switching</strong> phổ biến (Vietnamese + English)</li>
+</ul>
+</blockquote>
+<h2 id="training-datasets"><a class="header" href="#training-datasets">Training Datasets</a></h2>
+<h3 id="asr-datasets"><a class="header" href="#asr-datasets">ASR Datasets</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Giờ</th><th>Speakers</th><th>Phương ngữ</th><th>License</th><th>Nguồn</th></tr></thead><tbody>
+<tr><td>VLSP 2020 ASR</td><td>100h</td><td>~200</td><td>Bắc, Nam</td><td>Research</td><td>VLSP</td></tr>
+<tr><td>VLSP 2021 ASR</td><td>100h</td><td>~300</td><td>3 vùng</td><td>Research</td><td>VLSP</td></tr>
+<tr><td>CommonVoice (vi)</td><td>~50h</td><td>Community</td><td>Mixed</td><td>CC-0</td><td>Mozilla</td></tr>
+<tr><td>VietSuperSpeech</td><td>12h</td><td>1 (studio)</td><td>Bắc</td><td>MIT</td><td>VietTTS</td></tr>
+<tr><td>FPT OpenSpeech</td><td>25h</td><td>Multiple</td><td>Bắc</td><td>Research</td><td>FPT</td></tr>
+<tr><td>VIVOS</td><td>15h</td><td>65</td><td>Bắc, Nam</td><td>CC-BY-SA</td><td>AILAB</td></tr>
+<tr><td>InfoRe (Bài đọc)</td><td>25h</td><td>Multiple</td><td>Bắc</td><td>Research</td><td>InfoRe</td></tr>
+<tr><td>Vinbigdata YTTD</td><td>100h</td><td>Multiple</td><td>3 vùng</td><td>Competition</td><td>Vinbigdata</td></tr>
+<tr><td>LSVSC</td><td>~100h</td><td>~1000</td><td>3 vùng</td><td>Research</td><td>HUST</td></tr>
+<tr><td>BKAI-NAVER</td><td>100h</td><td>Multiple</td><td>3 vùng</td><td>Research</td><td>BKAI</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese ASR Datasets <a id="tbl-vi-asr-datasets"></a></p>
+<h3 id="tts-datasets"><a class="header" href="#tts-datasets">TTS Datasets</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Dataset</th><th>Giờ</th><th>Speakers</th><th>Chất lượng</th><th>License</th></tr></thead><tbody>
+<tr><td>VietSuperSpeech</td><td>12h</td><td>1 female</td><td>Studio (24-bit, 48kHz)</td><td>MIT</td></tr>
+<tr><td>InfoRe TTS</td><td>20h</td><td>1 female</td><td>Studio</td><td>Research</td></tr>
+<tr><td>VNTTS</td><td>10h</td><td>1 male</td><td>Studio</td><td>Research</td></tr>
+<tr><td>LJSpeech-vi (community)</td><td>~5h</td><td>1</td><td>Mixed</td><td>Various</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese TTS Datasets <a id="tbl-vi-tts-datasets"></a></p>
+<h3 id="tổng-kết-data-landscape"><a class="header" href="#tổng-kết-data-landscape">Tổng kết Data Landscape</a></h3>
+<p><a id="eq-vi-total-data"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Total Vietnamese labeled speech</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">500</span><span class="mord text"><span class="mord">-</span></span><span class="mord">700</span><span class="mord text"><span class="mord"> giờ (public)</span></span></span></span></span></span></p>
+<blockquote>
+<p><strong>⚠️ So sánh với English</strong></p>
+<p>English có hàng trăm nghìn giờ labeled data (LibriSpeech: 960h, GigaSpeech: 10,000h, SPGISpeech: 5,000h). Vietnamese vẫn còn <strong>thiếu nghiêm trọng</strong> cả về lượng và đa dạng.</p>
+</blockquote>
+<h2 id="benchmarks"><a class="header" href="#benchmarks">Benchmarks</a></h2>
+<h3 id="vlsp-vietnamese-language-and-speech-processing"><a class="header" href="#vlsp-vietnamese-language-and-speech-processing">VLSP (Vietnamese Language and Speech Processing)</a></h3>
+<p>VLSP là workshop/competition thường niên từ 2013:</p>
+<div class="table-wrapper"><table><thead><tr><th>Năm</th><th>Task</th><th>Dataset</th><th>Metric</th><th>Best Result</th></tr></thead><tbody>
+<tr><td>2020</td><td>ASR</td><td>100h broadcast</td><td>WER</td><td>6.5%</td></tr>
+<tr><td>2021</td><td>ASR</td><td>100h mixed</td><td>WER</td><td>8.2%</td></tr>
+<tr><td>2023</td><td>ASR + TTS</td><td>Multi-domain</td><td>WER/MOS</td><td>~7% / 4.1</td></tr>
+<tr><td>2025</td><td>ASR Streaming</td><td>Real-time</td><td>WER + Latency</td><td>Ongoing</td></tr>
+</tbody></table>
+</div>
+<p>: VLSP Competition Results <a id="tbl-vlsp-benchmarks"></a></p>
+<h3 id="các-benchmark-khác"><a class="header" href="#các-benchmark-khác">Các Benchmark Khác</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Benchmark</th><th>Tasks</th><th>Languages</th><th>Vietnamese?</th></tr></thead><tbody>
+<tr><td>FLEURS</td><td>ASR, LID</td><td>102</td><td>Có</td></tr>
+<tr><td>CommonVoice</td><td>ASR</td><td>100+</td><td>Có (~50h)</td></tr>
+<tr><td>ML-SUPERB</td><td>SSL evaluation</td><td>143</td><td>Có</td></tr>
+<tr><td>Whisper benchmark</td><td>ASR</td><td>99</td><td>Có</td></tr>
+<tr><td>SeamlessM4T</td><td>Translation</td><td>100</td><td>Có</td></tr>
+</tbody></table>
+</div>
+<p>: International Benchmarks có Vietnamese <a id="tbl-international-benchmarks-vi"></a></p>
+<h2 id="vietnamese-speech-models"><a class="header" href="#vietnamese-speech-models">Vietnamese Speech Models</a></h2>
+<h3 id="asr-models"><a class="header" href="#asr-models">ASR Models</a></h3>
+<p>Bảng dưới đây không nên được đọc như một leaderboard tuyệt đối. Các hệ thống thương mại thường không công bố đầy đủ test set, protocol đánh giá và điều kiện nhiễu; vì vậy các con số WER dạng <code>~</code> chỉ có giá trị tham khảo định hướng. Khi ra quyết định kỹ thuật, cần tái đánh giá trên tập dữ liệu nội bộ có cùng domain, phương ngữ và điều kiện thu âm với sản phẩm.</p>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Tổ chức</th><th>Base</th><th>WER/VLSP công khai</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>PhoWhisper</td><td>VinAI</td><td>Whisper</td><td>Khoảng 7-11% tuỳ split và paper</td><td>Có (HuggingFace)</td></tr>
+<tr><td>Wav2Vec2-vi</td><td>VinAI/community</td><td>Wav2Vec 2.0</td><td>Khoảng 10% trên một số benchmark công khai</td><td>Có</td></tr>
+<tr><td>XLSR-Vietnamese</td><td>Community</td><td>XLSR-53</td><td>Khoảng 12% trong báo cáo cộng đồng</td><td>Có</td></tr>
+<tr><td>Viettel ASR</td><td>Viettel</td><td>Conformer/production stack</td><td>Không có protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>Zalo ASR</td><td>Zalo/VNG</td><td>Production ASR</td><td>Không có protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>FPT.AI ASR</td><td>FPT</td><td>Production ASR</td><td>Không có protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>NVIDIA Canary-vi</td><td>NVIDIA</td><td>Canary</td><td>Chưa có kết quả VLSP công khai ổn định</td><td>Có (NeMo)</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese ASR Models <a id="tbl-vi-asr-models"></a></p>
+<h3 id="phowhisper-vinai"><a class="header" href="#phowhisper-vinai">PhoWhisper (VinAI)</a></h3>
+<p>PhoWhisper <sup class="footnote-reference"><a href="#nguyen2024phowhisper">1</a></sup> fine-tune Whisper cho tiếng Việt:</p>
+<ul>
+<li>Base: Whisper-large-v3</li>
+<li>Fine-tune data: ~500h Vietnamese</li>
+<li>Hỗ trợ 3 phương ngữ</li>
+<li>Available trên HuggingFace: <code>vinai/PhoWhisper-large</code></li>
+</ul>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "PhoWhisper Inference"
+from transformers import WhisperProcessor, WhisperForConditionalGeneration
+import torch
+from torch import Tensor
+
+# Load PhoWhisper
+processor = WhisperProcessor.from_pretrained("vinai/PhoWhisper-large")
+model = WhisperForConditionalGeneration.from_pretrained(
+    "vinai/PhoWhisper-large"
+)
+model.eval()
+
+def transcribe_vietnamese(
+    audio: Tensor,           # [T] - float32, 16kHz mono
+    sampling_rate: int = 16000,
+) -&gt; str:
+    """Transcribe Vietnamese audio using PhoWhisper."""
+    input_features: Tensor = processor(
+        audio.numpy(),
+        sampling_rate=sampling_rate,
+        return_tensors="pt",
+    ).input_features  # [1, 80, 3000] - float32
+
+    with torch.no_grad():
+        predicted_ids: Tensor = model.generate(
+            input_features,
+            language="vi",
+            task="transcribe",
+        )  # [1, S] - int64
+
+    transcription: str = processor.batch_decode(
+        predicted_ids, skip_special_tokens=True
+    )[0]
+    return transcription
+</code></pre>
+<h3 id="tts-models"><a class="header" href="#tts-models">TTS Models</a></h3>
+<p>Với TTS tiếng Việt, MOS công khai thường khó so sánh hơn WER vì phụ thuộc panel đánh giá, thiết bị nghe, transcript, phương ngữ và tiêu chí naturalness. Do đó, bảng này chỉ dùng để định vị hệ sinh thái, không thay thế cho human evaluation nội bộ.</p>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Tổ chức</th><th>Kiến trúc</th><th>Chất lượng công khai</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>VietTTS</td><td>Community</td><td>VITS</td><td>Baseline cộng đồng, phù hợp thử nghiệm</td><td>Có</td></tr>
+<tr><td>Zalo TTS</td><td>Zalo/VNG</td><td>Production TTS</td><td>Không có MOS/protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>FPT.AI TTS</td><td>FPT</td><td>Production TTS</td><td>Không có MOS/protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>Viettel TTS</td><td>Viettel</td><td>Production TTS</td><td>Không có MOS/protocol công khai đầy đủ</td><td>Không (API)</td></tr>
+<tr><td>CosyVoice-vi</td><td>Alibaba/community fine-tune</td><td>CosyVoice</td><td>Chưa có MOS tiếng Việt công khai đáng tin cậy</td><td>Có thể fine-tune</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese TTS Models <a id="tbl-vi-tts-models"></a></p>
+<h2 id="voice-conversion-vc"><a class="header" href="#voice-conversion-vc">Voice Conversion (VC)</a></h2>
+<p>Voice conversion - biến đổi giọng nói người A thành giọng người B mà giữ nguyên nội dung:</p>
+<p><a id="eq-voice-conversion"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8579em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7079em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathbf">x</span></span><span style="top:-3.0134em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.2222em;"><span class="mord">^</span></span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">G</span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">A</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">G</span></span></span></span> là generator, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5944em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathbf">s</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05017em;">B</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> là speaker embedding target.</p>
+<h3 id="các-approach"><a class="header" href="#các-approach">Các Approach</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Approach</th><th>Cần parallel data?</th><th>Chất lượng</th><th>Ví dụ</th></tr></thead><tbody>
+<tr><td>Parallel VC</td><td>Có</td><td>Cao</td><td>GMM mapping</td></tr>
+<tr><td>Non-parallel VC</td><td>Không</td><td>Cao</td><td>AutoVC, VITS-VC</td></tr>
+<tr><td>Zero-shot VC</td><td>Không (chỉ cần 1 sample)</td><td>Trung bình-Cao</td><td>FreeVC, YourTTS</td></tr>
+<tr><td>Any-to-Any VC</td><td>Không</td><td>Cao</td><td>VALL-E based</td></tr>
+</tbody></table>
+</div>
+<p>: Voice Conversion approaches <a id="tbl-vc-approaches"></a></p>
+<h2 id="các-tổ-chức-nghiên-cứu-speech-tại-việt-nam"><a class="header" href="#các-tổ-chức-nghiên-cứu-speech-tại-việt-nam">Các Tổ chức Nghiên cứu Speech tại Việt Nam</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tổ chức</th><th>Focus</th><th>Sản phẩm/Output</th></tr></thead><tbody>
+<tr><td>VinAI Research</td><td>ASR, NLP</td><td>PhoWhisper, PhoGPT, PhoBERT</td></tr>
+<tr><td>Zalo AI (VNG)</td><td>ASR, TTS, NLP</td><td>Zalo AI APIs, competition</td></tr>
+<tr><td>FPT.AI</td><td>Full-stack AI</td><td>FPT.AI Speech platform</td></tr>
+<tr><td>Viettel AI</td><td>Telecom AI</td><td>Call center ASR/TTS</td></tr>
+<tr><td>BKAI (HUST)</td><td>Academic research</td><td>Datasets, papers</td></tr>
+<tr><td>AILAB (VNUHCM)</td><td>Academic research</td><td>VIVOS dataset</td></tr>
+<tr><td>VietAI</td><td>Community</td><td>Courses, open-source</td></tr>
+</tbody></table>
+</div>
+<p>: Hệ sinh thái Speech AI tại Việt Nam <a id="tbl-vi-ecosystem"></a></p>
+<h2 id="thách-thức-và-hướng-phát-triển"><a class="header" href="#thách-thức-và-hướng-phát-triển">Thách thức và Hướng phát triển</a></h2>
+<h3 id="thách-thức"><a class="header" href="#thách-thức">Thách thức</a></h3>
+<ol>
+<li><strong>Data scarcity</strong>: Cần thêm hàng nghìn giờ labeled data</li>
+<li><strong>Dialect diversity</strong>: Model cần handle 3 phương ngữ + các accent địa phương</li>
+<li><strong>Code-switching</strong>: Vietnamese-English switching rất phổ biến</li>
+<li><strong>Tonal accuracy</strong>: 6 thanh điệu cần precision cao trong cả ASR và TTS</li>
+<li><strong>Domain-specific</strong>: Y tế, pháp lý, tài chính cần specialized models</li>
+</ol>
+<h3 id="hướng-phát-triển"><a class="header" href="#hướng-phát-triển">Hướng phát triển</a></h3>
+<ol>
+<li><strong>Self-supervised pretraining</strong> trên Vietnamese audio (giảm dependency on labeled data)</li>
+<li><strong>Multilingual transfer</strong> từ models lớn (Whisper, SeamlessM4T)</li>
+<li><strong>Synthetic data</strong> generation bằng TTS → ASR augmentation</li>
+<li><strong>Community datasets</strong>: Mô hình CommonVoice cho Vietnamese</li>
+<li><strong>Benchmark standardization</strong>: VLSP cần thống nhất evaluation protocol</li>
+</ol>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<ol>
+<li>Vietnamese có khoảng <strong>500-700 giờ</strong> public labeled speech data</li>
+<li><strong>PhoWhisper</strong> (VinAI) là một baseline open-source mạnh cho Vietnamese ASR, nhưng cần đọc kết quả theo đúng benchmark và thời điểm công bố</li>
+<li><strong>VLSP</strong> là benchmark competition chính, tổ chức hàng năm</li>
+<li>Hệ sinh thái: VinAI (research), Zalo/FPT/Viettel (products), BKAI/AILAB (academic)</li>
+<li>Thách thức lớn nhất: data scarcity, dialect diversity, tonal accuracy</li>
+</ol>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="nguyen2024phowhisper"><sup class="footnote-definition-label">1</sup>
+<p>Nguyen, Thanh-Nhi and Nguyen, Dat Quoc, "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition", arXiv preprint</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part6/16-vietnamese-speech.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part7/18-training-frameworks.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part6/16-vietnamese-speech.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part7/18-training-frameworks.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

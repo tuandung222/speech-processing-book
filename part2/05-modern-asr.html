@@ -1,0 +1,573 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 5: Modern ASR Architectures - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html" class="active"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part2/05-modern-asr.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-5-modern-asr-architectures"><a class="header" href="#chương-5-modern-asr-architectures">Chương 5: Modern ASR Architectures</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Chương 4 đã giới thiệu ba paradigm cốt lõi cho ASR (CTC, attention seq2seq, RNN-T). Chương này phát triển các <strong>kiến trúc encoder hiện đại</strong> đã định hình production ASR trong năm năm gần đây: <strong>Conformer</strong> (Gulati và cộng sự, 2020), <strong>Zipformer</strong> (Yao và cộng sự, 2023), <strong>E-Branchformer</strong> (Kim và cộng sự, 2022), và <strong>Paraformer</strong>.</p>
+<p>Lý do tách thành chương riêng: kiến trúc encoder thường quyết định phần lớn chất lượng và chi phí tính toán của một hệ ASR. Cùng loss và cùng dữ liệu, việc thay Transformer thuần bằng encoder được thiết kế riêng cho speech có thể tạo khác biệt lớn trong WER, latency và memory. Đó là vì encoder cần xử lý sequence audio dài, ví dụ hơn 1000 frames cho một câu 10 giây, với cả local pattern như formant, burst, co-articulation và global pattern như ngữ cảnh câu.</p>
+<p>Đối với độc giả NLP/LLM, các kiến trúc trong chương này là tương đương Speech của các Transformer variants (Longformer, BigBird, FlashAttention-based models): cải tiến trên Transformer chuẩn để phù hợp với tính chất riêng của domain.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: vấn đề audio sequence dài và động lực cho hybrid CNN + attention.</li>
+<li><strong>Phần 2</strong>: Conformer, kiến trúc encoder phổ biến nhất cho ASR hiện đại.</li>
+<li><strong>Phần 3</strong>: Zipformer, E-Branchformer, Paraformer, các cải tiến gần đây.</li>
+<li><strong>Phần 4</strong>: so sánh kiến trúc, lựa chọn theo budget compute và latency.</li>
+</ul>
+</blockquote>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Chương này trình bày các kiến trúc ASR hiện đại nhất, từ <strong>Conformer</strong> đến <strong>Zipformer</strong>, <strong>E-Branchformer</strong>, và xu hướng sử dụng <strong>MoE</strong> (Mixture of Experts) cùng <strong>SSM/Mamba</strong> trong speech recognition.</p>
+<blockquote>
+<p><strong>📝 Bước tiến từ Transformer đến Conformer</strong></p>
+<p>Transformer thuần túy (self-attention) không có inductive bias mạnh cho local acoustic patterns. Conformer kết hợp <strong>convolution</strong> (local) và <strong>self-attention</strong> (global), nên thường phù hợp hơn cho speech trong nhiều benchmark ASR.</p>
+</blockquote>
+<h3 id="bài-toán-encoder-asr-phải-giải"><a class="header" href="#bài-toán-encoder-asr-phải-giải">Bài toán encoder ASR phải giải</a></h3>
+<p>Một encoder ASR tốt phải cân bằng ba yêu cầu:</p>
+<div class="table-wrapper"><table><thead><tr><th>Yêu cầu</th><th>Vì sao quan trọng</th><th>Cơ chế thường dùng</th></tr></thead><tbody>
+<tr><td>Local acoustic modeling</td><td>phoneme phụ thuộc formant, burst, transition ngắn</td><td>convolution, depthwise conv, local attention</td></tr>
+<tr><td>Global context</td><td>homophone, phrase context, long utterance</td><td>self-attention, chunked attention</td></tr>
+<tr><td>Compute efficiency</td><td>audio sequence dài hơn text nhiều lần</td><td>subsampling, multi-scale, streaming cache</td></tr>
+</tbody></table>
+</div><pre class="mermaid">flowchart LR
+    MEL[&quot;Log-mel frames&lt;br&gt;100 fps&quot;] --&gt; SUB[&quot;Subsampling&lt;br&gt;reduce length&quot;]
+    SUB --&gt; LOCAL[&quot;Local module&lt;br&gt;conv / cgMLP&quot;]
+    SUB --&gt; GLOBAL[&quot;Global module&lt;br&gt;self-attention&quot;]
+    LOCAL --&gt; MERGE[&quot;Merge local + global&quot;]
+    GLOBAL --&gt; MERGE
+    MERGE --&gt; LOSS[&quot;CTC / RNN-T / Attention loss&quot;]
+</pre>
+<p>Đây là chủ đề chung của Conformer, E-Branchformer, Zipformer và FastConformer: <strong>đừng dùng Transformer text một cách nguyên xi cho audio; hãy sửa encoder để tôn trọng cấu trúc thời gian của speech.</strong></p>
+<h2 id="conformer"><a class="header" href="#conformer">Conformer</a></h2>
+<h3 id="kiến-trúc"><a class="header" href="#kiến-trúc">Kiến trúc</a></h3>
+<p>Conformer <sup class="footnote-reference"><a href="#gulati2020conformer">1</a></sup> xếp chồng các <strong>Conformer blocks</strong>, mỗi block gồm 4 modules theo thứ tự "macaron-style":</p>
+<pre class="mermaid">flowchart TD
+    X[&quot;Input x&quot;] --&gt; FF1[&quot;1/2 Feed Forward&quot;]
+    FF1 --&gt; MHSA[&quot;Multi-head self-attention&lt;br&gt;global context&quot;]
+    MHSA --&gt; CONV[&quot;Convolution module&lt;br&gt;local acoustic patterns&quot;]
+    CONV --&gt; FF2[&quot;1/2 Feed Forward&quot;]
+    FF2 --&gt; LN[&quot;LayerNorm&quot;]
+    LN --&gt; Y[&quot;Output y&quot;]
+</pre>
+<p>Macaron-style nghĩa là FFN được chia thành hai nửa đặt trước và sau attention/conv. Điều này giúp block vừa có năng lực biến đổi phi tuyến mạnh, vừa giữ residual path ổn định khi stack nhiều layers.</p>
+<p><a id="eq-conformer-ffn1"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8019em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="mord text"><span class="mord">FFN</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span></span></p>
+<p><a id="eq-conformer-mhsa"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8019em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8852em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0519em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">MHSA</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p><a id="eq-conformer-conv"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8019em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8852em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.0519em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Conv</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<p><a id="eq-conformer-ffn2"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathbf" style="margin-right:0.01597em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.4em;vertical-align:-0.95em;"></span><span class="mord text"><span class="mord">LayerNorm</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;"><span class="delimsizing size3">(</span></span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′′</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">2</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mord"><span class="mord text"><span class="mord">FFN</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8019em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">′′′</span></span></span></span></span></span></span></span></span><span class="mclose">)</span><span class="mclose delimcenter" style="top:0em;"><span class="delimsizing size3">)</span></span></span></span></span></span></span></p>
+<p><strong>Convolution Module</strong> sử dụng depthwise separable convolution:</p>
+<p><a id="eq-conformer-conv-module"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Conv</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">PointwiseConv</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">GLU</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord"><span class="mord text"><span class="mord">DepthwiseConv</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.242em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.03148em;">k</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">∘</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">PointwiseConv</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span></span></p>
+<p>với kernel size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">31</span></span></span></span> (capture ~310ms context ở 10ms frame rate).</p>
+<p>Vì sao cần convolution nếu đã có attention? Attention giỏi nhìn xa, nhưng không có inductive bias mạnh cho local acoustic transition. Speech có nhiều pattern rất cục bộ: stop burst, formant transition, onset/offset của âm tiết. Depthwise convolution đưa bias này vào model với chi phí thấp.</p>
+<div class="table-wrapper"><table><thead><tr><th>Module trong Conformer</th><th>Vai trò trực giác</th></tr></thead><tbody>
+<tr><td>FFN 1/2 trước</td><td>mở rộng/biến đổi feature ở từng frame</td></tr>
+<tr><td>MHSA</td><td>kết nối frame xa nhau trong cùng utterance</td></tr>
+<tr><td>Conv module</td><td>bắt local pattern và smooth theo thời gian</td></tr>
+<tr><td>FFN 1/2 sau</td><td>refinement sau khi đã trộn local/global</td></tr>
+<tr><td>LayerNorm/residual</td><td>ổn định training sâu</td></tr>
+</tbody></table>
+</div>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Conformer Block Implementation"
+import torch
+import torch.nn as nn
+from torch import Tensor
+
+class ConformerBlock(nn.Module):
+    """Single Conformer block with macaron-style FFN sandwich."""
+
+    def __init__(
+        self,
+        d_model: int = 256,
+        n_heads: int = 4,
+        ff_expansion: int = 4,
+        conv_kernel: int = 31,
+        dropout: float = 0.1,
+    ) -&gt; None:
+        super().__init__()
+        self.ffn1 = FeedForward(d_model, ff_expansion, dropout)
+        self.mhsa = nn.MultiheadAttention(
+            d_model, n_heads, dropout=dropout, batch_first=True
+        )
+        self.conv = ConvolutionModule(d_model, conv_kernel, dropout)
+        self.ffn2 = FeedForward(d_model, ff_expansion, dropout)
+        self.ln = nn.LayerNorm(d_model)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        # x: [B, T, D] - float32
+        x = x + 0.5 * self.ffn1(x)           # [B, T, D] - float32
+        residual = x
+        x_att, _ = self.mhsa(x, x, x)        # [B, T, D] - float32
+        x = residual + x_att                   # [B, T, D] - float32
+        x = x + self.conv(x)                  # [B, T, D] - float32
+        x = x + 0.5 * self.ffn2(x)           # [B, T, D] - float32
+        return self.ln(x)                      # [B, T, D] - float32
+
+
+class FeedForward(nn.Module):
+    def __init__(self, d: int, expansion: int, dropout: float) -&gt; None:
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.LayerNorm(d),
+            nn.Linear(d, d * expansion),  # [B, T, D] -&gt; [B, T, D*4]
+            nn.SiLU(),
+            nn.Dropout(dropout),
+            nn.Linear(d * expansion, d),  # [B, T, D*4] -&gt; [B, T, D]
+            nn.Dropout(dropout),
+        )
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        return self.net(x)  # [B, T, D] - float32
+
+
+class ConvolutionModule(nn.Module):
+    def __init__(self, d: int, kernel: int, dropout: float) -&gt; None:
+        super().__init__()
+        self.ln = nn.LayerNorm(d)
+        self.pointwise1 = nn.Conv1d(d, 2 * d, 1)     # GLU needs 2x
+        self.depthwise = nn.Conv1d(
+            d, d, kernel, padding=kernel // 2, groups=d
+        )
+        self.bn = nn.BatchNorm1d(d)
+        self.pointwise2 = nn.Conv1d(d, d, 1)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, x: Tensor) -&gt; Tensor:
+        # x: [B, T, D]
+        x = self.ln(x).transpose(1, 2)     # [B, D, T]
+        x = self.pointwise1(x)              # [B, 2D, T]
+        x = x.chunk(2, dim=1)[0] * torch.sigmoid(
+            x.chunk(2, dim=1)[1]
+        )                                    # [B, D, T] - GLU
+        x = self.depthwise(x)               # [B, D, T]
+        x = self.bn(x)                      # [B, D, T]
+        x = nn.functional.silu(x)           # [B, D, T]
+        x = self.pointwise2(x)              # [B, D, T]
+        return self.dropout(x).transpose(1, 2)  # [B, T, D]
+</code></pre>
+<h3 id="Đọc-kết-quả-benchmark-đúng-cách"><a class="header" href="#Đọc-kết-quả-benchmark-đúng-cách">Đọc kết quả benchmark đúng cách</a></h3>
+<p>Các bảng LibriSpeech rất hữu ích để so sánh kiến trúc trong điều kiện chuẩn, nhưng không nên xem là bảo chứng production. Một encoder tốt trên LibriSpeech vẫn cần kiểm tra trên accent, noise, domain, streaming constraint và ngôn ngữ mục tiêu.</p>
+<h3 id="kết-quả"><a class="header" href="#kết-quả">Kết quả</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Params</th><th>LibriSpeech test-clean</th><th>test-other</th></tr></thead><tbody>
+<tr><td>Transformer</td><td>118M</td><td>2.4% WER</td><td>5.6%</td></tr>
+<tr><td><strong>Conformer-L</strong></td><td>118M</td><td><strong>2.1%</strong></td><td><strong>4.3%</strong></td></tr>
+<tr><td>Conformer-XL</td><td>600M</td><td>1.9%</td><td>3.9%</td></tr>
+</tbody></table>
+</div>
+<p>: Conformer vs Transformer trên LibriSpeech <a id="tbl-conformer-results"></a></p>
+<p>Bảng trên minh họa xu hướng: thêm convolution và thiết kế encoder phù hợp speech có thể cải thiện rõ rệt so với Transformer thuần trong cùng benchmark. Khi đưa vào sản phẩm, cần đo thêm RTF, memory, batch throughput và độ ổn định trên long-form audio.</p>
+<h2 id="e-branchformer"><a class="header" href="#e-branchformer">E-Branchformer</a></h2>
+<p>E-Branchformer <sup class="footnote-reference"><a href="#kim2023ebranchformer">2</a></sup> cải tiến Conformer bằng <strong>parallel branches</strong>:</p>
+<p>Khác với Conformer chạy các module theo chuỗi, E-Branchformer tách đường xử lý global và local song song rồi merge. Điều này phản ánh một trực giác sư phạm: audio cần cả “nhìn gần” và “nhìn xa”, nhưng hai thao tác này không nhất thiết phải chờ nhau.</p>
+<pre class="mermaid">flowchart LR
+    X[&quot;Input&quot;] --&gt; G[&quot;Global branch&lt;br&gt;self-attention&quot;]
+    X --&gt; L[&quot;Local branch&lt;br&gt;cgMLP / conv gating&quot;]
+    G --&gt; M[&quot;Enhanced merge&quot;]
+    L --&gt; M
+    M --&gt; Y[&quot;Output&quot;]
+</pre>
+<p><a id="eq-ebranchformer"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6389em;vertical-align:-0.1944em;"></span><span class="mord mathbf" style="margin-right:0.01597em;">y</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Merge</span></span><span class="mopen">(</span><span class="mord text"><span class="mord">GlobalBranch</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">LocalBranch</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">))</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4444em;"></span><span class="mord mathbf">x</span></span></span></span></span></p>
+<ul>
+<li><strong>Global Branch</strong>: Multi-head self-attention (MHSA)</li>
+<li><strong>Local Branch</strong>: Convolutional gating mechanism (cgMLP)</li>
+<li><strong>Merge</strong>: Linear projection + concatenation</li>
+</ul>
+<blockquote>
+<p><strong>📝 Tại sao E-Branchformer?</strong></p>
+<p>Conformer xử lý tuần tự: FFN → MHSA → Conv → FFN. E-Branchformer chạy <strong>song song</strong> global và local branches, trong một số báo cáo cho tốc độ training tốt hơn và chất lượng cạnh tranh với Conformer.</p>
+</blockquote>
+<h2 id="zipformer"><a class="header" href="#zipformer">Zipformer</a></h2>
+<p>Zipformer <sup class="footnote-reference"><a href="#yao2023zipformer">3</a></sup> (từ nhóm k2/icefall) cải tiến nhiều khía cạnh:</p>
+<p>Zipformer tập trung vào câu hỏi engineering: làm thế nào giữ chất lượng cao nhưng giảm chi phí cho ASR thực tế? Câu trả lời là multi-scale processing: không phải layer nào cũng cần frame rate cao như nhau.</p>
+<pre class="mermaid">flowchart TD
+    A[&quot;Input 50 fps&quot;] --&gt; L1[&quot;Early blocks&lt;br&gt;50 fps&quot;]
+    L1 --&gt; D1[&quot;Downsample&quot;]
+    D1 --&gt; L2[&quot;Middle blocks&lt;br&gt;25 fps&quot;]
+    L2 --&gt; D2[&quot;Downsample&quot;]
+    D2 --&gt; L3[&quot;High-level blocks&lt;br&gt;12.5 fps&quot;]
+    L3 --&gt; U[&quot;Upsample / combine&quot;]
+    U --&gt; OUT[&quot;ASR logits&quot;]
+</pre>
+<p>Trực giác: layer đầu cần độ phân giải thời gian cao để bắt acoustic detail. Layer sâu hơn đã có representation trừu tượng hơn, nên có thể xử lý ở frame rate thấp hơn để tiết kiệm compute.</p>
+<h3 id="temporal-downsampling"><a class="header" href="#temporal-downsampling">Temporal Downsampling</a></h3>
+<p>Sử dụng <strong>multi-scale architecture</strong> với different frame rates ở các layers khác nhau:</p>
+<ul>
+<li>Layers đầu: 50 fps (10ms)</li>
+<li>Layers giữa: 25 fps (20ms) - downsample 2x</li>
+<li>Layers cuối: 12.5 fps (40ms) - downsample thêm 2x</li>
+</ul>
+<p><a id="eq-zipformer-fps"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mord"><span class="mord text"><span class="mord">fps</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.242em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.0074em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.7751em;"><span style="top:-2.989em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight"><span class="mord mathnormal mtight">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3448em;"><span style="top:-2.3488em;margin-left:0em;margin-right:0.0714em;"><span class="pstrut" style="height:2.5em;"></span><span class="sizing reset-size3 size1 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1512em;"><span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">50</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal">d</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.01968em;">l</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">2</span><span class="mclose">}</span></span></span></span></span></p>
+<h3 id="swoosh-activation"><a class="header" href="#swoosh-activation">Swoosh Activation</a></h3>
+<p>Thay SiLU bằng <strong>Swoosh</strong> activation:</p>
+<p><a id="eq-swoosh"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Swoosh</span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">σ</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span></span></span></span></span></p>
+<h3 id="biasnorm-thay-layernorm"><a class="header" href="#biasnorm-thay-layernorm">BiasNorm thay LayerNorm</a></h3>
+<p><a id="eq-biasnorm"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">BiasNorm</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.3074em;vertical-align:-0.936em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">learn scale</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">∥</span><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">b</span><span class="mord"><span class="mord">∥</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">RMS</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathbf">b</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.936em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Params</th><th>test-clean</th><th>test-other</th><th>Speed</th></tr></thead><tbody>
+<tr><td>Conformer</td><td>116M</td><td>2.1%</td><td>4.3%</td><td>1.0x</td></tr>
+<tr><td>E-Branchformer</td><td>116M</td><td>2.1%</td><td>4.2%</td><td>1.1x</td></tr>
+<tr><td><strong>Zipformer-L</strong></td><td>148M</td><td><strong>1.9%</strong></td><td><strong>4.0%</strong></td><td><strong>1.3x</strong></td></tr>
+</tbody></table>
+</div>
+<p>: So sánh kiến trúc ASR hiện đại <a id="tbl-modern-asr-comparison"></a></p>
+<p>Các con số trong bảng nên được đọc như ví dụ benchmark, không phải thứ hạng tuyệt đối. Kết quả thay đổi theo dataset, tokenizer, augmentation, decoding, LM rescoring và cấu hình streaming/offline.</p>
+<h2 id="fastconformer-nvidia"><a class="header" href="#fastconformer-nvidia">FastConformer (NVIDIA)</a></h2>
+<p>FastConformer <sup class="footnote-reference"><a href="#rekesh2023fast">4</a></sup> từ NVIDIA NeMo tối ưu Conformer cho production:</p>
+<p>FastConformer là ví dụ tốt về khác biệt giữa “model paper” và “model production”. Trong production, giảm WER không đủ; ta còn cần throughput cao, RTF thấp, memory ổn định và dễ export/serve.</p>
+<ul>
+<li><strong>8x downsampling</strong> ở CNN frontend (thay vì 4x) - giảm sequence length</li>
+<li><strong>Multi-blank CTC</strong> - thêm blank symbols cho phép skip nhiều frames</li>
+<li><strong>Hybrid CTC/RNNT</strong> training</li>
+</ul>
+<p><a id="eq-fastconformer-rtf"></a></p>
+<p><span class="katex-error" title="ParseError: KaTeX parse error: Unexpected character: &#x27;&#x27; at position 34: …astConformer}} ̲pprox 0.01 	ext…" style="color:#cc0000">undefined</span></p>
+<p><strong>Real-time factor (RTF)</strong> là thước đo rất quan trọng:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: right">RTF</th><th>Ý nghĩa</th></tr></thead><tbody>
+<tr><td style="text-align: right">1.0</td><td>xử lý 1 giây audio mất 1 giây</td></tr>
+<tr><td style="text-align: right">0.5</td><td>nhanh hơn realtime 2 lần</td></tr>
+<tr><td style="text-align: right">0.01</td><td>nhanh hơn realtime khoảng 100 lần trong điều kiện benchmark</td></tr>
+<tr><td style="text-align: right">&gt;1.0</td><td>chậm hơn realtime, không phù hợp streaming</td></tr>
+</tbody></table>
+</div>
+<p>RTF phụ thuộc mạnh vào hardware, batch size, precision, decoding beam, audio length và I/O. Vì vậy khi đọc con số RTF, luôn hỏi: đo trên GPU nào, batch bao nhiêu, offline hay streaming, có LM rescoring không?</p>
+<h2 id="moe-trong-speech-recognition"><a class="header" href="#moe-trong-speech-recognition">MoE trong Speech Recognition</a></h2>
+<h3 id="tại-sao-moe-cho-speech"><a class="header" href="#tại-sao-moe-cho-speech">Tại sao MoE cho Speech?</a></h3>
+<p>Mixture of Experts (MoE) <sup class="footnote-reference"><a href="#shazeer2017outrageously">5</a></sup> cho phép <strong>scale model capacity</strong> mà không tăng compute proportionally:</p>
+<p>Trong ASR, MoE hấp dẫn vì các frame khác nhau có thể cần chuyên gia khác nhau: speech sạch, speech nhiễu, âm nhạc nền, accent vùng miền, hoặc code-switching. Tuy nhiên MoE cũng làm production phức tạp hơn: routing, load balancing, memory footprint và latency tail đều khó kiểm soát hơn dense model.</p>
+<p><a id="eq-moe-speech"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">MoE</span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0576em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span></span></p>
+<p>với <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">g</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathbf">x</span><span class="mclose">)</span></span></span></span> là routing weights (chỉ top-<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span></span></span></span> experts được activate).</p>
+<h3 id="branchformer-moe"><a class="header" href="#branchformer-moe">Branchformer-MoE</a></h3>
+<p>Kết hợp E-Branchformer với MoE routing <sup class="footnote-reference"><a href="#you2024moe">6</a></sup>:</p>
+<ul>
+<li>Thay FFN layers bằng MoE layers (8-64 experts, top-2 routing)</li>
+<li>Load balancing loss để tránh expert collapse:</li>
+</ul>
+<p><a id="eq-moe-balance"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">balance</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">N</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1076em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> là fraction of tokens routed to expert <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:-0.1389em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">i</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> là average routing probability.</p>
+<h2 id="mambassm-trong-speech"><a class="header" href="#mambassm-trong-speech">Mamba/SSM trong Speech</a></h2>
+<h3 id="state-space-models-cho-audio"><a class="header" href="#state-space-models-cho-audio">State Space Models cho Audio</a></h3>
+<p>S4 <sup class="footnote-reference"><a href="#gu2022efficiently">7</a></sup> và Mamba <sup class="footnote-reference"><a href="#gu2023mamba">8</a></sup> xử lý sequences dài hiệu quả - rất phù hợp cho audio (16kHz = 16000 samples/sec):</p>
+<p><a id="eq-ssm-speech"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:3em;vertical-align:-1.25em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">t</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.75em;"><span style="top:-3.91em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8229em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathbf">A</span></span><span style="top:-3.2551em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1111em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8229em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathbf">B</span></span><span style="top:-3.2551em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span></span></span></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.41em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathbf">C</span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">t</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.25em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h3 id="khi-nào-nên-quan-tâm-ssmmamba"><a class="header" href="#khi-nào-nên-quan-tâm-ssmmamba">Khi nào nên quan tâm SSM/Mamba?</a></h3>
+<p>SSM/Mamba đáng chú ý khi sequence rất dài hoặc cần chi phí tuyến tính theo thời gian. Tuy nhiên, ASR không chỉ cần long-range modeling; nó cần alignment, streaming, robustness và decoding ổn định. Vì vậy, ở thời điểm hiện tại, SSM thường nên được xem như thành phần lai hoặc hướng nghiên cứu, không phải lựa chọn mặc định thay Conformer trong production.</p>
+<h3 id="hybrid-attention-ssm-cho-asr"><a class="header" href="#hybrid-attention-ssm-cho-asr">Hybrid Attention-SSM cho ASR</a></h3>
+<p>Jamba-style architectures <sup class="footnote-reference"><a href="#lieber2024jamba">9</a></sup> cho speech kết hợp:</p>
+<ul>
+<li><strong>Attention layers</strong>: Capture global dependencies (cross-utterance context)</li>
+<li><strong>Mamba layers</strong>: Xử lý long sequences hiệu quả (raw waveform hoặc high-resolution features)</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Kiến trúc</th><th>Complexity</th><th>Long Audio</th><th>Global Context</th></tr></thead><tbody>
+<tr><td>Pure Attention</td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.0641em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8141em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></td><td>Kém</td><td>Tốt</td></tr>
+<tr><td>Pure Mamba</td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.13889em;">T</span><span class="mclose">)</span></span></span></span></td><td>Tốt</td><td>Trung bình</td></tr>
+<tr><td><strong>Hybrid</strong></td><td>thường gần tuyến tính tùy thiết kế</td><td>Tốt</td><td>Tốt nếu vẫn giữ attention/global module</td></tr>
+</tbody></table>
+</div>
+<p>: Attention vs Mamba vs Hybrid cho speech <a id="tbl-hybrid-ssm-speech"></a></p>
+<blockquote>
+<p><strong>⚠️ SSM cho Speech còn rất mới</strong></p>
+<p>Tính đến 2025-2026, nghiên cứu về Mamba/SSM cho speech vẫn đang phát triển. Conformer, E-Branchformer, Zipformer và FastConformer vẫn là các lựa chọn thực dụng hơn trong nhiều pipeline ASR. Hybrid architectures hứa hẹn nhưng cần được benchmark kỹ theo domain.</p>
+</blockquote>
+<h2 id="lựa-chọn-kiến-trúc-theo-ràng-buộc"><a class="header" href="#lựa-chọn-kiến-trúc-theo-ràng-buộc">Lựa chọn kiến trúc theo ràng buộc</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Ràng buộc chính</th><th>Lựa chọn nên thử</th><th>Lý do</th></tr></thead><tbody>
+<tr><td>Offline accuracy</td><td>Conformer/E-Branchformer + attention/CTC</td><td>local + global mạnh</td></tr>
+<tr><td>Streaming production</td><td>FastConformer hoặc Conformer causal + RNN-T</td><td>latency kiểm soát được</td></tr>
+<tr><td>Low-resource</td><td>SSL encoder hoặc Conformer nhỏ + augmentation</td><td>tận dụng transfer và regularization</td></tr>
+<tr><td>On-device</td><td>small Conformer/Zipformer, quantization</td><td>giảm compute và memory</td></tr>
+<tr><td>Long-form meeting</td><td>chunked Conformer/Zipformer + endpointing</td><td>ổn định trên audio dài</td></tr>
+<tr><td>Research sequence dài</td><td>hybrid attention-SSM</td><td>thử nghiệm scaling theo thời gian</td></tr>
+</tbody></table>
+</div>
+<h3 id="sai-lầm-thường-gặp"><a class="header" href="#sai-lầm-thường-gặp">Sai lầm thường gặp</a></h3>
+<ul>
+<li><strong>Chỉ nhìn WER mà bỏ qua RTF</strong>: model tốt nhưng không chạy realtime thì không dùng được cho voice agent.</li>
+<li><strong>Dùng encoder bidirectional cho streaming</strong>: nhìn tương lai quá nhiều sẽ làm latency không đạt yêu cầu.</li>
+<li><strong>So benchmark khác decoding</strong>: greedy, beam, LM rescoring có thể làm bảng so sánh lệch.</li>
+<li><strong>Không tách eval theo noise/accent</strong>: một WER trung bình che giấu lỗi nghiêm trọng ở nhóm người dùng cụ thể.</li>
+<li><strong>Quên frontend/downsampling</strong>: nhiều khác biệt đến từ subsampling, SpecAugment và tokenizer, không chỉ block encoder.</li>
+</ul>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Kiến trúc</th><th>Năm</th><th>Đặc điểm chính</th><th>Use case</th></tr></thead><tbody>
+<tr><td>Conformer</td><td>2020</td><td>Conv + Attention (macaron)</td><td>ASR offline/streaming phổ biến</td></tr>
+<tr><td>E-Branchformer</td><td>2022</td><td>Parallel branches</td><td>ESPnet default</td></tr>
+<tr><td>Zipformer</td><td>2023</td><td>Multi-scale + Swoosh</td><td>k2/icefall</td></tr>
+<tr><td>FastConformer</td><td>2023</td><td>8x downsample</td><td>NVIDIA NeMo</td></tr>
+<tr><td>MoE-ASR</td><td>2024</td><td>Sparse expert routing</td><td>Scale capacity</td></tr>
+<tr><td>Hybrid SSM</td><td>2024+</td><td>Attention + Mamba</td><td>Long-form audio</td></tr>
+</tbody></table>
+</div>
+<p>: Tổng hợp kiến trúc ASR hiện đại <a id="tbl-asr-summary"></a></p>
+<p>Chương tiếp theo sẽ chuyển từ kiến trúc encoder tổng quát sang một case study quan trọng: Whisper và Canary. Khi đọc Chương 6, hãy để ý rằng thành công của Whisper không chỉ đến từ architecture, mà còn đến từ dữ liệu weakly supervised quy mô lớn, multitask tokens và thiết kế inference thực dụng.</p>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="gulati2020conformer"><sup class="footnote-definition-label">1</sup>
+<p>Gulati, Anmol and Qin, James and Chiu, Chung-Cheng and others, "Conformer: Convolution-augmented Transformer for Speech Recognition", Interspeech</p>
+</div>
+<div class="footnote-definition" id="kim2023ebranchformer"><sup class="footnote-definition-label">2</sup>
+<p>Kim, Kwangyoun and Wu, Felix and Peng, Yifan and others, "E-Branchformer: Branchformer with Enhanced Merging for Speech Recognition", IEEE Spoken Language Technology Workshop</p>
+</div>
+<div class="footnote-definition" id="yao2023zipformer"><sup class="footnote-definition-label">3</sup>
+<p>Yao, Zengwei and Guo, Liyong and Yang, Xiaoyu and others, "Zipformer: A Faster and Better Encoder for Automatic Speech Recognition", International Conference on Learning Representations</p>
+</div>
+<div class="footnote-definition" id="rekesh2023fast"><sup class="footnote-definition-label">4</sup>
+<p>Rekesh, Dima and Koluguri, Nithin Rao and Kriman, Samuel and others, "Fast Conformer with Linearly Scalable Attention for Efficient Speech Recognition", IEEE Automatic Speech Recognition and Understanding Workshop</p>
+</div>
+<div class="footnote-definition" id="shazeer2017outrageously"><sup class="footnote-definition-label">5</sup>
+<p>Shazeer, Noam and others, "Outrageously Large Neural Networks: The Sparsely-Gated Mixture-of-Experts Layer", International Conference on Learning Representations</p>
+</div>
+<div class="footnote-definition" id="you2024moe"><sup class="footnote-definition-label">6</sup>
+<p>You, Yifan and others, "E-Branchformer-based MoE Model for Efficient ASR", Interspeech</p>
+</div>
+<div class="footnote-definition" id="gu2022efficiently"><sup class="footnote-definition-label">7</sup>
+<p>Gu, Albert and Goel, Karan and R{'e, "Efficiently Modeling Long Sequences with Structured State Spaces", International Conference on Learning Representations</p>
+</div>
+<div class="footnote-definition" id="gu2023mamba"><sup class="footnote-definition-label">8</sup>
+<p>Gu, Albert and Dao, Tri, "Mamba: Linear-Time Sequence Modeling with Selective State Spaces", arXiv preprint arXiv:2312.00752</p>
+</div>
+<div class="footnote-definition" id="lieber2024jamba"><sup class="footnote-definition-label">9</sup>
+<p>Lieber, Opher and others, "Jamba: A Hybrid Transformer-Mamba Language Model", arXiv preprint arXiv:2403.19887</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part2/04-asr-foundations.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part2/06-whisper-canary.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part2/04-asr-foundations.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part2/06-whisper-canary.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

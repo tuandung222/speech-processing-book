@@ -1,0 +1,548 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Trang chủ - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="index.html" class="active">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/index.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="lời-nói-đầu"><a class="header" href="#lời-nói-đầu">Lời nói đầu</a></h1>
+<h2 id="tại-sao-cuốn-sách-này"><a class="header" href="#tại-sao-cuốn-sách-này">Tại sao cuốn sách này?</a></h2>
+<p>Trong thập kỷ qua, cộng đồng NLP đã chứng kiến sự bùng nổ của Large Language Models (LLMs) - từ BERT <sup class="footnote-reference"><a href="#devlin2019bert">1</a></sup> đến GPT-4 <sup class="footnote-reference"><a href="#openai2024gpt4o">2</a></sup>, từ text generation đến multimodal reasoning. Nhưng có một lĩnh vực mà ranh giới giữa "ngôn ngữ" và "tín hiệu vật lý" trở nên mờ nhạt: <strong>Speech AI</strong>.</p>
+<p>Speech AI không chỉ là "thêm một modality" vào LLM. Nó đòi hỏi sự hiểu biết sâu về:</p>
+<ul>
+<li><strong>Signal processing</strong>: Biến đổi Fourier, mel spectrogram, MFCC <sup class="footnote-reference"><a href="#davis1980comparison">3</a></sup> <sup class="footnote-reference"><a href="#oppenheim1999discrete">4</a></sup></li>
+<li><strong>Sequence alignment</strong>: CTC loss <sup class="footnote-reference"><a href="#graves2006connectionist">5</a></sup>, attention-based alignment, transducers <sup class="footnote-reference"><a href="#graves2012sequence">6</a></sup></li>
+<li><strong>Generative modeling</strong>: VAE <sup class="footnote-reference"><a href="#kingma2014vae">7</a></sup>, normalizing flows <sup class="footnote-reference"><a href="#rezende2015normalizing">8</a></sup>, flow matching <sup class="footnote-reference"><a href="#lipman2023flow">9</a></sup>, GAN <sup class="footnote-reference"><a href="#goodfellow2014generative">10</a></sup></li>
+<li><strong>Neural audio compression</strong>: Vector quantization <sup class="footnote-reference"><a href="#oord2017vqvae">11</a></sup>, residual VQ, codec tokens <sup class="footnote-reference"><a href="#defossez2022encodec">12</a></sup></li>
+<li><strong>Self-supervised learning</strong>: Wav2Vec 2.0 <sup class="footnote-reference"><a href="#baevski2020wav2vec">13</a></sup>, HuBERT <sup class="footnote-reference"><a href="#hsu2021hubert">14</a></sup>, WavLM <sup class="footnote-reference"><a href="#chen2022wavlm">15</a></sup></li>
+<li><strong>Real-time systems</strong>: Streaming inference, latency optimization, voice pipelines</li>
+</ul>
+<p>Cuốn sách này được viết cho <strong>CV/NLP data scientists</strong> muốn trở thành <strong>speech data scientists</strong> chuyên nghiệp. Đây là tài liệu nội bộ toàn diện, bao quát từ nền tảng lý thuyết đến triển khai production.</p>
+<h2 id="Đối-tượng-Độc-giả"><a class="header" href="#Đối-tượng-Độc-giả">Đối tượng Độc giả</a></h2>
+<p>Cuốn sách được thiết kế cho:</p>
+<ol>
+<li><strong>CV/NLP Data Scientists</strong> muốn chuyển sang speech modality</li>
+<li><strong>LLM Researchers</strong> quan tâm đến multimodal models (Qwen2.5-Omni, Qwen3-Omni, Moshi, GPT-4o)</li>
+<li><strong>ML/AI Engineers</strong> xây dựng voice AI pipelines cho production</li>
+<li><strong>Graduate students</strong> nghiên cứu speech processing</li>
+</ol>
+<p><strong>Prerequisites:</strong></p>
+<ul>
+<li>Transformer architecture <sup class="footnote-reference"><a href="#vaswani2017attention">16</a></sup> (self-attention, encoder-decoder)</li>
+<li>LLM training basics (tokenization, pre-training, fine-tuning)</li>
+<li>Python &amp; PyTorch proficiency</li>
+<li>Linear algebra &amp; probability fundamentals</li>
+</ul>
+<h2 id="cấu-trúc-cuốn-sách"><a class="header" href="#cấu-trúc-cuốn-sách">Cấu trúc Cuốn sách</a></h2>
+<p>Cuốn sách được thiết kế để đọc theo lộ trình phù hợp với background của bạn, không nhất thiết phải đọc tuyến tính từ đầu đến cuối. Mỗi phần phục vụ một mục đích sư phạm riêng. Xem mục <strong>Hướng dẫn Đọc</strong> ngay sau đây để chọn lộ trình.</p>
+<p>Cuốn sách gồm <strong>8 phần</strong> (bao gồm Phần 0 nền tảng cổ điển) và <strong>6 phụ lục</strong>, tổng cộng <strong>22 chương</strong> (Chương 0 đến Chương 21), đang được mở rộng dần.</p>
+<h3 id="phần-0--nền-tảng-cổ-điển-mới"><a class="header" href="#phần-0--nền-tảng-cổ-điển-mới">Phần 0 — Nền tảng cổ điển (mới)</a></h3>
+<p>Dành cho audience NLP/LLM thiếu kiến thức ngôn ngữ học, âm học, hoặc DSP. Đây là chương review nhằm bù lấp gap kiến thức cơ bản trước khi vào deep learning hiện đại. Bạn có thể skip nếu đã quen với phonetics, Fourier, HMM, GMM.</p>
+<ul>
+<li><strong>Chương 0</strong>: Linguistics, Acoustics, DSP, và Traditional ML (HMM-GMM, DTW, i-vectors)</li>
+</ul>
+<h3 id="phần-i--cầu-nối-khái-niệm-và-nền-tảng-tín-hiệu-chương-1-3"><a class="header" href="#phần-i--cầu-nối-khái-niệm-và-nền-tảng-tín-hiệu-chương-1-3">Phần I — Cầu nối khái niệm và nền tảng tín hiệu (Chương 1-3)</a></h3>
+<p>Phần quan trọng nhất để định hướng tư duy. Phần I xây dựng cây cầu giữa NLP/LLM bạn đã biết và Speech AI bạn sắp học. Sau Phần I, mọi thuật ngữ chuyên ngành sẽ không còn xa lạ.</p>
+<ul>
+<li><strong>Chương 1</strong>: Từ NLP đến Speech — Cầu nối khái niệm</li>
+<li><strong>Chương 2</strong>: Audio Signal Fundamentals (DFT, STFT, Mel filterbank, MFCC, SpecAugment)</li>
+<li><strong>Chương 3</strong>: Speech Representations (SSL backbones, contrastive learning, codec tokens)</li>
+</ul>
+<h3 id="phần-ii--nhận-dạng-giọng-nói-asr-chương-4-7"><a class="header" href="#phần-ii--nhận-dạng-giọng-nói-asr-chương-4-7">Phần II — Nhận dạng giọng nói (ASR) (Chương 4-7)</a></h3>
+<p>Bài toán Speech-to-Text, bài toán Speech AI lâu đời nhất, có nhiều thành tựu nhất, và là cửa ngõ thực tiễn vào ngành.</p>
+<ul>
+<li><strong>Chương 4</strong>: ASR Foundations — CTC, Sequence-to-Sequence with Attention, RNN-Transducer</li>
+<li><strong>Chương 5</strong>: Modern ASR Architectures — Conformer, Zipformer, E-Branchformer</li>
+<li><strong>Chương 6</strong>: Whisper &amp; Canary — large-scale weakly-supervised ASR case studies</li>
+<li><strong>Chương 7</strong>: Streaming ASR — kiến trúc và chiến lược cho real-time</li>
+</ul>
+<h3 id="phần-iii--tổng-hợp-giọng-nói-tts-và-codec-chương-8-10"><a class="header" href="#phần-iii--tổng-hợp-giọng-nói-tts-và-codec-chương-8-10">Phần III — Tổng hợp giọng nói (TTS) và codec (Chương 8-10)</a></h3>
+<p>Bài toán Text-to-Speech và các neural audio codec, là nền tảng cho voice cloning, voice agent, và Speech LLMs.</p>
+<ul>
+<li><strong>Chương 8</strong>: TTS Foundations — Tacotron 2, FastSpeech 2, vocoders (HiFi-GAN, BigVGAN)</li>
+<li><strong>Chương 9</strong>: End-to-End TTS — VITS, NaturalSpeech 3, F5-TTS, voice cloning với VALL-E</li>
+<li><strong>Chương 10</strong>: Audio Codecs — EnCodec, DAC, Mimi, SpeechTokenizer, residual vector quantization</li>
+</ul>
+<h3 id="phần-iv--speech-llms-và-multimodal-chương-11-13"><a class="header" href="#phần-iv--speech-llms-và-multimodal-chương-11-13">Phần IV — Speech LLMs và Multimodal (Chương 11-13)</a></h3>
+<p>Phần "frontier" nhất, là điểm gặp gỡ giữa Speech AI và LLM revolution. Nếu bạn từ NLP/LLM, đây là phần bạn sẽ thấy quen thuộc và thú vị nhất.</p>
+<ul>
+<li><strong>Chương 11</strong>: Speech Language Models — AudioLM, VALL-E, Moshi, Qwen2-Audio, Qwen3-Omni</li>
+<li><strong>Chương 12</strong>: Multimodal Omni Models — Qwen3-Omni, GPT-Realtime, Gemini Live, native multimodal</li>
+<li><strong>Chương 13</strong>: Full-Duplex Dialogue — Moshi architecture, conversational dynamics</li>
+</ul>
+<h3 id="phần-v--speech-understanding-translation-và-wake-word-chương-14-15-21"><a class="header" href="#phần-v--speech-understanding-translation-và-wake-word-chương-14-15-21">Phần V — Speech Understanding, Translation, và Wake-word (Chương 14-15, 21)</a></h3>
+<p>Các bài toán speech analysis (classification, translation, wake-word detection) là application layer của các kỹ thuật ở Phần I-IV.</p>
+<ul>
+<li><strong>Chương 14</strong>: Speech Classification — Speaker ID, emotion recognition, language ID, audio events</li>
+<li><strong>Chương 15</strong>: Speech Translation — S2TT, S2ST, simultaneous, SeamlessM4T deep dive</li>
+<li><strong>Chương 21</strong>: Wake-Word Detection (Keyword Spotting) — "Hey Siri" và các giải pháp công nghiệp</li>
+</ul>
+<h3 id="phần-vi--tiếng-việt-chương-16-17"><a class="header" href="#phần-vi--tiếng-việt-chương-16-17">Phần VI — Tiếng Việt (Chương 16-17)</a></h3>
+<p>Phần dành riêng cho thị trường và đặc thù tiếng Việt. Bao gồm phân tích các công ty Việt Nam (VinAI, ZaloAI, FPT.AI, VinFast, Trusting Social) và đánh giá khả năng của mô hình hiện tại.</p>
+<ul>
+<li><strong>Chương 16</strong>: Vietnamese Speech Processing — tonal features, code-switching, industry landscape</li>
+<li><strong>Chương 17</strong>: Vietnamese Datasets &amp; Benchmarks — VLSP, VIVOS, CMV-Vi, PhoWhisper</li>
+</ul>
+<h3 id="phần-vii--tools-inference-production-chương-18-20"><a class="header" href="#phần-vii--tools-inference-production-chương-18-20">Phần VII — Tools, Inference, Production (Chương 18-20)</a></h3>
+<p>Phần dành cho engineer triển khai thực tế. Khác Phần I-IV (focus lý thuyết và mô hình), Phần VII focus vào <strong>làm sao deploy được vào production reliably</strong>.</p>
+<ul>
+<li><strong>Chương 18</strong>: Training Frameworks — WeNet, ESPnet, NeMo, SpeechBrain, K2/Icefall</li>
+<li><strong>Chương 19</strong>: Inference Engines + Tooling — TensorRT-LLM, vLLM, Triton, ONNX Runtime, audio preprocessing libraries, augmentation, WeNet deep guide</li>
+<li><strong>Chương 20</strong>: Production Speech Systems — voice agent architectures, latency budget, cost engineering, observability, deployment patterns</li>
+</ul>
+<h3 id="phụ-lục-appendices-a-f"><a class="header" href="#phụ-lục-appendices-a-f">Phụ lục (Appendices A-F)</a></h3>
+<p>Reference material để tra cứu khi cần, không cần đọc tuần tự.</p>
+<ul>
+<li><strong>A</strong>: Notation Reference — quy ước ký hiệu toán học</li>
+<li><strong>B</strong>: Mathematical Proofs — chứng minh chi tiết cho CTC forward-backward, mel filterbank, etc.</li>
+<li><strong>C</strong>: NLP-Speech Concept Mapping — bảng tra cứu khái niệm (mở rộng từ Bảng 3.1 của Chương 1)</li>
+<li><strong>D</strong>: Code Listings — full implementations dài</li>
+<li><strong>E</strong>: Vietnamese Speech Resources — collection links, datasets, công cụ</li>
+<li><strong>F</strong>: Tool Comparison Matrices — bảng so sánh framework, model, library</li>
+</ul>
+<h3 id="dependencies-giữa-các-phần-đọc-theo-thứ-tự-ưu-tiên"><a class="header" href="#dependencies-giữa-các-phần-đọc-theo-thứ-tự-ưu-tiên">Dependencies giữa các phần (đọc theo thứ tự ưu tiên)</a></h3>
+<pre class="mermaid">flowchart TD
+    P0[&quot;Phần 0: Nền tảng cổ điển&lt;br&gt;(Ngôn ngữ học, Âm học, DSP, ML cổ điển)&quot;]
+    P1[&quot;Phần I: Cầu nối khái niệm &amp; Nền tảng tín hiệu&lt;br&gt;(Chương 1-3)&quot;]
+    P2[&quot;Phần II: Nhận dạng giọng nói - ASR&lt;br&gt;(Chương 4-7)&quot;]
+    P3[&quot;Phần III: Tổng hợp giọng nói &amp; Codecs - TTS&lt;br&gt;(Chương 8-10)&quot;]
+    P4[&quot;Phần IV: Speech LLMs &amp; Multimodal&lt;br&gt;(Chương 11-13)&quot;]
+    P5[&quot;Phần V: Understanding, Translation, Wake-word&lt;br&gt;(Chương 14-15, 21)&quot;]
+    P6[&quot;Phần VI: Tiếng Việt - Dialects &amp; Industry&lt;br&gt;(Chương 16-17)&quot;]
+    P7[&quot;Phần VII: Tools, Inference, Production&lt;br&gt;(Chương 18-20)&quot;]
+
+    P0 -.-&gt;|&quot;Khuyên đọc trước nếu thiếu nền DSP&quot;| P1
+    P1 === P2
+    P1 === P3
+    P1 === P4
+    P2 === P4
+    P3 === P4
+    P1 ---&gt; P5
+    P2 ---&gt; P5
+    P3 ---&gt; P5
+    P4 ---&gt; P5
+    P5 === P6
+    P6 === P7
+
+    style P0 fill:#f9f9f9,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5
+    style P1 fill:#e1f5fe,stroke:#0288d1,stroke-width:2px
+    style P4 fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
+    style P7 fill:#fff3e0,stroke:#f57c00,stroke-width:2px
+</pre>
+<p>Phần I là <strong>prerequisite cho tất cả</strong> (trừ Phần 0). Phần II-IV có thể đọc song song (mỗi phần độc lập về mặt mô hình). Phần V-VI-VII đều dựa trên Phần I-IV.</p>
+<h2 id="hướng-dẫn-Đọc"><a class="header" href="#hướng-dẫn-Đọc">Hướng dẫn Đọc</a></h2>
+<h3 id="Đến-từ-llmgpt-research"><a class="header" href="#Đến-từ-llmgpt-research">Đến từ LLM/GPT research</a></h3>
+<ol>
+<li><strong>Chương 1</strong> (NLP-to-Speech Bridge): bắt đầu từ đây.</li>
+<li><strong>Chương 11-13</strong> (Speech LLMs, Multimodal, Full-Duplex): lãnh thổ quen thuộc nhất.</li>
+<li><strong>Chương 2-3</strong> (Audio Fundamentals, Representations): bổ sung signal processing.</li>
+<li>Các chương còn lại theo thứ tự.</li>
+</ol>
+<h3 id="Đến-từ-nlpbert-research"><a class="header" href="#Đến-từ-nlpbert-research">Đến từ NLP/BERT research</a></h3>
+<ol>
+<li><strong>Chương 1</strong>, <strong>Chương 2-3</strong>, <strong>Chương 4</strong> (ASR ~ seq2seq translation).</li>
+<li><strong>Chương 5-7</strong> (Modern ASR), <strong>Chương 8-10</strong> (TTS &amp; Codecs), <strong>Chương 11-13</strong> (Speech LLMs).</li>
+</ol>
+<h3 id="Đến-từ-cvcomputer-vision"><a class="header" href="#Đến-từ-cvcomputer-vision">Đến từ CV/Computer Vision</a></h3>
+<ol>
+<li><strong>Chương 2</strong> (signal processing tương tự image features).</li>
+<li><strong>Chương 14</strong> (speech classification tương tự image classification).</li>
+<li><strong>Chương 3</strong> (self-supervised learning, tương đương SimCLR/DINO cho audio).</li>
+</ol>
+<h3 id="cần-triển-khai-production-ngay"><a class="header" href="#cần-triển-khai-production-ngay">Cần triển khai production ngay</a></h3>
+<ol>
+<li><strong>Chương 18-20</strong> (Training frameworks, Inference engines, Production systems).</li>
+<li><strong>Phụ lục F</strong> (Tool comparison matrices).</li>
+<li>Quay lại lý thuyết khi cần.</li>
+</ol>
+<h3 id="Đọc-toàn-bộ-comprehensive"><a class="header" href="#Đọc-toàn-bộ-comprehensive">Đọc toàn bộ (comprehensive)</a></h3>
+<p>Chương 0 đến Chương 21 theo thứ tự. Đây là lộ trình được khuyến nghị cho người đọc lần đầu tiếp cận Speech AI một cách hệ thống.</p>
+<h3 id="thiếu-nền-tảng-signal-processing-hoặc-hmm-gmm"><a class="header" href="#thiếu-nền-tảng-signal-processing-hoặc-hmm-gmm">Thiếu nền tảng signal processing hoặc HMM-GMM</a></h3>
+<p>Đọc <strong>Chương 0</strong> trước. Chương 0 cung cấp linguistics, acoustics, DSP và ML cổ điển ở mức ôn tập, đủ để hiểu các chương sau mà không cần đi quá sâu vào textbook truyền thống.</p>
+<h2 id="conventions"><a class="header" href="#conventions">Conventions</a></h2>
+<p>Xuyên suốt cuốn sách, chúng tôi sử dụng các conventions sau:</p>
+<blockquote>
+<p><strong>📝 Intuition</strong></p>
+<p>Giải thích trực giác về một khái niệm phức tạp.</p>
+</blockquote>
+<blockquote>
+<p><strong>⚠️ Hardware/Latency Warning</strong></p>
+<p>Cảnh báo về performance, latency, memory bottleneck, hoặc hardware constraints trong production.</p>
+</blockquote>
+<blockquote>
+<p><strong>💡 NLP Parallel</strong></p>
+<p>Mapping giữa khái niệm NLP quen thuộc và speech equivalent.</p>
+</blockquote>
+<p><strong>Code style:</strong></p>
+<pre><code class="language-python"># Mọi tensor operation đều có inline shape &amp; dtype comments
+x: Tensor  # [batch, time, features] - torch.float32
+mel: Tensor  # [batch, n_mels, n_frames] - torch.float32
+codes: Tensor  # [batch, n_codebooks, T] - torch.int64
+</code></pre>
+<p><strong>Math notation:</strong></p>
+<ul>
+<li>Tất cả display equations được đánh nhãn: <code>&lt;a id="eq-label"&gt;&lt;/a&gt;</code></li>
+<li>Cross-references: <code>[Phương trình](#eq-label)</code>, <code>[Hình](#fig-label)</code>, <code>[Bảng](#tbl-label)</code></li>
+<li>Xem <strong>Phụ lục A</strong> để biết đầy đủ notation conventions</li>
+</ul>
+<h2 id="nguồn-tham-khảo"><a class="header" href="#nguồn-tham-khảo">Nguồn Tham khảo</a></h2>
+<p>Cuốn sách được xây dựng dựa trên <strong>190+ papers và tài liệu</strong> quan trọng trong lĩnh vực Speech AI, bao gồm:</p>
+<ul>
+<li><strong>ASR</strong>: Whisper <sup class="footnote-reference"><a href="#radford2023robust">17</a></sup>, Conformer <sup class="footnote-reference"><a href="#gulati2020conformer">18</a></sup>, RNN-T <sup class="footnote-reference"><a href="#graves2012sequence">6</a></sup>, Canary <sup class="footnote-reference"><a href="#nvidia2024canary">19</a></sup></li>
+<li><strong>TTS</strong>: VITS <sup class="footnote-reference"><a href="#kim2021conditional">20</a></sup>, VALL-E <sup class="footnote-reference"><a href="#wang2023valle">21</a></sup>, F5-TTS <sup class="footnote-reference"><a href="#chen2024f5tts">22</a></sup>, CosyVoice <sup class="footnote-reference"><a href="#du2024cosyvoice">23</a></sup></li>
+<li><strong>Audio Codecs</strong>: EnCodec <sup class="footnote-reference"><a href="#defossez2022encodec">12</a></sup>, DAC <sup class="footnote-reference"><a href="#kumar2024dac">24</a></sup>, Mimi <sup class="footnote-reference"><a href="#defossez2024mimi">25</a></sup></li>
+<li><strong>Speech LLMs</strong>: AudioLM <sup class="footnote-reference"><a href="#borsos2023audiolm">26</a></sup>, Qwen2-Audio <sup class="footnote-reference"><a href="#chu2023qwen2audio">27</a></sup>, Moshi <sup class="footnote-reference"><a href="#defossez2024moshi">28</a></sup>, Qwen3-Omni <sup class="footnote-reference"><a href="#qwen2025qwen3omni">29</a></sup></li>
+<li><strong>Multimodal</strong>: Qwen2.5-Omni <sup class="footnote-reference"><a href="#xu2025qwen25omni">30</a></sup>, Qwen3-Omni <sup class="footnote-reference"><a href="#qwen2025qwen3omni">29</a></sup>, Gemini <sup class="footnote-reference"><a href="#team2024gemini">31</a></sup></li>
+<li><strong>Self-Supervised</strong>: Wav2Vec 2.0 <sup class="footnote-reference"><a href="#baevski2020wav2vec">13</a></sup>, HuBERT <sup class="footnote-reference"><a href="#hsu2021hubert">14</a></sup>, WavLM <sup class="footnote-reference"><a href="#chen2022wavlm">15</a></sup></li>
+<li><strong>Speech Translation</strong>: SeamlessM4T <sup class="footnote-reference"><a href="#communication2023seamlessm4t">32</a></sup></li>
+<li><strong>Vietnamese</strong>: PhoWhisper <sup class="footnote-reference"><a href="#nguyen2024phowhisper">33</a></sup>, PhoBERT <sup class="footnote-reference"><a href="#nguyen2020phobert">34</a></sup></li>
+<li><strong>Textbooks</strong>: SLP3 <sup class="footnote-reference"><a href="#jurafsky2024speech">35</a></sup>, Spoken Language Processing <sup class="footnote-reference"><a href="#huang2001spoken">36</a></sup></li>
+<li><strong>Training Tools</strong>: WeNet <sup class="footnote-reference"><a href="#zhang2022wenet">37</a></sup>, ESPnet <sup class="footnote-reference"><a href="#watanabe2018espnet">38</a></sup>, NeMo <sup class="footnote-reference"><a href="#kuchaiev2019nemo">39</a></sup>, SpeechBrain <sup class="footnote-reference"><a href="#ravanelli2021speechbrain">40</a></sup></li>
+</ul>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="devlin2019bert"><sup class="footnote-definition-label">1</sup>
+<p>Devlin, Jacob and Chang, Ming-Wei and Lee, Kenton and Toutanova, Kristina, "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding", North American Chapter of the Association for Computational Linguistics</p>
+</div>
+<div class="footnote-definition" id="openai2024gpt4o"><sup class="footnote-definition-label">2</sup>
+<p>{OpenAI}, "GPT-4o System Card", OpenAI Technical Report</p>
+</div>
+<div class="footnote-definition" id="davis1980comparison"><sup class="footnote-definition-label">3</sup>
+<p>Davis, Steven and Mermelstein, Paul, "Comparison of Parametric Representations for Monosyllabic Word Recognition", IEEE Transactions on Acoustics, Speech, and Signal Processing</p>
+</div>
+<div class="footnote-definition" id="oppenheim1999discrete"><sup class="footnote-definition-label">4</sup>
+<p>Oppenheim, Alan V and Schafer, Ronald W, "Discrete-Time Signal Processing"</p>
+</div>
+<div class="footnote-definition" id="graves2006connectionist"><sup class="footnote-definition-label">5</sup>
+<p>Graves, Alex and Fern{'a}ndez, Santiago and Gomez, Faustino and Schmidhuber, J{"u}rgen, "Connectionist Temporal Classification: Labelling Unsegmented Sequence Data with Recurrent Neural Networks", International Conference on Machine Learning</p>
+</div>
+<div class="footnote-definition" id="graves2012sequence"><sup class="footnote-definition-label">6</sup>
+<p>Graves, Alex, "Sequence Transduction with Recurrent Neural Networks", arXiv preprint arXiv:1211.3711</p>
+</div>
+<div class="footnote-definition" id="kingma2014vae"><sup class="footnote-definition-label">7</sup>
+<p>Kingma, Diederik P and Welling, Max, "Auto-Encoding Variational Bayes", International Conference on Learning Representations</p>
+</div>
+<div class="footnote-definition" id="rezende2015normalizing"><sup class="footnote-definition-label">8</sup>
+<p>Rezende, Danilo and Mohamed, Shakir, "Variational Inference with Normalizing Flows", International Conference on Machine Learning</p>
+</div>
+<div class="footnote-definition" id="lipman2023flow"><sup class="footnote-definition-label">9</sup>
+<p>Lipman, Yaron and Chen, Ricky T Q and Ben-Hamu, Heli and Nickel, Maximilian and Le, Matthew, "Flow Matching for Generative Modeling", International Conference on Learning Representations</p>
+</div>
+<div class="footnote-definition" id="goodfellow2014generative"><sup class="footnote-definition-label">10</sup>
+<p>Goodfellow, Ian and others, "Generative Adversarial Nets", Advances in Neural Information Processing Systems</p>
+</div>
+<div class="footnote-definition" id="oord2017vqvae"><sup class="footnote-definition-label">11</sup>
+<p>van den Oord, A{"a}ron and Vinyals, Oriol and Kavukcuoglu, Koray, "Neural Discrete Representation Learning", Advances in Neural Information Processing Systems</p>
+</div>
+<div class="footnote-definition" id="defossez2022encodec"><sup class="footnote-definition-label">12</sup>
+<p>D{'e}fossez, Alexandre and Copet, Jade and Synnaeve, Gabriel and Adi, Yossi, "High Fidelity Neural Audio Compression", Transactions on Machine Learning Research</p>
+</div>
+<div class="footnote-definition" id="baevski2020wav2vec"><sup class="footnote-definition-label">13</sup>
+<p>Baevski, Alexei and Zhou, Yuhao and Mohamed, Abdelrahman and Auli, Michael, "wav2vec 2.0: A Framework for Self-Supervised Learning of Speech Representations", Advances in Neural Information Processing Systems</p>
+</div>
+<div class="footnote-definition" id="hsu2021hubert"><sup class="footnote-definition-label">14</sup>
+<p>Hsu, Wei-Ning and Bolte, Benjamin and Tsai, Yao-Hung Hubert and Lakhotia, Kushal and Salakhutdinov, Ruslan and Mohamed, Abdelrahman, "HuBERT: Self-Supervised Speech Representation Learning by Masked Prediction of Hidden Units", IEEE/ACM Transactions on Audio, Speech, and Language Processing</p>
+</div>
+<div class="footnote-definition" id="chen2022wavlm"><sup class="footnote-definition-label">15</sup>
+<p>Chen, Sanyuan and Wang, Chengyi and others, "WavLM: Large-Scale Self-Supervised Pre-Training for Full Stack Speech Processing", IEEE Journal of Selected Topics in Signal Processing</p>
+</div>
+<div class="footnote-definition" id="vaswani2017attention"><sup class="footnote-definition-label">16</sup>
+<p>Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and Uszkoreit, Jakob and Jones, Llion and Gomez, Aidan N and Kaiser, {\L}ukasz and Polosukhin, Illia, "Attention Is All You Need", Advances in Neural Information Processing Systems</p>
+</div>
+<div class="footnote-definition" id="radford2023robust"><sup class="footnote-definition-label">17</sup>
+<p>Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya, "Robust Speech Recognition via Large-Scale Weak Supervision", International Conference on Machine Learning</p>
+</div>
+<div class="footnote-definition" id="gulati2020conformer"><sup class="footnote-definition-label">18</sup>
+<p>Gulati, Anmol and Qin, James and Chiu, Chung-Cheng and others, "Conformer: Convolution-augmented Transformer for Speech Recognition", Interspeech</p>
+</div>
+<div class="footnote-definition" id="nvidia2024canary"><sup class="footnote-definition-label">19</sup>
+<p>{NVIDIA}, "Canary: Multi-Lingual Multi-Task ASR and Translation Model", NVIDIA NeMo Toolkit Documentation</p>
+</div>
+<div class="footnote-definition" id="kim2021conditional"><sup class="footnote-definition-label">20</sup>
+<p>Kim, Jaehyeon and Kong, Jungil and Son, Juhee, "Conditional Variational Autoencoder with Adversarial Learning for End-to-End Text-to-Speech", International Conference on Machine Learning</p>
+</div>
+<div class="footnote-definition" id="wang2023valle"><sup class="footnote-definition-label">21</sup>
+<p>Wang, Chengyi and Chen, Sanyuan and Wu, Yu and others, "Neural Codec Language Models are Zero-Shot Text to Speech Synthesizers", arXiv preprint arXiv:2301.02111</p>
+</div>
+<div class="footnote-definition" id="chen2024f5tts"><sup class="footnote-definition-label">22</sup>
+<p>Chen, Yushen and others, "F5-TTS: A Fairytaler that Fakes Fluent and Faithful Speech with Flow Matching", arXiv preprint arXiv:2410.06885</p>
+</div>
+<div class="footnote-definition" id="du2024cosyvoice"><sup class="footnote-definition-label">23</sup>
+<p>Du, Zhihao and Chen, Qian and Zhang, Shiliang and others, "CosyVoice: A Scalable Multilingual Zero-shot Text-to-Speech Synthesizer Based on Supervised Semantic Tokens", arXiv preprint arXiv:2407.05407</p>
+</div>
+<div class="footnote-definition" id="kumar2024dac"><sup class="footnote-definition-label">24</sup>
+<p>Kumar, Rithesh and Seetharaman, Prem and others, "High-Fidelity Audio Compression with Improved RVQGAN", Advances in Neural Information Processing Systems</p>
+</div>
+<div class="footnote-definition" id="defossez2024mimi"><sup class="footnote-definition-label">25</sup>
+<p>D{'e}fossez, Alexandre and others, "Mimi: A Low-Latency Streaming Audio Codec", arXiv preprint arXiv:2410.00037</p>
+</div>
+<div class="footnote-definition" id="borsos2023audiolm"><sup class="footnote-definition-label">26</sup>
+<p>Borsos, Zal{'a}n and Marinier, Rapha{"e}l and others, "AudioLM: A Language Modeling Approach to Audio Generation", IEEE/ACM Transactions on Audio, Speech, and Language Processing</p>
+</div>
+<div class="footnote-definition" id="chu2023qwen2audio"><sup class="footnote-definition-label">27</sup>
+<p>Chu, Yunfei and Xu, Jin and Zhou, Xiaohuan and others, "Qwen-Audio: Advancing Universal Audio Understanding via Unified Large-Scale Audio-Language Models", arXiv preprint arXiv:2311.07919</p>
+</div>
+<div class="footnote-definition" id="defossez2024moshi"><sup class="footnote-definition-label">28</sup>
+<p>D{'e}fossez, Alexandre and Musicant, Laurent and others, "Moshi: A Speech-Text Foundation Model for Real-Time Dialogue", arXiv preprint arXiv:2410.00037</p>
+</div>
+<div class="footnote-definition" id="xu2025qwen25omni"><sup class="footnote-definition-label">30</sup>
+<p>Xu, Jin and Chu, Yunfei and others, "Qwen2.5-Omni Technical Report", arXiv preprint arXiv:2503.20215</p>
+</div>
+<div class="footnote-definition" id="team2024gemini"><sup class="footnote-definition-label">31</sup>
+<p>{Gemini Team}, "Gemini: A Family of Highly Capable Multimodal Models", arXiv preprint arXiv:2312.11805</p>
+</div>
+<div class="footnote-definition" id="qwen2025qwen3omni"><sup class="footnote-definition-label">29</sup>
+<p>{Qwen Team}, "Qwen3-Omni Technical Report", arXiv preprint arXiv:2509.17765</p>
+</div>
+<div class="footnote-definition" id="communication2023seamlessm4t"><sup class="footnote-definition-label">32</sup>
+<p>{Seamless Communication}, "SeamlessM4T: Massively Multilingual and Multimodal Machine Translation", arXiv preprint arXiv:2308.11596</p>
+</div>
+<div class="footnote-definition" id="nguyen2024phowhisper"><sup class="footnote-definition-label">33</sup>
+<p>Nguyen, Thanh-Nhi and Nguyen, Dat Quoc, "PhoWhisper: Fine-tuning Whisper for Vietnamese Automatic Speech Recognition", arXiv preprint</p>
+</div>
+<div class="footnote-definition" id="nguyen2020phobert"><sup class="footnote-definition-label">34</sup>
+<p>Nguyen, Dat Quoc and Nguyen, Anh Tuan, "PhoBERT: Pre-trained Language Models for Vietnamese", Findings of the Association for Computational Linguistics: EMNLP</p>
+</div>
+<div class="footnote-definition" id="jurafsky2024speech"><sup class="footnote-definition-label">35</sup>
+<p>Jurafsky, Daniel and Martin, James H, "Speech and Language Processing"</p>
+</div>
+<div class="footnote-definition" id="huang2001spoken"><sup class="footnote-definition-label">36</sup>
+<p>Huang, Xuedong and Acero, Alex and Hon, Hsiao-Wuen, "Spoken Language Processing: A Guide to Theory, Algorithm, and System Development"</p>
+</div>
+<div class="footnote-definition" id="zhang2022wenet"><sup class="footnote-definition-label">37</sup>
+<p>Zhang, Binbin and Wu, Di and Peng, Zhendong and others, "WeNet 2.0: More Productive End-to-End Speech Recognition Toolkit", Interspeech</p>
+</div>
+<div class="footnote-definition" id="watanabe2018espnet"><sup class="footnote-definition-label">38</sup>
+<p>Watanabe, Shinji and Hori, Takaaki and others, "ESPnet: End-to-End Speech Processing Toolkit", Interspeech</p>
+</div>
+<div class="footnote-definition" id="kuchaiev2019nemo"><sup class="footnote-definition-label">39</sup>
+<p>Kuchaiev, Oleksii and Li, Jason and others, "NeMo: A Toolkit for Building AI Applications Using Neural Modules", arXiv preprint arXiv:1909.09577</p>
+</div>
+<div class="footnote-definition" id="ravanelli2021speechbrain"><sup class="footnote-definition-label">40</sup>
+<p>Ravanelli, Mirco and Parcollet, Titouan and others, "SpeechBrain: A General-Purpose Speech Toolkit", arXiv preprint arXiv:2106.04624</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+                            <a rel="next prefetch" href="part0/00-foundations-review.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+                    <a rel="next prefetch" href="part0/00-foundations-review.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="theme/custom.js"></script>
+        <script src="mermaid.min.js"></script>
+        <script src="mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

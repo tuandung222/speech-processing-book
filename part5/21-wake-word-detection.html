@@ -1,0 +1,796 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 21: Wake-Word Detection (KWS) - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html" class="active"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part5/21-wake-word-detection.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-21-wake-word-detection-keyword-spotting"><a class="header" href="#chương-21-wake-word-detection-keyword-spotting">Chương 21: Wake-Word Detection (Keyword Spotting)</a></h1>
+<h2 id="mở-đầu-hey-siri--bài-toán-nghe-tưởng-đơn-giản"><a class="header" href="#mở-đầu-hey-siri--bài-toán-nghe-tưởng-đơn-giản">Mở đầu: "Hey Siri" — bài toán nghe tưởng đơn giản</a></h2>
+<p>Có một bài toán Speech AI hiện diện trong cuộc sống hàng ngày của hàng tỉ người mà ít ai chú ý: mỗi lần bạn nói "Hey Siri", "OK Google", "Alexa", hay "Hey Cortana", có một mô hình neural network đã liên tục lắng nghe microphone của bạn trong nhiều tháng, chờ đợi đúng cụm từ đó.</p>
+<p>Bài toán này nghe có vẻ đơn giản: detect 1 cụm từ cụ thể trong audio stream. Nhưng implementation thực tế đòi hỏi vượt qua các trade-off cực đoan:</p>
+<ul>
+<li><strong>Always-on</strong>: chạy 24/7, không tắt khi pin yếu.</li>
+<li><strong>Ultra-low power</strong>: tiêu thụ &lt;10 mW để không drain pin trong 1 ngày.</li>
+<li><strong>Sub-100ms latency</strong>: detect ngay khi user kết thúc nói wake-word.</li>
+<li><strong>Low false-accept rate (FAR)</strong>: không thức dậy khi user không gọi (1 lần/24h là tệ, 1 lần/tuần là acceptable).</li>
+<li><strong>Low false-reject rate (FRR)</strong>: thức dậy mỗi khi user thực sự gọi (&gt;95% là chấp nhận được).</li>
+<li><strong>Privacy-preserving</strong>: không upload audio liên tục lên cloud.</li>
+</ul>
+<p>Cân bằng tất cả constraints này khiến Wake-Word Detection trở thành một trong những bài toán engineering thú vị nhất trong Speech AI, và là nền tảng cho mọi voice assistant.</p>
+<p>Chương này deep dive về Wake-Word Detection (còn gọi là Keyword Spotting hoặc KWS): bài toán, mathematical formulation, classical vs modern approaches, industry implementations, và đặc biệt là cách deploy trên edge devices với constraints khắc nghiệt.</p>
+<blockquote>
+<p><strong>📝 Cấu trúc chương</strong></p>
+<p>Phần 1-2: bài toán và mathematical formulation.
+Phần 3: production constraints (power, latency, FAR/FRR).
+Phần 4: classical approaches (HMM/GMM, DTW) — historical context.
+Phần 5: modern DL approaches (small CNN, Conformer-KWS, streaming RNN-T).
+Phần 6: industry implementations deep dive (Apple, Google, Amazon, Microsoft).
+Phần 7: training data và augmentation strategies.
+Phần 8: deployment trên edge (TFLite Micro, ONNX Runtime Mobile).
+Phần 9: personalization (user-specific wake-words).
+Phần 10: Vietnamese wake-words.
+Phần 11: tóm tắt.</p>
+</blockquote>
+<hr />
+<h2 id="phần-1--bài-toán-và-terminology"><a class="header" href="#phần-1--bài-toán-và-terminology">Phần 1 — Bài toán và terminology</a></h2>
+<h3 id="11-Định-nghĩa"><a class="header" href="#11-Định-nghĩa">1.1 Định nghĩa</a></h3>
+<p><strong>Wake-word detection</strong> (WWD) là bài toán detect một cụm từ cụ thể (wake-word, hot-word, trigger phrase) trong continuous audio stream. Khi wake-word được detect, system "wake up" và bắt đầu xử lý audio sau wake-word như command/query.</p>
+<p>Cụm từ tương đương: <strong>Keyword Spotting (KWS)</strong> — detect một hoặc nhiều keywords trong audio. Wake-word detection là special case của KWS với vocabulary chỉ 1 keyword.</p>
+<h3 id="12-các-terminology-liên-quan"><a class="header" href="#12-các-terminology-liên-quan">1.2 Các terminology liên quan</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Term</th><th>Definition</th></tr></thead><tbody>
+<tr><td><strong>Wake-word</strong></td><td>Cụm từ duy nhất kích hoạt voice assistant ("Hey Siri")</td></tr>
+<tr><td><strong>Hot-word / Hotword</strong></td><td>Đồng nghĩa với wake-word, dùng nhiều bởi Google docs</td></tr>
+<tr><td><strong>Trigger phrase</strong></td><td>Đồng nghĩa, dùng bởi Microsoft Cortana docs</td></tr>
+<tr><td><strong>Wake-up word</strong></td><td>Đồng nghĩa, dùng cho automotive context</td></tr>
+<tr><td><strong>Keyword spotting (KWS)</strong></td><td>General: detect một tập keywords (10-100) trong audio</td></tr>
+<tr><td><strong>Open-vocabulary KWS</strong></td><td>Detect bất kỳ keyword nào user define, không pre-train</td></tr>
+<tr><td><strong>Speech command recognition</strong></td><td>Variation: classify single utterance into N commands</td></tr>
+<tr><td><strong>Voice activity detection (VAD)</strong></td><td>Different problem: detect speech vs silence (không phân biệt nội dung)</td></tr>
+</tbody></table>
+</div>
+<h3 id="13-khác-biệt-với-asr"><a class="header" href="#13-khác-biệt-với-asr">1.3 Khác biệt với ASR</a></h3>
+<p>Wake-word detection KHÔNG phải ASR:</p>
+<ul>
+<li>ASR: transcribe arbitrary speech → text. Vocabulary mở.</li>
+<li>WWD: binary decision "wake-word present" vs "not present". Vocabulary cố định 1 phrase.</li>
+</ul>
+<p>Tại sao không dùng ASR cho wake-word detection? Lý do là <strong>power budget</strong>:</p>
+<ul>
+<li>ASR (Whisper-tiny): ~50 MB model, ~50-100 mW inference, ~10 USD GPU per server-hour.</li>
+<li>WWD (typical): ~50 KB model, &lt;10 mW inference, gần như 0 USD (runs on device DSP).</li>
+</ul>
+<p>Nói cách khác, WWD là một specialized binary classifier optimized cực mạnh cho 1 phrase, trong khi ASR là general transcription.</p>
+<hr />
+<h2 id="phần-2--mathematical-formulation"><a class="header" href="#phần-2--mathematical-formulation">Phần 2 — Mathematical Formulation</a></h2>
+<p>Formal definition cho phép ta phân tích trade-offs và design models.</p>
+<h3 id="21-binary-classification-per-audio-window"><a class="header" href="#21-binary-classification-per-audio-window">2.1 Binary classification per audio window</a></h3>
+<p>Given continuous audio stream <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">x</span><span class="mopen">(</span><span class="mord mathnormal">t</span><span class="mclose">)</span></span></span></span>, WWD output a sequence of binary decisions <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">{</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">1</span><span class="mclose">}</span></span></span></span> tại các time windows <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="minner"><span class="mopen delimcenter" style="top:0em;">[</span><span class="mord text"><span class="mord">score</span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">])</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="mclose delimcenter" style="top:0em;">]</span></span></span></span></span></span></p>
+<p>trong đó:</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span></span></span></span> là window length (typical 500-1500 ms, dài đủ chứa 1 wake-word phrase).</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">score</span></span><span class="mopen">(</span><span class="mord">⋅</span><span class="mclose">)</span></span></span></span> là model output (posterior probability hoặc logit).</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> là decision threshold.</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mopen">[</span><span class="mord">⋅</span><span class="mclose">]</span></span></span></span> là indicator function.</li>
+</ul>
+<p>Window stride <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> (typical 10-100 ms) quyết định decision frequency. Tăng <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">s</span></span></span></span> giảm compute nhưng tăng latency.</p>
+<h3 id="22-posterior-smoothing"><a class="header" href="#22-posterior-smoothing">2.2 Posterior smoothing</a></h3>
+<p>Single-window decision quá noisy. Smooth across multiple consecutive windows:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7622em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.106em;vertical-align:-1.2777em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8723em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mrel mtight">=</span><span class="mord mtight">0</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.13889em;">W</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2777em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">score</span></span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mopen">[</span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3117em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">−</span><span class="mord mathnormal mtight">i</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mclose">])</span></span></span></span></span></p>
+<p>Trigger khi <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7622em;vertical-align:-0.1944em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.5678em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">ˉ</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.1132em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">smooth</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span>. Đây giảm false positives đáng kể.</p>
+<h3 id="23-decision-threshold-tuning"><a class="header" href="#23-decision-threshold-tuning">2.3 Decision threshold tuning</a></h3>
+<p>Threshold <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> là knob quan trọng nhất:</p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> cao → ít false positives (FP), nhiều false negatives (FN). Cụ thể FAR thấp, FRR cao.</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span> thấp → ngược lại.</li>
+</ul>
+<p>Operating point được chọn dựa trên use case:</p>
+<div class="table-wrapper"><table><thead><tr><th>Use case</th><th>Recommended threshold</th></tr></thead><tbody>
+<tr><td>Smart speaker (privacy-sensitive)</td><td>High <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>, FAR &lt;0.1/hour acceptable, FRR ~5-10%</td></tr>
+<tr><td>In-car voice assistant</td><td>Medium <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>, balance safety và usability</td></tr>
+<tr><td>Wearable (constant battery drain concern)</td><td>Very high <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>, FAR &lt;0.01/hour</td></tr>
+<tr><td>Industrial control</td><td>Very low <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.1132em;">τ</span></span></span></span>, FRR &lt;1% critical (don't miss commands)</td></tr>
+</tbody></table>
+</div>
+<h3 id="24-performance-metrics"><a class="header" href="#24-performance-metrics">2.4 Performance metrics</a></h3>
+<p>Standard metrics for WWD:</p>
+<h4 id="241-far-false-accept-rate"><a class="header" href="#241-far-false-accept-rate">2.4.1 FAR (False Accept Rate)</a></h4>
+<p>Số lần system wake nhầm khi user không gọi:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">FAR</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Total non-keyword time</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">False positives</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">(per unit time)</span></span></span></span></span></span></p>
+<p>Unit thường là FA/hour hoặc FA/day. Industry standard: &lt;1 FA/hour cho consumer products.</p>
+<h4 id="242-frr-false-reject-rate"><a class="header" href="#242-frr-false-reject-rate">2.4.2 FRR (False Reject Rate)</a></h4>
+<p>Tỷ lệ system không thức khi user thực sự gọi:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">FRR</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2519em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Total keyword utterances</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">False negatives</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
+<p>Industry standard: FRR &lt;5-10% cho clean speech, &lt;20% cho noisy environments.</p>
+<h4 id="243-det-curve"><a class="header" href="#243-det-curve">2.4.3 DET curve</a></h4>
+<p>Tradeoff FAR vs FRR plotted trên DET (Detection Error Tradeoff) curve. Operating point = chọn một điểm trên curve.</p>
+<p>Equal Error Rate (EER): điểm where FAR = FRR. Useful single-number metric nhưng không reflect real-world tuning.</p>
+<h4 id="244-latency"><a class="header" href="#244-latency">2.4.4 Latency</a></h4>
+<p>Time from "user finishes saying wake-word" to "system signals wake":</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Latency</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">detection</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7651em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">t</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">end of wake-word</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></span></p>
+<p>Target: &lt;100-200 ms. Vượt mức này, user perceive lag.</p>
+<hr />
+<h2 id="phần-3--constraints-unique-to-wake-word-systems"><a class="header" href="#phần-3--constraints-unique-to-wake-word-systems">Phần 3 — Constraints Unique to Wake-Word Systems</a></h2>
+<p>WWD có constraints khắc nghiệt hơn nhiều speech tasks khác. Hiểu rõ giúp đánh giá đúng các architecture choices.</p>
+<h3 id="31-always-on-power-budget"><a class="header" href="#31-always-on-power-budget">3.1 Always-on power budget</a></h3>
+<p>Wake-word model chạy liên tục 24/7. Power budget extremely tight:</p>
+<ul>
+<li>Phone: target &lt;10 mW (so với LED screen ~500 mW, GPS ~50 mW).</li>
+<li>Smart speaker (AC powered): less tight, có thể 100-500 mW.</li>
+<li>Wearable (smartwatch): target &lt;5 mW, often even lower.</li>
+<li>TWS earbuds (true wireless stereo): target &lt;2 mW per ear.</li>
+</ul>
+<p>Bao nhiêu battery drain? 10 mW × 24h = 240 mWh = ~5% pin của một phone (5000 mAh × 3.7V = 18500 mWh).</p>
+<p>Achievable bằng:</p>
+<ol>
+<li>Small model (50 KB - 500 KB).</li>
+<li>INT8 hoặc INT4 quantization.</li>
+<li>Specialized hardware (DSP chip với MAC accelerator).</li>
+<li>Aggressive batching (process windows in batches).</li>
+</ol>
+<h3 id="32-memory-budget"><a class="header" href="#32-memory-budget">3.2 Memory budget</a></h3>
+<p>Phần lớn wake-word models chạy trên microcontrollers:</p>
+<ul>
+<li>ARM Cortex-M4: 256 KB RAM, 1 MB Flash.</li>
+<li>ESP32: 520 KB RAM, 4 MB Flash.</li>
+<li>Apple Neural Engine: dedicated, MB-scale.</li>
+</ul>
+<p>Model size constraint: &lt;500 KB cho most embedded, &lt;100 KB cho ultra-low-power MCUs.</p>
+<h3 id="33-privacy-considerations"><a class="header" href="#33-privacy-considerations">3.3 Privacy considerations</a></h3>
+<p>Wake-word model là first line of privacy defense:</p>
+<ul>
+<li>Pre-wake: audio xử lý on-device, không upload cloud.</li>
+<li>Post-wake: audio sau wake-word có thể upload (depends on platform).</li>
+</ul>
+<p>Nếu wake-word model có false positive, có thể accidentally upload private audio. Đây là lý do FAR &lt; 1/hour là critical, không chỉ UX.</p>
+<h3 id="34-acoustic-environments"><a class="header" href="#34-acoustic-environments">3.4 Acoustic environments</a></h3>
+<p>Wake-word phải work trong:</p>
+<ul>
+<li>Quiet bedroom (clean, easy).</li>
+<li>Noisy kitchen (background TV, dishwasher).</li>
+<li>Car (engine noise, music, road noise).</li>
+<li>Outdoor (wind, traffic).</li>
+<li>Multiple speakers nearby (cocktail party).</li>
+</ul>
+<p>Training data MUST include diverse environments hoặc model fails trong real deployment.</p>
+<h3 id="35-speaker-variations"><a class="header" href="#35-speaker-variations">3.5 Speaker variations</a></h3>
+<p>Same wake-word ("Hey Siri") nói bởi:</p>
+<ul>
+<li>Adult male vs female vs child.</li>
+<li>Native English vs accented English.</li>
+<li>Whispered vs shouted.</li>
+<li>Fast vs slow.</li>
+<li>Recovered from illness (raspy voice).</li>
+</ul>
+<p>Robust to all = data augmentation aggressive trong training.</p>
+<hr />
+<h2 id="phần-4--classical-approaches-pre-deep-learning"><a class="header" href="#phần-4--classical-approaches-pre-deep-learning">Phần 4 — Classical Approaches (Pre-Deep Learning)</a></h2>
+<p>Trước 2014, WWD primarily dùng HMM-GMM hoặc DTW. Phần này quick overview cho historical context.</p>
+<h3 id="41-hmm-gmm-keywordgarbage-models"><a class="header" href="#41-hmm-gmm-keywordgarbage-models">4.1 HMM-GMM keyword/garbage models</a></h3>
+<p>Idea: train một HMM-GMM cho keyword (e.g., "OK Google"), một cho "garbage" (everything else). Compare likelihood:</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">decision</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">∣</span><span class="mord text"><span class="mord">keyword HMM</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord mathnormal">x</span><span class="mord">∣</span><span class="mord text"><span class="mord">garbage HMM</span></span><span class="mclose">)</span></span></span></span></span></p>
+<p>Pros: principled, can be trained với small data.
+Cons: GMMs limited capacity, không capture complex acoustic patterns. EER thường 5-15% cho clean speech, much worse noisy.</p>
+<h3 id="42-sliding-window-dtw"><a class="header" href="#42-sliding-window-dtw">4.2 Sliding window DTW</a></h3>
+<p>Dynamic Time Warping computes optimal alignment between template wake-word recording và sliding window of input audio.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">d</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mop">min</span><span class="mopen">{</span><span class="mord mathnormal">d</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord">1</span><span class="mclose">)}</span></span></span></span></span></p>
+<p>trong đó <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal">c</span><span class="mopen">(</span><span class="mord mathnormal">i</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span><span class="mclose">)</span></span></span></span> là local distance giữa frame <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> của template và frame <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span></span></span></span> của input.</p>
+<p>Trigger khi DTW distance &lt; threshold.</p>
+<p>Pros: simple, no training needed.
+Cons: scales poorly, sensitive to speaker variations, slow inference.</p>
+<p>Modern relevance: DTW vẫn dùng cho speaker verification / user-personalized wake-word (cần ít data).</p>
+<h3 id="43-why-classical-approaches-failed"><a class="header" href="#43-why-classical-approaches-failed">4.3 Why classical approaches failed</a></h3>
+<p>Đến khoảng năm 2015, khoảng cách accuracy giữa phương pháp cổ điển và deep learning trở nên đủ lớn để các hệ thống mới chuyển dần sang neural approaches:</p>
+<ul>
+<li>Capture complex acoustic patterns automatically.</li>
+<li>Robust to speaker, environment variations với augmentation.</li>
+<li>EER drops from 5-15% to 1-3% on standard benchmarks.</li>
+</ul>
+<hr />
+<h2 id="phần-5--modern-deep-learning-approaches"><a class="header" href="#phần-5--modern-deep-learning-approaches">Phần 5 — Modern Deep Learning Approaches</a></h2>
+<p>Modern WWD dùng small CNNs hoặc Conformer-based architectures. Phần này deep dive từng approach.</p>
+<h3 id="51-small-cnn-baseline"><a class="header" href="#51-small-cnn-baseline">5.1 Small CNN baseline</a></h3>
+<p>Architecture đơn giản (dùng bởi Google Speech Commands paper 2017):</p>
+<pre><code class="language-python">import torch.nn as nn
+
+class SmallCNN_KWS(nn.Module):
+    def __init__(self, num_keywords: int = 12):
+        super().__init__()
+        # Input: mel spectrogram [B, 1, 40, 98] (40 mels, 98 frames = ~1 sec)
+        self.conv1 = nn.Conv2d(1, 64, kernel_size=(20, 8), stride=(1, 1))
+        self.bn1 = nn.BatchNorm2d(64)
+        self.pool1 = nn.MaxPool2d((2, 2))
+        
+        self.conv2 = nn.Conv2d(64, 64, kernel_size=(10, 4), stride=(1, 1))
+        self.bn2 = nn.BatchNorm2d(64)
+        
+        # Global average pooling -&gt; classification head
+        self.gap = nn.AdaptiveAvgPool2d(1)
+        self.fc = nn.Linear(64, num_keywords)
+    
+    def forward(self, x):
+        x = nn.functional.relu(self.bn1(self.conv1(x)))
+        x = self.pool1(x)
+        x = nn.functional.relu(self.bn2(self.conv2(x)))
+        x = self.gap(x).squeeze(-1).squeeze(-1)
+        return self.fc(x)
+</code></pre>
+<p>Stats: ~150K params, ~100 KB INT8, ~5 mW inference on Cortex-M4.</p>
+<p>Performance: ~92-94% accuracy trên Google Speech Commands V2 (35 keywords).</p>
+<h3 id="52-ds-cnn-depthwise-separable-cnn"><a class="header" href="#52-ds-cnn-depthwise-separable-cnn">5.2 DS-CNN (Depthwise Separable CNN)</a></h3>
+<p>Improvement: replace standard conv với depthwise separable (factorize spatial + channel-wise convs):</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Standard Conv</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">in</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">out</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8641em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">FLOPs</span></span></span></span></span></span></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Depthwise Separable</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">in</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9474em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">in</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2806em;"><span style="top:-2.55em;margin-left:-0.0715em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">out</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord text"><span class="mord">FLOPs</span></span></span></span></span></span></p>
+<p>For typical <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">K</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">64</span></span></span></span>, reduction factor ~8x. Same accuracy, much fewer FLOPs.</p>
+<p>Used by: Google "OK Google" v3-v5 (around 2018-2020).</p>
+<h3 id="53-tc-resnet-temporal-convolution-resnet"><a class="header" href="#53-tc-resnet-temporal-convolution-resnet">5.3 TC-ResNet (Temporal Convolution ResNet)</a></h3>
+<p>Use 1D temporal convolutions instead of 2D spatial. Optimized for time-frequency features:</p>
+<ul>
+<li>Input: mel spectrogram treated as 1D sequence with <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">n</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">mels</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span> channels.</li>
+<li>Architecture: stack of 1D Conv-BN-ReLU blocks with residual connections.</li>
+</ul>
+<p>Pros: faster than 2D CNN, similar accuracy.</p>
+<h3 id="54-conformer-kws-google-2022"><a class="header" href="#54-conformer-kws-google-2022">5.4 Conformer-KWS (Google, 2022)</a></h3>
+<p>Apply Conformer architecture (originally for ASR) to WWD:</p>
+<ul>
+<li>Conformer block = convolution + self-attention.</li>
+<li>Captures both local (convolution) and global (attention) patterns.</li>
+<li>Better accuracy than CNNs ở same parameter budget.</li>
+</ul>
+<p>Architecture details:</p>
+<pre><code class="language-python">class ConformerKWS(nn.Module):
+    def __init__(self, num_keywords, hidden_dim=64, num_layers=2):
+        super().__init__()
+        self.input_proj = nn.Linear(80, hidden_dim)  # 80 mels
+        self.conformer_blocks = nn.ModuleList([
+            ConformerBlock(hidden_dim, num_heads=4, ffn_dim=128)
+            for _ in range(num_layers)
+        ])
+        self.classifier = nn.Linear(hidden_dim, num_keywords)
+    
+    def forward(self, mel):  # [B, T, 80]
+        x = self.input_proj(mel)
+        for block in self.conformer_blocks:
+            x = block(x)
+        x = x.mean(dim=1)  # temporal pooling
+        return self.classifier(x)
+</code></pre>
+<p>Performance: 96-97% on Google Speech Commands V2, ~200K params.</p>
+<h3 id="55-streaming-rnn-t-cho-continuous-kws"><a class="header" href="#55-streaming-rnn-t-cho-continuous-kws">5.5 Streaming RNN-T cho continuous KWS</a></h3>
+<p>Cho continuous audio stream với multiple potential keywords, RNN-T architecture is natural fit:</p>
+<ul>
+<li>Encoder process audio streaming.</li>
+<li>Predictor maintains language model state.</li>
+<li>Joint network decides per frame to emit keyword token hoặc blank.</li>
+</ul>
+<p>This is overkill cho single wake-word but useful cho open-vocabulary KWS hoặc multi-keyword scenarios.</p>
+<h3 id="56-two-stage-architecture-industry-pattern"><a class="header" href="#56-two-stage-architecture-industry-pattern">5.6 Two-stage architecture (industry pattern)</a></h3>
+<p>Stage 1: very small always-on DNN (&lt;10 KB) detects "candidates", FAR ~10/hour.</p>
+<p>Stage 2: larger verification DNN (~500 KB) confirms candidates, drops FAR to &lt;0.1/hour.</p>
+<p>Used by Apple ("Hey Siri" original architecture), allows aggressive power saving (Stage 2 only activates when Stage 1 triggers).</p>
+<hr />
+<h2 id="phần-6--industry-implementations"><a class="header" href="#phần-6--industry-implementations">Phần 6 — Industry Implementations</a></h2>
+<p>Đào sâu từng industry implementation. Tất cả info từ public papers, blog posts, conference talks.</p>
+<h3 id="61-apple-hey-siri"><a class="header" href="#61-apple-hey-siri">6.1 Apple "Hey Siri"</a></h3>
+<p>Apple publish "Hey Siri" architecture trong machine learning journal (2017):</p>
+<p><strong>Two-stage architecture</strong>:</p>
+<ol>
+<li><strong>Stage 1 — Always-on DNN</strong>: ~50 KB, runs on AOP (Always-On Processor) co-processor. ~5 mW. Outputs binary "candidate" / "no candidate".</li>
+<li><strong>Stage 2 — Verification DNN</strong>: larger (~MB scale), runs on Apple Neural Engine when Stage 1 triggers. Verifies if real "Hey Siri" vs sound-alike. Outputs probability.</li>
+</ol>
+<p><strong>Personalization</strong>: After user enrolls "Hey Siri" với their voice (3 times), system fine-tunes Stage 2 với user's voice samples. Reduces FAR for "Hey Siri" said by non-owner.</p>
+<p><strong>Languages</strong>: ~20 languages supported (Hey Siri in Vietnamese is "Hey Siri" — không localize).</p>
+<h3 id="62-google-ok-google--hey-google"><a class="header" href="#62-google-ok-google--hey-google">6.2 Google "OK Google" / "Hey Google"</a></h3>
+<p>Multiple papers documenting evolution:</p>
+<ul>
+<li><strong>2014</strong>: Original DNN-based keyword spotting (Chen et al., ICASSP 2014).</li>
+<li><strong>2017</strong>: Convolutional and Recurrent Neural Networks for KWS (Sainath &amp; Parada).</li>
+<li><strong>2020-2022</strong>: Conformer-based KWS with improved accuracy.</li>
+</ul>
+<p>Architecture today (per public docs):</p>
+<ol>
+<li><strong>Always-on small DNN</strong> trên Pixel chip (Tensor): ~100 KB, ~2 mW.</li>
+<li><strong>Verification on AP</strong> (Application Processor) khi triggered.</li>
+</ol>
+<p><strong>Personalization</strong>: Voice Match feature trains user-specific classifier.</p>
+<h3 id="63-amazon-alexa"><a class="header" href="#63-amazon-alexa">6.3 Amazon Alexa</a></h3>
+<p>Alexa wake-word detection runs on Echo device locally:</p>
+<ul>
+<li><strong>Architecture</strong>: small CNN với mel features.</li>
+<li><strong>Power</strong>: device always plugged in (AC powered), less constrained than phone.</li>
+<li><strong>Verification</strong>: cloud verification cho high-confidence false positive reduction.</li>
+</ul>
+<p>Amazon publishes Alexa wake-word datasets (Hey Snips contributed by Snips, later acquired by Sonos).</p>
+<h3 id="64-microsoft-cortana"><a class="header" href="#64-microsoft-cortana">6.4 Microsoft Cortana</a></h3>
+<p>Cortana wake-word architecture similar to Apple/Google: small DNN on-device + verification.</p>
+<p>Notable: Microsoft maintained Cortana for years for enterprise but consumer adoption was limited compared to Siri/Alexa.</p>
+<h3 id="65-open-source-alternatives"><a class="header" href="#65-open-source-alternatives">6.5 Open-source alternatives</a></h3>
+<h4 id="651-porcupine-picovoice"><a class="header" href="#651-porcupine-picovoice">6.5.1 Porcupine (Picovoice)</a></h4>
+<ul>
+<li>Commercial company với open-source SDKs.</li>
+<li>Pre-trained wake-word models cho popular phrases.</li>
+<li>Custom wake-word training service.</li>
+<li>Runs on Cortex-M, Cortex-A, x86, mobile.</li>
+</ul>
+<h4 id="652-snowboy-deprecated"><a class="header" href="#652-snowboy-deprecated">6.5.2 Snowboy (deprecated)</a></h4>
+<ul>
+<li>Originally open-source by KITT.ai.</li>
+<li>Acquired by Baidu, then deprecated in 2020.</li>
+<li>Still used in legacy projects.</li>
+</ul>
+<h4 id="653-mycroft-precise"><a class="header" href="#653-mycroft-precise">6.5.3 Mycroft Precise</a></h4>
+<ul>
+<li>Open-source wake-word for Mycroft AI voice assistant.</li>
+<li>TensorFlow Lite-based.</li>
+<li>Community-trained models cho "Hey Mycroft" và custom.</li>
+</ul>
+<h4 id="654-howl-cmu"><a class="header" href="#654-howl-cmu">6.5.4 Howl (CMU)</a></h4>
+<ul>
+<li>Academic open-source toolkit for KWS research.</li>
+<li>Allows quick prototyping new models.</li>
+</ul>
+<hr />
+<h2 id="phần-7--training-data--augmentation-strategies"><a class="header" href="#phần-7--training-data--augmentation-strategies">Phần 7 — Training Data + Augmentation Strategies</a></h2>
+<p>Quality của WWD model phụ thuộc heavily vào data.</p>
+<h3 id="71-standard-datasets"><a class="header" href="#71-standard-datasets">7.1 Standard datasets</a></h3>
+<h4 id="711-google-speech-commands-v2-2018"><a class="header" href="#711-google-speech-commands-v2-2018">7.1.1 Google Speech Commands V2 (2018)</a></h4>
+<ul>
+<li>35 keywords (~3700 speakers).</li>
+<li>105,000 utterances.</li>
+<li>1-second clips at 16 kHz.</li>
+<li>License: Creative Commons.</li>
+<li>Used cho most academic WWD benchmarks.</li>
+</ul>
+<h4 id="712-hey-snips-2018"><a class="header" href="#712-hey-snips-2018">7.1.2 Hey Snips (2018)</a></h4>
+<ul>
+<li>"Hey Snips" wake-word data.</li>
+<li>Collected by Snips (later acquired by Sonos).</li>
+<li>Open source.</li>
+</ul>
+<h4 id="713-mlcommons-multilingual-spoken-words-corpus-2021"><a class="header" href="#713-mlcommons-multilingual-spoken-words-corpus-2021">7.1.3 MLCommons Multilingual Spoken Words Corpus (2021)</a></h4>
+<ul>
+<li>350,000+ words across 50 languages.</li>
+<li>6,400+ hours of audio.</li>
+<li>Released by ML Commons.</li>
+</ul>
+<h3 id="72-augmentation-strategies"><a class="header" href="#72-augmentation-strategies">7.2 Augmentation strategies</a></h3>
+<p>WWD models benefit hugely from aggressive augmentation:</p>
+<h4 id="721-noise-augmentation"><a class="header" href="#721-noise-augmentation">7.2.1 Noise augmentation</a></h4>
+<p>Mix wake-word recordings với background noise:</p>
+<pre><code class="language-python">def augment_with_noise(clean_audio, noise_audio, snr_db):
+    """Mix clean and noise at specified SNR."""
+    clean_power = np.mean(clean_audio ** 2)
+    noise_power = np.mean(noise_audio ** 2)
+    
+    # Scale noise to achieve target SNR
+    snr_linear = 10 ** (snr_db / 10)
+    scale = np.sqrt(clean_power / (noise_power * snr_linear))
+    
+    return clean_audio + scale * noise_audio
+</code></pre>
+<p>SNR ranges: -5 dB to +20 dB common. Sub-zero SNR teach model to handle very noisy.</p>
+<h4 id="722-reverberation-augmentation"><a class="header" href="#722-reverberation-augmentation">7.2.2 Reverberation augmentation</a></h4>
+<p>Convolve với room impulse responses (RIRs):</p>
+<pre><code class="language-python">import scipy.signal
+
+def add_reverb(audio, rir):
+    """Convolve audio with room impulse response."""
+    return scipy.signal.fftconvolve(audio, rir, mode='same')
+</code></pre>
+<p>RIR datasets: BUT Reverb DB, OpenSLR REVERB challenge.</p>
+<h4 id="723-speed-perturbation"><a class="header" href="#723-speed-perturbation">7.2.3 Speed perturbation</a></h4>
+<p>Speed up / slow down audio without changing pitch (or changing both):</p>
+<pre><code class="language-python">import librosa
+
+def speed_perturb(audio, sr, speed):
+    """Speed perturbation."""
+    return librosa.effects.time_stretch(audio, rate=speed)
+</code></pre>
+<p>Typical: 0.9x, 1.0x, 1.1x. 3-way speed augmentation triple data effectively.</p>
+<h4 id="724-pitch-shifting"><a class="header" href="#724-pitch-shifting">7.2.4 Pitch shifting</a></h4>
+<p>Shift pitch up/down:</p>
+<pre><code class="language-python">def pitch_shift(audio, sr, semitones):
+    return librosa.effects.pitch_shift(audio, sr=sr, n_steps=semitones)
+</code></pre>
+<p>Helps generalize across speakers (low pitch male, high pitch female/child).</p>
+<h4 id="725-specaugment"><a class="header" href="#725-specaugment">7.2.5 SpecAugment</a></h4>
+<p>On mel spectrogram (post-feature extraction):</p>
+<ul>
+<li>Frequency masking: zero out random frequency bands.</li>
+<li>Time masking: zero out random time slices.</li>
+</ul>
+<h4 id="726-hard-negative-mining"><a class="header" href="#726-hard-negative-mining">7.2.6 Hard negative mining</a></h4>
+<p>Most important: train on "sounds like wake-word but isn't":</p>
+<ul>
+<li>"Hey Sarah" (similar to "Hey Siri").</li>
+<li>"OK people" (similar to "OK Google").</li>
+</ul>
+<p>Hard negatives dramatically reduce FAR.</p>
+<h3 id="73-data-collection-for-new-wake-word"><a class="header" href="#73-data-collection-for-new-wake-word">7.3 Data collection for new wake-word</a></h3>
+<p>If you want custom wake-word (e.g., "Hey Vinfast"):</p>
+<ol>
+<li><strong>Collect positive samples</strong>: 1000-5000 utterances from diverse speakers.</li>
+<li><strong>Collect negative samples</strong>: hours of conversational speech (background) + hard negatives.</li>
+<li><strong>Augment positives</strong> với noise, reverb, speed (10-100x effective data).</li>
+<li><strong>Train binary classifier</strong>: typically Conformer-small or DS-CNN.</li>
+<li><strong>Tune threshold</strong> on validation set.</li>
+</ol>
+<p>Realistic budget: 1-3 months engineering, 10,000-50,000 USD if outsourcing data collection.</p>
+<hr />
+<h2 id="phần-8--edge-deployment"><a class="header" href="#phần-8--edge-deployment">Phần 8 — Edge Deployment</a></h2>
+<p>WWD đặc thù về deployment vì power/memory constraints.</p>
+<h3 id="81-tflite-micro"><a class="header" href="#81-tflite-micro">8.1 TFLite Micro</a></h3>
+<p>TensorFlow Lite for Microcontrollers (TFLite Micro): library cho ML on ARM Cortex-M and similar:</p>
+<pre><code class="language-python"># Train PyTorch model
+model = train_kws_model()
+
+# Convert to ONNX
+torch.onnx.export(model, dummy_input, "kws.onnx")
+
+# Convert ONNX -&gt; TF -&gt; TFLite
+import onnx
+from onnx_tf.backend import prepare
+
+onnx_model = onnx.load("kws.onnx")
+tf_rep = prepare(onnx_model)
+tf_rep.export_graph("kws_tf")
+
+import tensorflow as tf
+converter = tf.lite.TFLiteConverter.from_saved_model("kws_tf")
+converter.optimizations = [tf.lite.Optimize.DEFAULT]
+converter.target_spec.supported_types = [tf.int8]
+tflite_model = converter.convert()
+
+with open("kws.tflite", "wb") as f:
+    f.write(tflite_model)
+</code></pre>
+<p>TFLite Micro flash usage: ~50-200 KB model + ~50 KB runtime.</p>
+<h3 id="82-onnx-runtime-mobile"><a class="header" href="#82-onnx-runtime-mobile">8.2 ONNX Runtime Mobile</a></h3>
+<p>Alternative: ONNX Runtime với mobile-optimized binary:</p>
+<ul>
+<li>iOS: ONNX Runtime iOS framework, ~5 MB binary.</li>
+<li>Android: ONNX Runtime AAR, ~10 MB binary.</li>
+</ul>
+<p>Larger than TFLite but supports wider model architectures.</p>
+<h3 id="83-core-ml-apple"><a class="header" href="#83-core-ml-apple">8.3 Core ML (Apple)</a></h3>
+<p>Apple ecosystem: convert to Core ML for Apple Neural Engine acceleration:</p>
+<pre><code class="language-python">import coremltools as ct
+
+# Convert PyTorch model
+mlmodel = ct.convert(
+    traced_model,
+    inputs=[ct.TensorType(name="mel", shape=(1, 1, 40, 98))],
+    compute_precision=ct.precision.FLOAT16,
+)
+
+mlmodel.save("kws.mlmodel")
+</code></pre>
+<p>Performance: ~2-5 mW on iPhone Neural Engine, sub-50ms inference.</p>
+<h3 id="84-mediapipe-google"><a class="header" href="#84-mediapipe-google">8.4 MediaPipe (Google)</a></h3>
+<p>Google's framework for on-device ML, supports KWS pipeline:</p>
+<ul>
+<li>Audio preprocessing on CPU.</li>
+<li>Model inference on GPU/NPU.</li>
+<li>Post-processing for threshold tuning.</li>
+</ul>
+<hr />
+<h2 id="phần-9--personalization-user-specific-wake-words"><a class="header" href="#phần-9--personalization-user-specific-wake-words">Phần 9 — Personalization (User-Specific Wake-Words)</a></h2>
+<p>Generic wake-word models trigger on anyone's voice. Personalization improves FAR by 5-10x.</p>
+<h3 id="91-enrollment-process"><a class="header" href="#91-enrollment-process">9.1 Enrollment process</a></h3>
+<ol>
+<li>User says wake-word 3-5 times in quiet environment.</li>
+<li>Extract speaker embedding from each utterance (using pre-trained speaker encoder).</li>
+<li>Average embeddings → user's "voice signature".</li>
+</ol>
+<h3 id="92-inference-with-personalization"><a class="header" href="#92-inference-with-personalization">9.2 Inference with personalization</a></h3>
+<p>When wake-word candidate detected:</p>
+<ol>
+<li>Extract speaker embedding from candidate utterance.</li>
+<li>Compute cosine similarity với user's signature.</li>
+<li>Accept only if similarity &gt; threshold.</li>
+</ol>
+<pre><code class="language-python">def personalized_wake_word(audio, base_score, user_embedding, speaker_encoder):
+    """Combine base wake-word score with speaker verification."""
+    # Speaker embedding from candidate audio
+    candidate_emb = speaker_encoder(audio)
+    
+    # Cosine similarity với user
+    similarity = F.cosine_similarity(candidate_emb, user_embedding, dim=-1)
+    
+    # Combined score
+    combined = base_score * similarity.sigmoid()
+    return combined &gt; threshold
+</code></pre>
+<h3 id="93-limitations-of-personalization"><a class="header" href="#93-limitations-of-personalization">9.3 Limitations of personalization</a></h3>
+<ul>
+<li>Single voice only (won't work for family with shared device).</li>
+<li>Voice changes over time (illness, age).</li>
+<li>Need re-enrollment periodically.</li>
+</ul>
+<p>Multi-user systems use multiple voice profiles (e.g., Amazon Alexa "Voice ID").</p>
+<hr />
+<h2 id="phần-10--vietnamese-wake-words"><a class="header" href="#phần-10--vietnamese-wake-words">Phần 10 — Vietnamese Wake-Words</a></h2>
+<p>Trong context Vietnam, các wake-word notable:</p>
+<h3 id="101-wake-words-trên-thị-trường-vietnam"><a class="header" href="#101-wake-words-trên-thị-trường-vietnam">10.1 Wake-words trên thị trường Vietnam</a></h3>
+<ul>
+<li><strong>"Ok Vinfast"</strong> — VinFast in-car voice assistant.</li>
+<li><strong>"Chào Zalo"</strong> / <strong>"Hey Kiki"</strong> — ZaloAI assistants.</li>
+<li><strong>"Hey Siri"</strong> / <strong>"OK Google"</strong> — Apple/Google products (English wake-word vẫn dùng cho user Vi).</li>
+</ul>
+<h3 id="102-tonal-language-considerations"><a class="header" href="#102-tonal-language-considerations">10.2 Tonal language considerations</a></h3>
+<p>Tiếng Việt có 6 thanh điệu. Wake-word "Ok Vinfast" sai thanh điệu (e.g., "Ok Vĩnfast") không nên trigger.</p>
+<p>Solution:</p>
+<ol>
+<li>Tone-aware features: extract F0 (pitch) contour, include trong model input.</li>
+<li>Augment với tone-shifted versions cho hard negatives.</li>
+<li>Use character-level model thay vì BPE (preserve tonal distinctions).</li>
+</ol>
+<h3 id="103-code-switching-wake-words"><a class="header" href="#103-code-switching-wake-words">10.3 Code-switching wake-words</a></h3>
+<p>Wake-word có thể là mixed Vi-En: "Hey Vinfast", "Chào Google" (hypothetical).</p>
+<p>Train với code-switched data ensure model handles correctly.</p>
+<h3 id="104-recommended-approach-cho-vietnamese-custom-wake-word"><a class="header" href="#104-recommended-approach-cho-vietnamese-custom-wake-word">10.4 Recommended approach cho Vietnamese custom wake-word</a></h3>
+<ol>
+<li><strong>Data collection</strong>: 5,000+ utterances, diverse speakers (Bắc/Trung/Nam dialects).</li>
+<li><strong>Hard negatives</strong>: include "Hey VinHomes", "Hey VinGroup" (similar Vinfast).</li>
+<li><strong>Augmentation</strong>: in-car noise (engine, music, road).</li>
+<li><strong>Model</strong>: small Conformer-KWS, ~200K params, INT8 quantized.</li>
+<li><strong>Deployment</strong>: ONNX Runtime Mobile cho Android automotive.</li>
+<li><strong>Personalization</strong>: tied to user phone connection (optional).</li>
+</ol>
+<hr />
+<h2 id="phần-11--tóm-tắt"><a class="header" href="#phần-11--tóm-tắt">Phần 11 — Tóm tắt</a></h2>
+<h3 id="111-key-takeaways"><a class="header" href="#111-key-takeaways">11.1 Key takeaways</a></h3>
+<ol>
+<li><strong>WWD là binary classification specialized cho 1 phrase</strong>, not ASR. Different constraints, different architectures.</li>
+<li><strong>Power budget &lt; 10 mW</strong> là constraint nhất, requires small models (50-500 KB) + DSP/MCU deployment.</li>
+<li><strong>FAR &lt; 1/hour và FRR &lt; 5-10%</strong> là industry standard. Threshold tuning is key knob.</li>
+<li><strong>Modern WWD</strong>: Conformer-KWS / DS-CNN với INT8 quantization. ~96-97% accuracy on Google Speech Commands V2.</li>
+<li><strong>Two-stage architecture</strong> (Apple "Hey Siri") allows aggressive power saving: small always-on detector + larger verification when triggered.</li>
+<li><strong>Data augmentation aggressive</strong>: noise mixing, reverb, speed/pitch perturbation, hard negative mining.</li>
+<li><strong>Personalization</strong>: speaker embedding-based verification reduces FAR 5-10x.</li>
+<li><strong>Edge deployment</strong>: TFLite Micro for MCU, Core ML for Apple, ONNX Runtime Mobile for cross-platform.</li>
+<li><strong>Vietnamese wake-words</strong>: tone-aware features, dialect coverage, in-car noise augmentation critical.</li>
+</ol>
+<h3 id="112-references"><a class="header" href="#112-references">11.2 References</a></h3>
+<ol>
+<li>Chen, G. et al. (2014). Small-footprint Keyword Spotting Using Deep Neural Networks. ICASSP.</li>
+<li>Sainath, T. &amp; Parada, C. (2015). Convolutional Neural Networks for Small-footprint Keyword Spotting. Interspeech.</li>
+<li>Warden, P. (2018). Speech Commands: A Dataset for Limited-Vocabulary Speech Recognition. arXiv:1804.03209.</li>
+<li>Coucke, A. et al. (2019). Efficient Keyword Spotting using Dilated Convolutions and Gating. ICASSP.</li>
+<li>Apple ML Journal (2017). Hey Siri: An On-device DNN-powered Voice Trigger for Apple's Personal Assistant.</li>
+<li>Picovoice (2024). Porcupine Wake Word Engine documentation.</li>
+<li>Google AI Blog (2017). Improving Voice Search for People with Speech Impairments.</li>
+<li>Mukhopadhyay, A. et al. (2024). Conformer-based Streaming Keyword Spotting for Edge Devices.</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part5/15-speech-translation.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part6/16-vietnamese-speech.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part5/15-speech-translation.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part6/16-vietnamese-speech.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

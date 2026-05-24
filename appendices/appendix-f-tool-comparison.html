@@ -1,0 +1,340 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>F. Tool Comparison - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html" class="active"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/appendices/appendix-f-tool-comparison.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="phụ-lục-f-tool-comparison-matrix"><a class="header" href="#phụ-lục-f-tool-comparison-matrix">Phụ lục F: Tool Comparison Matrix</a></h1>
+<h2 id="mục-đích"><a class="header" href="#mục-đích">Mục đích</a></h2>
+<p>Phụ lục F tập hợp các ma trận so sánh nhanh cho công cụ và mô hình Speech AI. Đây là reference material cho engineer cần đưa ra quyết định nhanh: training framework nào phù hợp, inference engine nào tối ưu, model TTS nào cho voice agent, ASR API nào cho tiếng Việt. Các phần tích chi tiết về từng công cụ nằm trong các chương Phần VII.</p>
+<h2 id="ma-trận-so-sánh-công-cụ-speech-ai"><a class="header" href="#ma-trận-so-sánh-công-cụ-speech-ai">Ma trận So sánh Công cụ Speech AI</a></h2>
+<p>Phụ lục này cung cấp bảng so sánh toàn diện các công cụ, frameworks, và engines cho speech processing.</p>
+<h2 id="a-training-frameworks"><a class="header" href="#a-training-frameworks">A. Training Frameworks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>WeNet</th><th>ESPnet</th><th>SpeechBrain</th><th>NeMo</th><th>k2/icefall</th><th>fairseq</th></tr></thead><tbody>
+<tr><td><strong>ASR</strong></td><td>CTC, RNNT, Attn</td><td>CTC, RNNT, Attn</td><td>CTC, Attn</td><td>CTC, RNNT</td><td>CTC, RNNT, MMI</td><td>CTC, Seq2Seq</td></tr>
+<tr><td><strong>TTS</strong></td><td>Không</td><td>VITS, FastSpeech</td><td>Tacotron, FastSpeech</td><td>FastPitch, VITS</td><td>Không</td><td>Không</td></tr>
+<tr><td><strong>ST</strong></td><td>Không</td><td>Có</td><td>Có</td><td>Không</td><td>Không</td><td>Có (SeamlessM4T)</td></tr>
+<tr><td><strong>SSL</strong></td><td>Không</td><td>Có</td><td>Có</td><td>Không</td><td>Không</td><td>Wav2Vec, HuBERT</td></tr>
+<tr><td><strong>Streaming</strong></td><td>Dynamic chunk</td><td>Chunked</td><td>Không native</td><td>Cache-based</td><td>Không</td><td>Không</td></tr>
+<tr><td><strong>C++ Runtime</strong></td><td>Có</td><td>Không</td><td>Không</td><td>Via Triton</td><td>Có (k2)</td><td>Không</td></tr>
+<tr><td><strong>Multi-GPU</strong></td><td>DDP</td><td>DDP</td><td>DDP</td><td>Megatron</td><td>DDP</td><td>DDP, FSDP</td></tr>
+<tr><td><strong>Config</strong></td><td>YAML</td><td>YAML</td><td>HyperPyYAML</td><td>OmegaConf</td><td>Python</td><td>Hydra</td></tr>
+<tr><td><strong>Recipes</strong></td><td>~20</td><td>200+</td><td>100+</td><td>~50</td><td>~30</td><td>~20</td></tr>
+<tr><td><strong>License</strong></td><td>Apache 2.0</td><td>Apache 2.0</td><td>Apache 2.0</td><td>Apache 2.0</td><td>Apache 2.0</td><td>MIT</td></tr>
+</tbody></table>
+</div>
+<p>: Training Framework Feature Matrix <a id="tbl-training-matrix"></a></p>
+<h2 id="b-inference-engines"><a class="header" href="#b-inference-engines">B. Inference Engines</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>TensorRT</th><th>ONNX RT</th><th>CTranslate2</th><th>vLLM</th><th>OpenVINO</th></tr></thead><tbody>
+<tr><td><strong>GPU Support</strong></td><td>NVIDIA only</td><td>CUDA, TRT</td><td>CUDA</td><td>CUDA</td><td>Intel iGPU</td></tr>
+<tr><td><strong>CPU Support</strong></td><td>Không</td><td>Có</td><td>Có</td><td>Không</td><td>Có (optimized)</td></tr>
+<tr><td><strong>INT8</strong></td><td>Có (calibration)</td><td>Có (QDQ)</td><td>Có (auto)</td><td>Via backends</td><td>Có (NNCF)</td></tr>
+<tr><td><strong>FP16</strong></td><td>Có</td><td>Có</td><td>Có</td><td>Có</td><td>Limited</td></tr>
+<tr><td><strong>Dynamic Batch</strong></td><td>Via Triton</td><td>Manual</td><td>Manual</td><td>Continuous</td><td>Manual</td></tr>
+<tr><td><strong>Streaming</strong></td><td>Có</td><td>Có</td><td>Có</td><td>Có</td><td>Có</td></tr>
+<tr><td><strong>Whisper opt</strong></td><td>Community</td><td>Community</td><td><strong>Native</strong></td><td>N/A</td><td>Community</td></tr>
+<tr><td><strong>Speech LLM</strong></td><td>N/A</td><td>N/A</td><td>N/A</td><td><strong>Native</strong></td><td>N/A</td></tr>
+<tr><td><strong>Latency (rel)</strong></td><td><strong>Lowest</strong></td><td>Low</td><td>Low</td><td>Medium</td><td>Low (CPU)</td></tr>
+<tr><td><strong>Ease of use</strong></td><td>Khó</td><td>Dễ</td><td>Dễ</td><td>Dễ</td><td>Trung bình</td></tr>
+</tbody></table>
+</div>
+<p>: Inference Engine Feature Matrix <a id="tbl-inference-matrix"></a></p>
+<h2 id="c-asr-models"><a class="header" href="#c-asr-models">C. ASR Models</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Params</th><th>Architecture</th><th>Streaming</th><th>Languages</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>Whisper large-v3</td><td>1.5B</td><td>Enc-Dec (Attn)</td><td>Không</td><td>99</td><td>Có</td></tr>
+<tr><td>Canary-1B</td><td>1B</td><td>FastConformer</td><td>Có</td><td>4</td><td>Có</td></tr>
+<tr><td>USM</td><td>2B</td><td>Conformer</td><td>Có</td><td>300+</td><td>Không</td></tr>
+<tr><td>Conformer-L</td><td>118M</td><td>Conformer-CTC/RNNT</td><td>Có</td><td>Config</td><td>Có</td></tr>
+<tr><td>Zipformer-L</td><td>148M</td><td>Zipformer-RNNT</td><td>Có</td><td>Config</td><td>Có</td></tr>
+<tr><td>PhoWhisper</td><td>1.5B</td><td>Whisper fine-tune</td><td>Không</td><td>Vietnamese</td><td>Có</td></tr>
+</tbody></table>
+</div>
+<p>: ASR Model Comparison <a id="tbl-asr-model-matrix"></a></p>
+<h2 id="d-tts-models"><a class="header" href="#d-tts-models">D. TTS Models</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Năm</th><th>Kiến trúc</th><th>Zero-shot</th><th>Streaming</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>Tacotron 2</td><td>2018</td><td>Autoregressive</td><td>Không</td><td>Không</td><td>Có</td></tr>
+<tr><td>FastSpeech 2</td><td>2021</td><td>Non-autoregressive</td><td>Không</td><td>Có</td><td>Có</td></tr>
+<tr><td>VITS</td><td>2021</td><td>E2E (VAE + Flow + GAN)</td><td>Không</td><td>Có</td><td>Có</td></tr>
+<tr><td>VALL-E</td><td>2023</td><td>Codec LM</td><td><strong>Có</strong> (3s prompt)</td><td>Không</td><td>Không</td></tr>
+<tr><td>CosyVoice</td><td>2024</td><td>Flow matching + LLM</td><td><strong>Có</strong></td><td>Có</td><td>Có</td></tr>
+<tr><td>F5-TTS</td><td>2024</td><td>Flow matching (DiT)</td><td><strong>Có</strong></td><td>Có</td><td>Có</td></tr>
+<tr><td>Seed-TTS</td><td>2024</td><td>Diffusion + AR</td><td><strong>Có</strong></td><td>Không</td><td>Không</td></tr>
+<tr><td>Parler-TTS</td><td>2024</td><td>Text-described</td><td><strong>Có</strong> (text desc)</td><td>Có</td><td>Có</td></tr>
+</tbody></table>
+</div>
+<p>: TTS Model Comparison <a id="tbl-tts-model-matrix"></a></p>
+<h2 id="e-audio-codecs"><a class="header" href="#e-audio-codecs">E. Audio Codecs</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Codec</th><th>Tổ chức</th><th>Bitrate</th><th>Sample Rate</th><th>Codebooks</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>EnCodec</td><td>Meta</td><td>1.5-24 kbps</td><td>24kHz</td><td>2-32 (RVQ)</td><td>Có</td></tr>
+<tr><td>DAC</td><td>Descript</td><td>8-16 kbps</td><td>44.1kHz</td><td>9 (RVQ)</td><td>Có</td></tr>
+<tr><td>SpeechTokenizer</td><td>FunAudioLLM</td><td>1-4 kbps</td><td>16kHz</td><td>8 (semantic+acoustic)</td><td>Có</td></tr>
+<tr><td>Mimi</td><td>Kyutai</td><td>1.1 kbps</td><td>24kHz</td><td>8 (RVQ)</td><td>Có</td></tr>
+<tr><td>Snac</td><td>Hubertus</td><td>0.8-4 kbps</td><td>24-44kHz</td><td>3-7 (multi-scale)</td><td>Có</td></tr>
+</tbody></table>
+</div>
+<p>: Audio Codec Comparison <a id="tbl-codec-matrix"></a></p>
+<h2 id="f-ssl-models"><a class="header" href="#f-ssl-models">F. SSL Models</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Params</th><th>Pre-train Data</th><th>Objective</th><th>Best Tasks</th></tr></thead><tbody>
+<tr><td>Wav2Vec 2.0</td><td>317M</td><td>60K hrs</td><td>Contrastive</td><td>ASR</td></tr>
+<tr><td>HuBERT</td><td>317M</td><td>60K hrs</td><td>Masked prediction</td><td>ASR, classification</td></tr>
+<tr><td>WavLM</td><td>317M</td><td>94K hrs</td><td>Masked + denoising</td><td>Nhiều SUPERB tasks</td></tr>
+<tr><td>data2vec 2.0</td><td>317M</td><td>60K hrs</td><td>Teacher-student</td><td>ASR, classification</td></tr>
+<tr><td>CLAP</td><td>~200M</td><td>630K pairs</td><td>Audio-text contrastive</td><td>Zero-shot, retrieval</td></tr>
+<tr><td>Whisper</td><td>1.5B</td><td>5M hrs</td><td>Supervised seq2seq</td><td>ASR, translation</td></tr>
+</tbody></table>
+</div>
+<p>: SSL Model Comparison <a id="tbl-ssl-matrix"></a></p>
+<h2 id="g-multimodal-omni-models"><a class="header" href="#g-multimodal-omni-models">G. Multimodal Omni Models</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Tổ chức</th><th>Audio In</th><th>Audio Out</th><th>Real-time</th><th>Open-source</th></tr></thead><tbody>
+<tr><td>GPT-4o</td><td>OpenAI</td><td>Có</td><td>Có</td><td>Có</td><td>Không</td></tr>
+<tr><td>Gemini 2.0</td><td>Google</td><td>Có</td><td>Có</td><td>Có</td><td>Không</td></tr>
+<tr><td>Qwen2-Audio</td><td>Alibaba</td><td>Có</td><td>Không</td><td>Không</td><td>Có</td></tr>
+<tr><td>Qwen2.5-Omni</td><td>Alibaba</td><td>Có</td><td>Có</td><td>Có</td><td>Có</td></tr>
+<tr><td>Moshi</td><td>Kyutai</td><td>Có</td><td>Có</td><td>Có</td><td>Có</td></tr>
+<tr><td>SALMONN</td><td>ByteDance</td><td>Có</td><td>Không</td><td>Không</td><td>Có</td></tr>
+</tbody></table>
+</div>
+<p>: Multimodal Omni Model Comparison <a id="tbl-omni-matrix"></a></p>
+<h2 id="h-vietnamese-speech-ecosystem"><a class="header" href="#h-vietnamese-speech-ecosystem">H. Vietnamese Speech Ecosystem</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tổ chức</th><th>ASR</th><th>TTS</th><th>Open-source</th><th>API</th></tr></thead><tbody>
+<tr><td>VinAI</td><td>PhoWhisper</td><td>Không</td><td>Có</td><td>Không</td></tr>
+<tr><td>Zalo AI</td><td>Zalo ASR</td><td>Zalo TTS</td><td>Không</td><td>Có</td></tr>
+<tr><td>FPT.AI</td><td>FPT ASR</td><td>FPT TTS</td><td>Không</td><td>Có</td></tr>
+<tr><td>Viettel AI</td><td>Viettel ASR</td><td>Viettel TTS</td><td>Không</td><td>Có</td></tr>
+<tr><td>NVIDIA</td><td>Canary-vi</td><td>Không</td><td>Có (NeMo)</td><td>Không</td></tr>
+<tr><td>Community</td><td>XLSR-vi</td><td>VietTTS</td><td>Có</td><td>Không</td></tr>
+</tbody></table>
+</div>
+<p>: Vietnamese Speech Ecosystem <a id="tbl-vietnamese-matrix"></a></p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendices/appendix-e-vietnamese-resources.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../references.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendices/appendix-e-vietnamese-resources.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../references.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

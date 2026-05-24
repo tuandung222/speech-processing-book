@@ -1,0 +1,1234 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 19: Inference Engines - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html" class="active"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part7/19-inference-engines.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-19-inference-engines-và-tooling"><a class="header" href="#chương-19-inference-engines-và-tooling">Chương 19: Inference Engines và Tooling</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Sau khi train được mô hình Speech AI chất lượng, bài toán tiếp theo là <strong>deploy nó vào production với chi phí và latency hợp lý</strong>. Đây là lúc inference engine, optimization toolkit, và data preprocessing/augmentation library trở nên quyết định. Khác biệt giữa naive PyTorch inference và pipeline tối ưu (TensorRT, vLLM, Triton) có thể là 5-10x throughput hoặc 3-5x giảm cost server.</p>
+<p>Chương này khảo sát hệ sinh thái inference cho Speech AI ở ba mức:</p>
+<ul>
+<li><strong>Inference engines core</strong>: TensorRT, ONNX Runtime, OpenVINO, CTranslate2 (faster-whisper), vLLM cho Speech LLM.</li>
+<li><strong>Serving frameworks</strong>: Triton Inference Server, BentoML, Ray Serve cho production pipeline phức tạp.</li>
+<li><strong>Supporting libraries</strong>: torchaudio, librosa, soundfile, audiomentations cho preprocessing và augmentation.</li>
+</ul>
+<p>Đặc biệt, chương dành một deep dive cho <strong>WeNet</strong> (kế thừa Phần 18 nhưng từ góc nhìn inference), trình bày cách export ONNX và LibTorch cho deployment.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: tổng quan inference engines, tiêu chí lựa chọn (latency, throughput, cost, cross-platform).</li>
+<li><strong>Phần 2</strong>: TensorRT, ONNX Runtime, OpenVINO cho ASR và TTS.</li>
+<li><strong>Phần 3</strong>: CTranslate2 và faster-whisper, optimization chuyên cho Whisper.</li>
+<li><strong>Phần 4</strong>: vLLM cho Speech LLM (Qwen2-Audio, Qwen3-Omni, Moshi self-host).</li>
+<li><strong>Phần 5</strong>: Triton, BentoML, Ray Serve cho serving pipeline.</li>
+<li><strong>Phần 6</strong>: speech processing libraries ecosystem (preprocessing, augmentation, pretrained loader, quantization).</li>
+<li><strong>Phần 7</strong>: WeNet deep guide cho production deployment.</li>
+</ul>
+</blockquote>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Chương này trình bày chi tiết các inference engines phổ biến nhất để <strong>deploy speech processing models</strong> trong production. Từ <strong>TensorRT + Triton</strong> (NVIDIA stack) đến <strong>ONNX Runtime</strong>, <strong>CTranslate2</strong>, và các alternatives khác.</p>
+<blockquote>
+<p><strong>📝 Tại sao cần Inference Engine riêng?</strong></p>
+<p>PyTorch inference <strong>chậm</strong> và <strong>tốn memory</strong> cho production:</p>
+<ul>
+<li>Không có graph optimization</li>
+<li>Dynamic shapes gây overhead</li>
+<li>Không tận dụng hardware-specific optimizations (TensorCores, INT8)</li>
+</ul>
+<p>Inference engines tối ưu: <strong>2-10x faster</strong>, <strong>50-70% less memory</strong> so với raw PyTorch.</p>
+</blockquote>
+<h2 id="so-sánh-tổng-quan"><a class="header" href="#so-sánh-tổng-quan">So sánh Tổng quan</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Engine</th><th>Tổ chức</th><th>Hardware</th><th>Quantization</th><th>Streaming</th><th>Speech-specific</th></tr></thead><tbody>
+<tr><td><strong>TensorRT</strong></td><td>NVIDIA</td><td>GPU (NVIDIA)</td><td>INT8, FP16</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>Triton</strong></td><td>NVIDIA</td><td>GPU/CPU</td><td>Via backends</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>ONNX Runtime</strong></td><td>Microsoft</td><td>GPU/CPU/Edge</td><td>INT8, QDQ</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>CTranslate2</strong></td><td>OpenNMT</td><td>GPU/CPU</td><td>INT8, FP16</td><td>Có</td><td><strong>Whisper</strong></td></tr>
+<tr><td><strong>faster-whisper</strong></td><td>Community</td><td>GPU/CPU</td><td>INT8, FP16</td><td>Có</td><td><strong>Whisper</strong></td></tr>
+<tr><td><strong>vLLM</strong></td><td>UC Berkeley</td><td>GPU</td><td>AWQ, GPTQ</td><td>Có</td><td>Speech LLM</td></tr>
+<tr><td><strong>OpenVINO</strong></td><td>Intel</td><td>CPU/iGPU</td><td>INT8</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>BentoML</strong></td><td>BentoML</td><td>Any</td><td>Via backends</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>Ray Serve</strong></td><td>Anyscale</td><td>Any</td><td>Via backends</td><td>Có</td><td>Không</td></tr>
+<tr><td><strong>WhisperX</strong></td><td>Community</td><td>GPU</td><td>Via CTranslate2</td><td>Có</td><td><strong>Whisper+</strong></td></tr>
+</tbody></table>
+</div>
+<p>: So sánh Inference Engines cho Speech <a id="tbl-inference-engines"></a></p>
+<h2 id="tensorrt--triton-inference-server"><a class="header" href="#tensorrt--triton-inference-server">TensorRT + Triton Inference Server</a></h2>
+<h3 id="tensorrt"><a class="header" href="#tensorrt">TensorRT</a></h3>
+<p>TensorRT <sup class="footnote-reference"><a href="#nvidia2024tensorrt">1</a></sup> là inference optimizer của NVIDIA:</p>
+<p><strong>Optimization Pipeline:</strong></p>
+<p><a id="eq-trt-pipeline"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.3581em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">PyTorch/ONNX</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1081em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">TRT Builder</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2948em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">TRT Engine</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">TRT Runtime</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">Inference</span></span></span></span></span></span></p>
+<p><strong>Các tối ưu chính:</strong></p>
+<ol>
+<li><strong>Layer Fusion</strong>: Combine multiple operations thành 1 kernel</li>
+<li><strong>Precision Calibration</strong>: FP32 → FP16/INT8 với calibration data</li>
+<li><strong>Kernel Auto-tuning</strong>: Chọn kernel tối ưu cho hardware cụ thể</li>
+<li><strong>Dynamic Shapes</strong>: Support variable-length audio input</li>
+</ol>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "TensorRT Conversion cho ASR Model"
+# import tensorrt as trt
+# import torch
+# from torch import Tensor
+
+# Step 1: Export PyTorch to ONNX
+# def export_to_onnx(
+#     model: torch.nn.Module,
+#     dummy_input: Tensor,  # [1, T, 80] - mel spectrogram
+#     onnx_path: str = "model.onnx",
+# ) -&gt; None:
+#     torch.onnx.export(
+#         model,
+#         dummy_input,
+#         onnx_path,
+#         input_names=["audio_features"],
+#         output_names=["logits"],
+#         dynamic_axes={
+#             "audio_features": {0: "batch", 1: "time"},
+#             "logits": {0: "batch", 1: "time"},
+#         },
+#         opset_version=17,
+#     )
+
+# Step 2: Build TensorRT Engine
+# def build_trt_engine(
+#     onnx_path: str,
+#     engine_path: str,
+#     precision: str = "fp16",  # fp32, fp16, int8
+#     max_batch: int = 8,
+#     max_seq_len: int = 3000,
+# ) -&gt; None:
+#     logger = trt.Logger(trt.Logger.WARNING)
+#     builder = trt.Builder(logger)
+#     network = builder.create_network(
+#         1 &lt;&lt; int(trt.NetworkDefinitionCreationFlag.EXPLICIT_BATCH)
+#     )
+#     parser = trt.OnnxParser(network, logger)
+#
+#     with open(onnx_path, "rb") as f:
+#         parser.parse(f.read())
+#
+#     config = builder.create_builder_config()
+#     config.set_memory_pool_limit(
+#         trt.MemoryPoolType.WORKSPACE, 4 &lt;&lt; 30  # 4GB
+#     )
+#
+#     if precision == "fp16":
+#         config.set_flag(trt.BuilderFlag.FP16)
+#     elif precision == "int8":
+#         config.set_flag(trt.BuilderFlag.INT8)
+#         # Need calibrator for INT8
+#
+#     # Dynamic shapes
+#     profile = builder.create_optimization_profile()
+#     profile.set_shape(
+#         "audio_features",
+#         min=(1, 1, 80),
+#         opt=(4, 1500, 80),
+#         max=(max_batch, max_seq_len, 80),
+#     )
+#     config.add_optimization_profile(profile)
+#
+#     engine = builder.build_serialized_network(network, config)
+#     with open(engine_path, "wb") as f:
+#         f.write(engine)
+</code></pre>
+<h3 id="triton-inference-server"><a class="header" href="#triton-inference-server">Triton Inference Server</a></h3>
+<p>Triton <sup class="footnote-reference"><a href="#nvidia2024triton">2</a></sup> là serving framework hỗ trợ multiple backends:</p>
+<p><strong>Đặc điểm chính:</strong></p>
+<ul>
+<li><strong>Multi-model serving</strong>: Serve nhiều models trên 1 server</li>
+<li><strong>Dynamic batching</strong>: Tự động batch requests</li>
+<li><strong>Model pipelines</strong>: Chain multiple models (e.g., VAD → ASR → NLU)</li>
+<li><strong>Multiple backends</strong>: TensorRT, ONNX, PyTorch, TensorFlow, Python</li>
+<li><strong>Metrics</strong>: Prometheus metrics built-in</li>
+</ul>
+<p><strong>Model Repository Structure:</strong></p>
+<pre><code>model_repository/
+├── asr_encoder/
+│   ├── config.pbtxt
+│   └── 1/
+│       └── model.plan          # TensorRT engine
+├── asr_decoder/
+│   ├── config.pbtxt
+│   └── 1/
+│       └── model.onnx          # ONNX model
+├── vad/
+│   ├── config.pbtxt
+│   └── 1/
+│       └── model.pt            # PyTorch model
+└── pipeline/
+    ├── config.pbtxt            # Ensemble/BLS config
+    └── 1/
+        └── model.py            # Python backend
+</code></pre>
+<p><strong>Config Example:</strong></p>
+<pre><code># config.pbtxt for ASR encoder
+name: "asr_encoder"
+platform: "tensorrt_plan"
+max_batch_size: 8
+
+input [
+  {
+    name: "audio_features"
+    data_type: TYPE_FP16
+    dims: [-1, 80]
+  }
+]
+
+output [
+  {
+    name: "encoder_output"
+    data_type: TYPE_FP16
+    dims: [-1, 256]
+  }
+]
+
+dynamic_batching {
+  preferred_batch_size: [4, 8]
+  max_queue_delay_microseconds: 100
+}
+
+instance_group [
+  {
+    count: 2
+    kind: KIND_GPU
+    gpus: [0]
+  }
+]
+</code></pre>
+<h3 id="benchmark-tensorrt-vs-pytorch"><a class="header" href="#benchmark-tensorrt-vs-pytorch">Benchmark TensorRT vs PyTorch</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>PyTorch (ms)</th><th>TensorRT FP16 (ms)</th><th>TensorRT INT8 (ms)</th><th>Speedup</th></tr></thead><tbody>
+<tr><td>Conformer-L (encoder)</td><td>45</td><td>12</td><td>8</td><td>3.7-5.6x</td></tr>
+<tr><td>Whisper-large-v3</td><td>850</td><td>280</td><td>190</td><td>3.0-4.5x</td></tr>
+<tr><td>FastConformer</td><td>25</td><td>7</td><td>5</td><td>3.6-5.0x</td></tr>
+<tr><td>HiFi-GAN vocoder</td><td>15</td><td>4</td><td>3</td><td>3.7-5.0x</td></tr>
+</tbody></table>
+</div>
+<p>: TensorRT speedup trên A100 GPU (batch=1, 10s audio) <a id="tbl-trt-benchmark"></a></p>
+<h2 id="onnx-runtime"><a class="header" href="#onnx-runtime">ONNX Runtime</a></h2>
+<h3 id="tổng-quan-1"><a class="header" href="#tổng-quan-1">Tổng quan</a></h3>
+<p>ONNX Runtime <sup class="footnote-reference"><a href="#onnxruntime2024">3</a></sup> từ Microsoft - cross-platform inference:</p>
+<ul>
+<li><strong>CPU + GPU + Edge</strong> support</li>
+<li><strong>Quantization</strong> built-in (dynamic, static, QDQ)</li>
+<li><strong>Execution Providers</strong>: CUDA, TensorRT, DirectML, OpenVINO, CoreML</li>
+<li><strong>Rất phổ biến</strong> cho production deployment</li>
+</ul>
+<h3 id="speech-model-inference"><a class="header" href="#speech-model-inference">Speech Model Inference</a></h3>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "ONNX Runtime ASR Inference"
+import numpy as np
+from numpy import ndarray
+
+# import onnxruntime as ort
+
+# def create_asr_session(
+#     model_path: str,
+#     use_gpu: bool = True,
+# ) -&gt; ort.InferenceSession:
+#     """Create ONNX Runtime session for ASR."""
+#     providers: list[str] = []
+#     if use_gpu:
+#         providers.append("CUDAExecutionProvider")
+#     providers.append("CPUExecutionProvider")
+#
+#     session = ort.InferenceSession(
+#         model_path,
+#         providers=providers,
+#         sess_options=_get_session_options(),
+#     )
+#     return session
+
+# def _get_session_options() -&gt; ort.SessionOptions:
+#     opts = ort.SessionOptions()
+#     opts.graph_optimization_level = (
+#         ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+#     )
+#     opts.intra_op_num_threads = 4
+#     opts.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+#     return opts
+
+# Example inference:
+# session = create_asr_session("conformer.onnx")
+# mel: ndarray = np.random.randn(1, 500, 80).astype(np.float32)
+# result = session.run(None, {"mel_spectrogram": mel})
+# logits: ndarray = result[0]  # [1, 125, vocab_size]
+</code></pre>
+<h3 id="quantization-với-onnx-runtime"><a class="header" href="#quantization-với-onnx-runtime">Quantization với ONNX Runtime</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Quantization</th><th>Accuracy Drop</th><th>Speedup (CPU)</th><th>Speedup (GPU)</th></tr></thead><tbody>
+<tr><td>FP32 (baseline)</td><td>0%</td><td>1.0x</td><td>1.0x</td></tr>
+<tr><td>FP16</td><td>&lt; 0.1%</td><td>1.0x</td><td>1.5-2.0x</td></tr>
+<tr><td>Dynamic INT8</td><td>0.1-0.5%</td><td><strong>2.0-3.0x</strong></td><td>1.5x</td></tr>
+<tr><td>Static INT8 (QDQ)</td><td>0.2-1.0%</td><td><strong>2.5-4.0x</strong></td><td>2.0-3.0x</td></tr>
+</tbody></table>
+</div>
+<p>: ONNX Runtime Quantization results <a id="tbl-ort-quantization"></a></p>
+<h2 id="ctranslate2--faster-whisper"><a class="header" href="#ctranslate2--faster-whisper">CTranslate2 &amp; faster-whisper</a></h2>
+<h3 id="ctranslate2"><a class="header" href="#ctranslate2">CTranslate2</a></h3>
+<p>CTranslate2 <sup class="footnote-reference"><a href="#klein2020opennmt">4</a></sup> từ OpenNMT - optimized cho <strong>Transformer inference</strong>:</p>
+<ul>
+<li><strong>8x less memory</strong> so với PyTorch</li>
+<li><strong>INT8/FP16</strong> quantization tự động</li>
+<li><strong>CPU + GPU</strong> support</li>
+<li>Đặc biệt tối ưu cho <strong>Whisper</strong> models</li>
+</ul>
+<h3 id="faster-whisper"><a class="header" href="#faster-whisper">faster-whisper</a></h3>
+<p>faster-whisper <sup class="footnote-reference"><a href="#faster_whisper">5</a></sup> dùng CTranslate2 backend cho Whisper:</p>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "faster-whisper Inference"
+# from faster_whisper import WhisperModel
+
+# def transcribe_fast(
+#     audio_path: str,
+#     model_size: str = "large-v3",
+#     device: str = "cuda",
+#     compute_type: str = "float16",  # float16, int8, int8_float16
+# ) -&gt; str:
+#     """Fast Whisper inference with CTranslate2 backend."""
+#     model = WhisperModel(
+#         model_size,
+#         device=device,
+#         compute_type=compute_type,
+#     )
+#
+#     segments, info = model.transcribe(
+#         audio_path,
+#         language="vi",
+#         beam_size=5,
+#         vad_filter=True,      # Built-in VAD
+#         vad_parameters=dict(
+#             min_silence_duration_ms=500,
+#         ),
+#     )
+#
+#     transcript: str = " ".join(
+#         segment.text for segment in segments
+#     )
+#     return transcript
+
+# Benchmark:
+# PyTorch Whisper large-v3: ~850ms/10s audio (A100)
+# faster-whisper large-v3 FP16: ~280ms/10s audio (A100)
+# faster-whisper large-v3 INT8: ~180ms/10s audio (A100)
+</code></pre>
+<h3 id="whisperx"><a class="header" href="#whisperx">WhisperX</a></h3>
+<p>WhisperX <sup class="footnote-reference"><a href="#bain2023whisperx">6</a></sup> mở rộng faster-whisper với:</p>
+<ul>
+<li><strong>Batched inference</strong>: Process nhiều audio segments cùng lúc</li>
+<li><strong>Word-level timestamps</strong>: Forced alignment với wav2vec2</li>
+<li><strong>Speaker diarization</strong>: Tích hợp pyannote.audio</li>
+<li><strong>VAD</strong>: Silero VAD để segment audio trước khi transcribe</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>Whisper (OpenAI)</th><th>faster-whisper</th><th>WhisperX</th></tr></thead><tbody>
+<tr><td>Speed</td><td>1x</td><td><strong>3-4x</strong></td><td><strong>3-4x</strong></td></tr>
+<tr><td>Word timestamps</td><td>Có (slow)</td><td>Có</td><td><strong>Có (fast, accurate)</strong></td></tr>
+<tr><td>Speaker diarization</td><td>Không</td><td>Không</td><td><strong>Có</strong></td></tr>
+<tr><td>Batch inference</td><td>Không</td><td>Không</td><td><strong>Có</strong></td></tr>
+<tr><td>VAD pre-processing</td><td>Không</td><td>Có</td><td><strong>Có (Silero)</strong></td></tr>
+</tbody></table>
+</div>
+<p>: Whisper variants comparison <a id="tbl-whisper-variants"></a></p>
+<h2 id="vllm-cho-speech-llms"><a class="header" href="#vllm-cho-speech-llms">vLLM cho Speech LLMs</a></h2>
+<p>vLLM <sup class="footnote-reference"><a href="#kwon2023efficient">7</a></sup> và vLLM-Omni cho serving Speech LLMs (Qwen2-Audio, Qwen3-Omni, SALMONN):</p>
+<ul>
+<li><strong>PagedAttention</strong>: Efficient KV-cache management</li>
+<li><strong>Continuous batching</strong>: Dynamic request scheduling</li>
+<li><strong>Tensor parallelism</strong>: Multi-GPU serving</li>
+<li><strong>Omni serving</strong>: hỗ trợ text/image/audio/video input và text/audio output qua OpenAI-compatible API trong vLLM-Omni</li>
+</ul>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "vLLM Speech LLM Serving"
+# from vllm import LLM, SamplingParams
+
+# # Serve Qwen2-Audio
+# llm = LLM(
+#     model="Qwen/Qwen2-Audio-7B-Instruct",
+#     tensor_parallel_size=1,
+#     gpu_memory_utilization=0.9,
+# )
+
+# # Inference with audio input
+# sampling_params = SamplingParams(
+#     temperature=0.7,
+#     max_tokens=256,
+# )
+# prompt = "Transcribe the following audio in Vietnamese:"
+# # result = llm.generate(prompt, sampling_params)
+</code></pre>
+<h3 id="vllm-omni-cho-qwen3-omni"><a class="header" href="#vllm-omni-cho-qwen3-omni">vLLM-Omni cho Qwen3-Omni</a></h3>
+<p>Với Qwen3-Omni, vLLM-Omni dùng flag <code>--omni</code> và có thể chạy unified process hoặc stage-based deployment. Recipe chính thức minh hoạ:</p>
+<pre><code class="language-bash">#| eval: false
+vllm serve Qwen/Qwen3-Omni-30B-A3B-Instruct --omni --port 8091
+</code></pre>
+<p>Khi cần tách tải production, có thể chạy ba stage:</p>
+<ol>
+<li><strong>Stage 0</strong>: Thinker + API server.</li>
+<li><strong>Stage 1</strong>: Talker, sinh speech tokens.</li>
+<li><strong>Stage 2</strong>: Code2Wav, chuyển codec tokens thành waveform.</li>
+</ol>
+<p>Điểm cần nhớ: <code>/v1/realtime</code> yêu cầu tắt <code>async_chunk</code> trong một số cấu hình; benchmark nên đo riêng TTFT, TPOT, inter-token latency và end-to-end latency cho cả text-only lẫn text+audio output.</p>
+<h2 id="openvino-intel"><a class="header" href="#openvino-intel">OpenVINO (Intel)</a></h2>
+<p>OpenVINO <sup class="footnote-reference"><a href="#openvino2024">8</a></sup> từ Intel cho <strong>CPU-optimized inference</strong>:</p>
+<ul>
+<li>Tối ưu cho Intel CPUs (AVX-512, VNNI)</li>
+<li>INT8 quantization với NNCF</li>
+<li>Phù hợp cho edge deployment</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>PyTorch CPU (ms)</th><th>OpenVINO FP32 (ms)</th><th>OpenVINO INT8 (ms)</th></tr></thead><tbody>
+<tr><td>Whisper-small</td><td>2500</td><td>1200</td><td>600</td></tr>
+<tr><td>Conformer-M</td><td>180</td><td>85</td><td>45</td></tr>
+<tr><td>Silero VAD</td><td>5</td><td>2</td><td>1.5</td></tr>
+</tbody></table>
+</div>
+<p>: OpenVINO speedup trên Intel Xeon (batch=1) <a id="tbl-openvino-benchmark"></a></p>
+<h2 id="bentoml--ray-serve"><a class="header" href="#bentoml--ray-serve">BentoML &amp; Ray Serve</a></h2>
+<h3 id="bentoml"><a class="header" href="#bentoml">BentoML</a></h3>
+<p>BentoML <sup class="footnote-reference"><a href="#bentoml2024">9</a></sup> - framework cho ML model serving:</p>
+<ul>
+<li><strong>Declarative API</strong> để define services</li>
+<li><strong>Adaptive batching</strong> tự động</li>
+<li><strong>Multi-model composition</strong> cho speech pipelines</li>
+<li><strong>Docker + Kubernetes</strong> deployment built-in</li>
+</ul>
+<h3 id="ray-serve"><a class="header" href="#ray-serve">Ray Serve</a></h3>
+<p>Ray Serve <sup class="footnote-reference"><a href="#moritz2018ray">10</a></sup> cho <strong>distributed model serving</strong>:</p>
+<ul>
+<li><strong>Horizontal scaling</strong> tự động</li>
+<li><strong>Multi-node deployment</strong></li>
+<li><strong>Model composition</strong> cho complex pipelines</li>
+<li>Tích hợp với Ray ecosystem (Ray Train, Ray Data)</li>
+</ul>
+<h2 id="speech-pipeline-architecture"><a class="header" href="#speech-pipeline-architecture">Speech Pipeline Architecture</a></h2>
+<p>Một production speech pipeline điển hình:</p>
+<p><a id="eq-speech-pipeline"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Audio</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">VAD</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2948em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Segments</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">ASR</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.1113em;vertical-align:-0.011em;"></span><span class="mord text"><span class="mord">Text</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel x-arrow"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.1003em;"><span style="top:-3.322em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight x-arrow-pad"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">NLU</span></span></span></span></span><span class="svg-align" style="top:-2.689em;"><span class="pstrut" style="height:2.7em;"></span><span class="hide-tail" style="height:0.522em;min-width:1.469em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.522em' viewBox='0 0 400000 522' preserveAspectRatio='xMaxYMin slice'><path d='M0 241v40h399891c-47.3 35.3-84 78-110 128 -16.7 32-27.7 63.7-33 95 0 1.3-.2 2.7-.5 4-.3 1.3-.5 2.3-.5 3 0 7.3 6.7 11 20  11 8 0 13.2-.8 15.5-2.5 2.3-1.7 4.2-5.5 5.5-11.5 2-13.3 5.7-27 11-41 14.7-44.7  39-84.5 73-119.5s73.7-60.2 119-75.5c6-2 9-5.7 9-11s-3-9-9-11c-45.3-15.3-85 -40.5-119-75.5s-58.3-74.8-73-119.5c-4.7-14-8.3-27.3-11-40-1.3-6.7-3.2-10.8-5.5 -12.5-2.3-1.7-7.5-2.5-15.5-2.5-14 0-21 3.7-21 11 0 2 2 10.3 6 25 20.7 83.3 67  151.7 139 205zm0 0v40h399900v-40z'/></svg></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.011em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Intent</span></span></span></span></span></span></p>
+<h3 id="deployment-pattern"><a class="header" href="#deployment-pattern">Deployment Pattern</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Component</th><th>Engine</th><th>Hardware</th><th>Latency Target</th></tr></thead><tbody>
+<tr><td>VAD</td><td>ONNX Runtime</td><td>CPU</td><td>&lt; 5ms</td></tr>
+<tr><td>ASR Encoder</td><td>TensorRT</td><td>GPU</td><td>&lt; 50ms</td></tr>
+<tr><td>ASR Decoder</td><td>TensorRT</td><td>GPU</td><td>&lt; 20ms</td></tr>
+<tr><td>LM Rescoring</td><td>CTranslate2</td><td>CPU/GPU</td><td>&lt; 30ms</td></tr>
+<tr><td>NLU</td><td>vLLM</td><td>GPU</td><td>&lt; 100ms</td></tr>
+</tbody></table>
+</div>
+<p>: Production Speech Pipeline components <a id="tbl-pipeline-components"></a></p>
+<h3 id="latency-optimization-tips"><a class="header" href="#latency-optimization-tips">Latency Optimization Tips</a></h3>
+<ol>
+<li><strong>Batch dynamic shapes</strong>: Pad to nearest power-of-2</li>
+<li><strong>Cache KV-states</strong>: Reuse previous computation cho streaming</li>
+<li><strong>Model pruning</strong>: Remove redundant layers/heads</li>
+<li><strong>Speculative decoding</strong>: Cho autoregressive models</li>
+<li><strong>Pipeline parallelism</strong>: Overlap VAD, ASR, NLU computation</li>
+</ol>
+<blockquote>
+<p><strong>⚠️ GPU Memory Budget</strong></p>
+<p>Trên 1 GPU A100 (80GB), có thể serve:</p>
+<ul>
+<li><strong>Whisper large-v3</strong> (FP16): ~3GB → batch_size=16 dễ dàng</li>
+<li><strong>Qwen2-Audio-7B</strong> (FP16): ~14GB → batch_size=4</li>
+<li><strong>SeamlessM4T-v2-large</strong>: ~10GB → batch_size=8</li>
+<li>Remaining memory cho KV-cache và dynamic batching</li>
+</ul>
+</blockquote>
+<h2 id="recommendation"><a class="header" href="#recommendation">Recommendation</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Use Case</th><th>Engine đề xuất</th><th>Lý do</th></tr></thead><tbody>
+<tr><td>Whisper deployment</td><td><strong>faster-whisper</strong> (CTranslate2)</td><td>3-4x faster, INT8, simple API</td></tr>
+<tr><td>ASR streaming</td><td><strong>TensorRT + Triton</strong></td><td>Lowest latency, dynamic batching</td></tr>
+<tr><td>Speech LLM serving</td><td><strong>vLLM</strong></td><td>PagedAttention, continuous batching</td></tr>
+<tr><td>CPU-only deployment</td><td><strong>ONNX Runtime</strong> hoặc <strong>OpenVINO</strong></td><td>Cross-platform, INT8</td></tr>
+<tr><td>Edge/mobile</td><td><strong>ONNX Runtime Mobile</strong></td><td>Lightweight, multi-platform</td></tr>
+<tr><td>Complex pipelines</td><td><strong>Triton</strong> hoặc <strong>Ray Serve</strong></td><td>Multi-model, scaling</td></tr>
+<tr><td>Quick prototype</td><td><strong>BentoML</strong></td><td>Simple API, Docker export</td></tr>
+</tbody></table>
+</div>
+<p>: Inference Engine Recommendations <a id="tbl-engine-recommendations"></a></p>
+<h2 id="phần-mở-rộng-speech-processing-libraries-ecosystem"><a class="header" href="#phần-mở-rộng-speech-processing-libraries-ecosystem">Phần Mở rộng: Speech Processing Libraries Ecosystem</a></h2>
+<p>Inference engine chỉ là một mảnh của puzzle. Production speech pipeline cần nhiều libraries để xử lý data preprocessing, augmentation, model loading, và optimization. Phần này khảo sát ecosystem rộng hơn theo từng category.</p>
+<h3 id="a-audio-data-preprocessing-libraries"><a class="header" href="#a-audio-data-preprocessing-libraries">A. Audio data preprocessing libraries</a></h3>
+<p>Trước khi feed vào model, audio cần được loaded, resampled, normalized. Đây là các thư viện chính:</p>
+<h4 id="a1-torchaudio"><a class="header" href="#a1-torchaudio">A.1 <code>torchaudio</code></a></h4>
+<p>PyTorch native audio library. Strengths: GPU-accelerated transforms, tight integration với PyTorch models.</p>
+<pre><code class="language-python">import torchaudio
+import torchaudio.transforms as T
+
+# Load (returns waveform, sample_rate)
+waveform, sr = torchaudio.load("audio.wav")  # [channels, samples]
+
+# Resample to 16kHz (chuẩn cho speech)
+resampler = T.Resample(orig_freq=sr, new_freq=16000)
+waveform_16k = resampler(waveform)
+
+# Mel spectrogram on GPU
+mel_transform = T.MelSpectrogram(
+    sample_rate=16000,
+    n_fft=400,
+    hop_length=160,
+    n_mels=80,
+).cuda()
+mel_spec = mel_transform(waveform_16k.cuda())  # [channels, n_mels, frames]
+</code></pre>
+<h4 id="a2-librosa"><a class="header" href="#a2-librosa">A.2 <code>librosa</code></a></h4>
+<p>Pure Python (CPU only), academic standard cho audio analysis. Slower than torchaudio but more analysis features.</p>
+<pre><code class="language-python">import librosa
+
+# Load
+y, sr = librosa.load("audio.wav", sr=16000)  # 1D numpy array
+
+# Many analysis functions
+mel = librosa.feature.melspectrogram(y=y, sr=sr, n_mels=80)
+chroma = librosa.feature.chroma_stft(y=y, sr=sr)
+mfcc = librosa.feature.mfcc(y=y, sr=sr, n_mfcc=13)
+pitch, magnitudes = librosa.piptrack(y=y, sr=sr)
+</code></pre>
+<p><strong>Khi nào dùng</strong>: research, exploratory data analysis, không có GPU available. Tránh cho production training (slow).</p>
+<h4 id="a3-soundfile"><a class="header" href="#a3-soundfile">A.3 <code>soundfile</code></a></h4>
+<p>Fast audio I/O. Read/write nhiều formats (WAV, FLAC, OGG).</p>
+<pre><code class="language-python">import soundfile as sf
+
+# Read
+data, sr = sf.read("audio.wav")
+
+# Write
+sf.write("output.wav", data, sr, subtype='PCM_16')
+</code></pre>
+<h4 id="a4-pydub"><a class="header" href="#a4-pydub">A.4 <code>pydub</code></a></h4>
+<p>Higher-level audio manipulation (cắt, ghép, fade in/out). Wrapper trên ffmpeg.</p>
+<pre><code class="language-python">from pydub import AudioSegment
+
+audio = AudioSegment.from_wav("input.wav")
+clip = audio[1000:5000]  # 1-5 seconds
+faded = clip.fade_in(500).fade_out(500)
+faded.export("clip.wav", format="wav")
+</code></pre>
+<h3 id="b-data-augmentation-libraries"><a class="header" href="#b-data-augmentation-libraries">B. Data augmentation libraries</a></h3>
+<p>Augmentation là essential cho ASR training. Boost accuracy 5-10% trên test set.</p>
+<h4 id="b1-audiomentations"><a class="header" href="#b1-audiomentations">B.1 <code>audiomentations</code></a></h4>
+<p>Most popular Python library cho audio augmentation.</p>
+<pre><code class="language-python">from audiomentations import Compose, AddGaussianNoise, TimeStretch, PitchShift, Shift
+
+augment = Compose([
+    AddGaussianNoise(min_amplitude=0.001, max_amplitude=0.015, p=0.5),
+    TimeStretch(min_rate=0.8, max_rate=1.25, p=0.5),
+    PitchShift(min_semitones=-4, max_semitones=4, p=0.5),
+    Shift(min_fraction=-0.5, max_fraction=0.5, p=0.5),
+])
+
+augmented = augment(samples=audio_array, sample_rate=16000)
+</code></pre>
+<h4 id="b2-torch-audiomentations"><a class="header" href="#b2-torch-audiomentations">B.2 <code>torch-audiomentations</code></a></h4>
+<p>GPU version of audiomentations. Differentiable, batched.</p>
+<pre><code class="language-python">from torch_audiomentations import Compose, Gain, PolarityInversion
+
+apply_augmentation = Compose(
+    transforms=[
+        Gain(min_gain_in_db=-15.0, max_gain_in_db=5.0, p=0.5),
+        PolarityInversion(p=0.5)
+    ]
+)
+# Works on batched GPU tensors [batch, channels, samples]
+augmented_batch = apply_augmentation(audio_batch, sample_rate=16000)
+</code></pre>
+<h4 id="b3-pyroomacoustics--rir-generator"><a class="header" href="#b3-pyroomacoustics--rir-generator">B.3 <code>pyroomacoustics</code> + <code>rir-generator</code></a></h4>
+<p>Simulate room impulse responses cho realistic reverb augmentation.</p>
+<pre><code class="language-python">import pyroomacoustics as pra
+import numpy as np
+
+# Simulate small room
+room = pra.ShoeBox([4, 5, 3], fs=16000, max_order=3)  # dimensions in meters
+room.add_source([1, 1, 1], signal=clean_audio)
+room.add_microphone([2, 3, 1.5])
+room.simulate()
+reverberant_audio = room.mic_array.signals[0]
+</code></pre>
+<h4 id="b4-nlpaug-audio-submodule"><a class="header" href="#b4-nlpaug-audio-submodule">B.4 <code>nlpaug</code> audio submodule</a></h4>
+<p>Multimodal augmentation library, có audio support đơn giản. Less features than audiomentations but easy API.</p>
+<h4 id="b5-specaugment-via-torchaudio"><a class="header" href="#b5-specaugment-via-torchaudio">B.5 SpecAugment via torchaudio</a></h4>
+<pre><code class="language-python">import torchaudio.transforms as T
+
+freq_masking = T.FrequencyMasking(freq_mask_param=15)
+time_masking = T.TimeMasking(time_mask_param=35)
+
+# Apply to mel spectrogram
+mel = compute_mel(audio)
+mel_aug = time_masking(freq_masking(mel))
+</code></pre>
+<p>SpecAugment được áp dụng directly trên mel spectrogram, không phải trên waveform.</p>
+<h3 id="c-loading-pretrained-models-huggingface-transformers-focus"><a class="header" href="#c-loading-pretrained-models-huggingface-transformers-focus">C. Loading pretrained models (HuggingFace Transformers focus)</a></h3>
+<p>HF Transformers là framework phổ biến để tải và thử nghiệm các speech models hiện đại từ HuggingFace Hub.</p>
+<h4 id="c1-whisper"><a class="header" href="#c1-whisper">C.1 Whisper</a></h4>
+<pre><code class="language-python">from transformers import WhisperFeatureExtractor, WhisperForConditionalGeneration, WhisperTokenizer
+import torch
+
+# Load components
+feature_extractor = WhisperFeatureExtractor.from_pretrained("openai/whisper-large-v3")
+tokenizer = WhisperTokenizer.from_pretrained("openai/whisper-large-v3")
+model = WhisperForConditionalGeneration.from_pretrained(
+    "openai/whisper-large-v3",
+    torch_dtype=torch.float16,  # half precision for speed
+    device_map="cuda:0",
+)
+
+# Inference
+audio, sr = load_audio("test.wav", target_sr=16000)
+inputs = feature_extractor(audio, sampling_rate=16000, return_tensors="pt")
+inputs = inputs.to("cuda:0", torch.float16)
+
+predicted_ids = model.generate(
+    inputs.input_features,
+    language="vi",  # Vietnamese
+    task="transcribe",
+)
+transcription = tokenizer.batch_decode(predicted_ids, skip_special_tokens=True)
+print(transcription)
+</code></pre>
+<h4 id="c2-wav2vec-20--phowhisper"><a class="header" href="#c2-wav2vec-20--phowhisper">C.2 Wav2Vec 2.0 / PhoWhisper</a></h4>
+<pre><code class="language-python">from transformers import Wav2Vec2ForCTC, Wav2Vec2Processor
+
+# PhoWhisper (Vietnamese)
+processor = Wav2Vec2Processor.from_pretrained("vinai/PhoWhisper-base")
+model = Wav2Vec2ForCTC.from_pretrained("vinai/PhoWhisper-base")
+
+# Process
+inputs = processor(audio, sampling_rate=16000, return_tensors="pt")
+logits = model(**inputs).logits
+predicted_ids = torch.argmax(logits, dim=-1)
+transcription = processor.batch_decode(predicted_ids)[0]
+</code></pre>
+<h4 id="c3-loading-custom-checkpoint"><a class="header" href="#c3-loading-custom-checkpoint">C.3 Loading custom checkpoint</a></h4>
+<pre><code class="language-python"># Load from local path
+model = WhisperForConditionalGeneration.from_pretrained("/path/to/local/whisper")
+
+# Load from HF cache
+from huggingface_hub import snapshot_download
+local_dir = snapshot_download(repo_id="openai/whisper-large-v3")
+model = WhisperForConditionalGeneration.from_pretrained(local_dir)
+
+# Load specific revision
+model = WhisperForConditionalGeneration.from_pretrained(
+    "openai/whisper-large-v3",
+    revision="abc123def",  # specific commit
+)
+</code></pre>
+<h3 id="d-optimization-stack"><a class="header" href="#d-optimization-stack">D. Optimization stack</a></h3>
+<p>Production needs aggressive optimization. Stack overview:</p>
+<h4 id="d1-onnx-runtime"><a class="header" href="#d1-onnx-runtime">D.1 ONNX Runtime</a></h4>
+<pre><code class="language-python">import onnxruntime as ort
+import numpy as np
+
+# Convert PyTorch -&gt; ONNX
+dummy_input = torch.randn(1, 80, 3000)  # whisper mel
+torch.onnx.export(
+    model,
+    dummy_input,
+    "whisper.onnx",
+    opset_version=17,
+    input_names=["mel"],
+    output_names=["logits"],
+)
+
+# Run với ONNX Runtime
+session = ort.InferenceSession(
+    "whisper.onnx",
+    providers=["CUDAExecutionProvider", "CPUExecutionProvider"],
+)
+outputs = session.run(None, {"mel": dummy_input.numpy()})
+</code></pre>
+<h4 id="d2-tensorrt-llm"><a class="header" href="#d2-tensorrt-llm">D.2 TensorRT-LLM</a></h4>
+<p>Cho LLM-based speech models (Qwen2-Audio, Moshi).</p>
+<pre><code class="language-bash"># Install
+pip install tensorrt_llm
+
+# Convert HF model -&gt; TRT engine
+python -m tensorrt_llm.examples.llama.build \
+    --model_dir Qwen2-Audio-7B \
+    --output_dir qwen2_audio_trt \
+    --dtype float16 \
+    --max_batch_size 16
+</code></pre>
+<h4 id="d3-vllm-cho-speech-llms"><a class="header" href="#d3-vllm-cho-speech-llms">D.3 vLLM cho Speech LLMs</a></h4>
+<pre><code class="language-python">from vllm import LLM, SamplingParams
+
+llm = LLM(model="Qwen/Qwen2-Audio-7B-Instruct", dtype="float16")
+sampling = SamplingParams(temperature=0.7, max_tokens=200)
+outputs = llm.generate(prompts, sampling)
+</code></pre>
+<h4 id="d4-triton-inference-server"><a class="header" href="#d4-triton-inference-server">D.4 Triton Inference Server</a></h4>
+<p>Production serving với multi-model support.</p>
+<pre><code class="language-bash"># Model repository structure
+model_repository/
+├── whisper/
+│   ├── config.pbtxt
+│   └── 1/model.onnx
+├── tts/
+│   └── ...
+└── llm/
+    └── ...
+
+# Launch
+tritonserver --model-repository=/path/to/model_repository
+</code></pre>
+<h4 id="d5-quantization-libraries"><a class="header" href="#d5-quantization-libraries">D.5 Quantization libraries</a></h4>
+<ul>
+<li><strong>bitsandbytes</strong>: INT8 và INT4 quantization for HF models.</li>
+<li><strong>AWQ</strong>: activation-aware quantization, popular for LLMs.</li>
+<li><strong>GPTQ</strong>: weight-only quantization.</li>
+<li><strong>PyTorch native quantization</strong>: torch.quantization for PyTorch models.</li>
+</ul>
+<pre><code class="language-python">from transformers import AutoModelForCausalLM, BitsAndBytesConfig
+
+quant_config = BitsAndBytesConfig(
+    load_in_8bit=True,
+    bnb_8bit_compute_dtype=torch.float16,
+)
+
+model = AutoModelForCausalLM.from_pretrained(
+    "Qwen/Qwen2-Audio-7B",
+    quantization_config=quant_config,
+    device_map="auto",
+)
+</code></pre>
+<hr />
+<h2 id="phần-mở-rộng-wenet-deep-guide"><a class="header" href="#phần-mở-rộng-wenet-deep-guide">Phần Mở rộng: WeNet Deep Guide</a></h2>
+<p>WeNet là một trong những ASR training/inference frameworks phổ biến nhất, đặc biệt cho streaming ASR và Chinese/Asian languages. Phần này là hướng dẫn deep dive về cách dùng WeNet trong production.</p>
+<h3 id="wenet-1--design-philosophy"><a class="header" href="#wenet-1--design-philosophy">WeNet 1 — Design philosophy</a></h3>
+<p>WeNet (Mobvoi/Xiaomi, 2021+) được thiết kế xoay quanh <strong>U2 architecture</strong> (Unified streaming + non-streaming): một mô hình train được, có thể chạy cả streaming và offline mode chỉ bằng cách thay decoding strategy.</p>
+<p>Key features:</p>
+<ul>
+<li><strong>Joint CTC + attention loss</strong>: best of both worlds.</li>
+<li><strong>Dynamic chunk training</strong>: train với variable chunk sizes, deploy với fixed chunk.</li>
+<li><strong>Streaming friendly</strong>: causal Conformer encoder, chunk-based attention.</li>
+<li><strong>Production-ready export</strong>: ONNX, LibTorch, TensorRT.</li>
+</ul>
+<h3 id="wenet-2--installation"><a class="header" href="#wenet-2--installation">WeNet 2 — Installation</a></h3>
+<pre><code class="language-bash"># Clone repo
+git clone https://github.com/wenet-e2e/wenet.git
+cd wenet
+
+# Install Python deps
+pip install -r requirements.txt
+
+# Optional: install C++ runtime for production
+cd runtime/server/x86
+mkdir build &amp;&amp; cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release
+make -j4
+</code></pre>
+<h3 id="wenet-3--data-preparation-kaldi-style"><a class="header" href="#wenet-3--data-preparation-kaldi-style">WeNet 3 — Data preparation (Kaldi-style)</a></h3>
+<p>WeNet uses Kaldi data format:</p>
+<pre><code>data/train/
+├── wav.scp        # utterance_id /path/to/audio.wav
+├── text           # utterance_id transcription
+├── utt2spk        # utterance_id speaker_id
+└── spk2utt        # speaker_id utterance_id [utterance_id ...]
+</code></pre>
+<p>Example <code>wav.scp</code>:</p>
+<pre><code>BAC009S0002W0123 /data/aishell/wav/train/S0002/BAC009S0002W0123.wav
+BAC009S0002W0124 /data/aishell/wav/train/S0002/BAC009S0002W0124.wav
+</code></pre>
+<p>Example <code>text</code>:</p>
+<pre><code>BAC009S0002W0123 而 对 楼 市 成 交 抑 制 作 用 最 大 的 限 购
+BAC009S0002W0124 也 成 为 地 方 政 府 的 调 控 工 具
+</code></pre>
+<p>Generate Kaldi-style data từ raw audio:</p>
+<pre><code class="language-bash"># Có example scripts trong examples/aishell/
+cd examples/aishell/s0
+bash local/aishell_data_prep.sh /path/to/aishell/data
+</code></pre>
+<h3 id="wenet-4--configuration-yaml"><a class="header" href="#wenet-4--configuration-yaml">WeNet 4 — Configuration YAML</a></h3>
+<p>WeNet config example (<code>conf/train_unified_conformer.yaml</code>):</p>
+<pre><code class="language-yaml"># Model architecture
+input_dim: 80
+output_dim: 5000  # BPE vocab size
+
+# Encoder: Conformer
+encoder: conformer
+encoder_conf:
+    output_size: 256
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 12
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    attention_dropout_rate: 0.0
+    input_layer: conv2d  # Subsampling
+    normalize_before: true
+    cnn_module_kernel: 15
+    use_cnn_module: True
+    activation_type: 'swish'
+    pos_enc_layer_type: 'rel_pos'
+    selfattention_layer_type: 'rel_selfattn'
+
+# Decoder: Bi-Transformer
+decoder: bitransformer
+decoder_conf:
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 3
+    r_num_blocks: 3  # Right-to-left decoder for rescoring
+    dropout_rate: 0.1
+    positional_dropout_rate: 0.1
+    self_attention_dropout_rate: 0.0
+    src_attention_dropout_rate: 0.0
+
+# Joint CTC + Attention loss
+model_conf:
+    ctc_weight: 0.3
+    lsm_weight: 0.1
+    length_normalized_loss: false
+    reverse_weight: 0.3  # Bidirectional decoder weight
+
+# Optimizer
+optim: adam
+optim_conf:
+    lr: 0.002
+scheduler: warmuplr
+scheduler_conf:
+    warmup_steps: 25000
+
+# Data
+dataset_conf:
+    filter_conf:
+        max_length: 40960  # samples (frames)
+        min_length: 0
+        token_max_length: 200
+        token_min_length: 1
+    resample_conf:
+        resample_rate: 16000
+    speed_perturb: true  # Speed augmentation
+    fbank_conf:
+        num_mel_bins: 80
+        frame_shift: 10
+        frame_length: 25
+        dither: 0.1
+    spec_aug: true  # SpecAugment
+    spec_aug_conf:
+        num_t_mask: 2
+        num_f_mask: 2
+        max_t: 50
+        max_f: 10
+    shuffle: true
+    sort: true
+    batch_conf:
+        batch_type: 'dynamic'
+        max_frames_in_batch: 12000
+</code></pre>
+<h3 id="wenet-5--training-command"><a class="header" href="#wenet-5--training-command">WeNet 5 — Training command</a></h3>
+<pre><code class="language-bash"># Single GPU
+python wenet/bin/train.py \
+    --config conf/train_unified_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer \
+    --num_workers 4 \
+    --pin_memory
+
+# Multi-GPU distributed
+torchrun --nproc_per_node=4 --master_port=29500 \
+    wenet/bin/train.py \
+    --config conf/train_unified_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer
+</code></pre>
+<p>Monitor via TensorBoard:</p>
+<pre><code class="language-bash">tensorboard --logdir exp/conformer/tensorboard
+</code></pre>
+<p>Typical training time: 4-5 ngày on 8x V100 for AISHELL-1 (170h Chinese data).</p>
+<h3 id="wenet-6--decoding-modes"><a class="header" href="#wenet-6--decoding-modes">WeNet 6 — Decoding modes</a></h3>
+<p>WeNet supports 4 decoding modes:</p>
+<ol>
+<li><strong>ctc_greedy_search</strong>: fastest, lowest accuracy.</li>
+<li><strong>ctc_prefix_beam_search</strong>: standard CTC beam, balanced.</li>
+<li><strong>attention_rescoring</strong>: best accuracy, slowest. Uses bidirectional decoder.</li>
+<li><strong>attention</strong>: pure attention decoding (offline only).</li>
+</ol>
+<pre><code class="language-bash"># Offline decoding với attention rescoring (best accuracy)
+python wenet/bin/recognize.py \
+    --config exp/conformer/train.yaml \
+    --test_data data/test/data.list \
+    --checkpoint exp/conformer/avg_30.pt \
+    --beam_size 10 \
+    --batch_size 1 \
+    --penalty 0.0 \
+    --dict data/dict/lang_char.txt \
+    --ctc_weight 0.3 \
+    --reverse_weight 0.3 \
+    --result_file exp/conformer/test_attention_rescoring/text \
+    --mode attention_rescoring
+</code></pre>
+<h3 id="wenet-7--streaming-inference-setup"><a class="header" href="#wenet-7--streaming-inference-setup">WeNet 7 — Streaming inference setup</a></h3>
+<p>Streaming mode dùng chunk-based attention:</p>
+<pre><code class="language-python">import wenet
+import torch
+
+# Load model
+model = wenet.load_model('exp/conformer/avg_30.pt')
+model.eval()
+
+# Streaming config
+chunk_size = 16  # frames per chunk (~160ms)
+num_left_chunks = 4  # Look back 4 chunks (640ms history)
+
+# Simulate streaming
+audio_chunks = stream_audio_from_mic()  # generator yielding chunks
+
+for chunk in audio_chunks:
+    # Decode this chunk
+    result = model.streaming_decode(
+        chunk,
+        chunk_size=chunk_size,
+        num_left_chunks=num_left_chunks,
+        decoding_chunk_size=chunk_size,
+        simulate_streaming=True,
+    )
+    print(f"Partial: {result.partial_text}")
+    if result.is_final:
+        print(f"Final: {result.text}")
+</code></pre>
+<h3 id="wenet-8--export-to-onnxlibtorch"><a class="header" href="#wenet-8--export-to-onnxlibtorch">WeNet 8 — Export to ONNX/LibTorch</a></h3>
+<p>For production deployment:</p>
+<pre><code class="language-bash"># Export to ONNX (cho ONNX Runtime, TensorRT)
+python wenet/bin/export_onnx_cpu.py \
+    --config exp/conformer/train.yaml \
+    --checkpoint exp/conformer/avg_30.pt \
+    --output_dir exp/conformer/onnx \
+    --chunk_size 16 \
+    --num_decoding_left_chunks 4
+
+# Export to LibTorch (cho C++ runtime)
+python wenet/bin/export_jit.py \
+    --config exp/conformer/train.yaml \
+    --checkpoint exp/conformer/avg_30.pt \
+    --output_file exp/conformer/final.zip
+</code></pre>
+<h3 id="wenet-9--vietnamese-fine-tuning-recipe"><a class="header" href="#wenet-9--vietnamese-fine-tuning-recipe">WeNet 9 — Vietnamese fine-tuning recipe</a></h3>
+<p>Cho team Vi muốn fine-tune WeNet trên Vi data:</p>
+<pre><code class="language-bash"># 1. Prepare Vi data (e.g., from VLSP, VIVOS)
+cd examples/aishell/s0  # use as template
+mkdir -p data/vi_train
+
+# Generate wav.scp, text, etc.
+python scripts/prepare_vi_data.py \
+    --audio_dir /path/to/vi_audio \
+    --transcription_file /path/to/transcripts.txt \
+    --output_dir data/vi_train
+
+# 2. Generate dictionary (Vi tokens)
+cat data/vi_train/text | python tools/text2token.py \
+    --space "&lt;space&gt;" \
+    --bpe_model bpe.model \
+    &gt; data/dict/vi_lang_char.txt
+
+# 3. Modify config for Vi
+cp conf/train_unified_conformer.yaml conf/train_vi.yaml
+# Edit:
+#   output_dim: &lt;vocabulary_size&gt;
+#   speed_perturb: true (helpful for Vi tones)
+
+# 4. Initialize từ pretrained Whisper or multilingual Wav2Vec
+# (Optional: download pretrained checkpoint, load as init)
+
+# 5. Train với multi-GPU
+torchrun --nproc_per_node=2 \
+    wenet/bin/train.py \
+    --config conf/train_vi.yaml \
+    --data_type raw \
+    --train_data data/vi_train/data.list \
+    --cv_data data/vi_dev/data.list \
+    --model_dir exp/vi_conformer \
+    --init_checkpoint /path/to/pretrained.pt
+</code></pre>
+<h3 id="wenet-10--common-pitfalls"><a class="header" href="#wenet-10--common-pitfalls">WeNet 10 — Common pitfalls</a></h3>
+<ol>
+<li><strong>OOM during training</strong>: reduce <code>max_frames_in_batch</code> từ 12000 xuống 8000 hoặc 6000.</li>
+<li><strong>Slow convergence</strong>: ensure <code>speed_perturb: true</code> (3-way augmentation).</li>
+<li><strong>Streaming accuracy worse than offline</strong>: tune <code>num_left_chunks</code> (more context = better accuracy, more latency).</li>
+<li><strong>Export to ONNX fails</strong>: ensure <code>chunk_size</code> divisible by subsampling factor (4).</li>
+<li><strong>Vietnamese tone confusion</strong>: use character-level dictionary, not BPE merged tokens that span tones.</li>
+</ol>
+<hr />
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<ol>
+<li><strong>TensorRT + Triton</strong>: Gold standard cho NVIDIA GPU deployment, 3-5x faster than naive PyTorch.</li>
+<li><strong>ONNX Runtime</strong>: Cross-platform, dễ dùng, hỗ trợ nhiều backends.</li>
+<li><strong>CTranslate2/faster-whisper</strong>: Tối ưu cho Whisper, 3-4x faster, 8x less memory.</li>
+<li><strong>vLLM</strong>: Cho Speech LLM serving (Qwen2-Audio, Moshi, etc.).</li>
+<li><strong>OpenVINO</strong>: Intel CPU optimization.</li>
+<li><strong>BentoML/Ray Serve</strong>: High-level serving frameworks cho complex pipelines.</li>
+<li><strong>WeNet</strong>: End-to-end framework cho ASR training + production deployment, đặc biệt streaming.</li>
+<li><strong>Production speech pipeline cần multiple engines</strong> cho different components.</li>
+<li><strong>Data preprocessing/augmentation libraries</strong> (torchaudio, librosa, audiomentations) là essential cho training quality.</li>
+<li><strong>Quantization</strong> (INT8, AWQ, GPTQ) là key cho cost-effective deployment.</li>
+</ol>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="nvidia2024tensorrt"><sup class="footnote-definition-label">1</sup>
+<p>{NVIDIA}, "TensorRT: High-Performance Deep Learning Inference Optimizer and Runtime", NVIDIA Developer Documentation</p>
+</div>
+<div class="footnote-definition" id="nvidia2024triton"><sup class="footnote-definition-label">2</sup>
+<p>{NVIDIA}, "Triton Inference Server: An Open-Source Inference Serving Software", NVIDIA Developer Documentation</p>
+</div>
+<div class="footnote-definition" id="onnxruntime2024"><sup class="footnote-definition-label">3</sup>
+<p>{Microsoft}, "ONNX Runtime: Cross-Platform, High Performance ML Inferencing and Training Accelerator", Microsoft Open Source</p>
+</div>
+<div class="footnote-definition" id="klein2020opennmt"><sup class="footnote-definition-label">4</sup>
+<p>Klein, Guillaume and Kim, Yoon and others, "OpenNMT: Neural Machine Translation Toolkit", Association for Machine Translation in the Americas</p>
+</div>
+<div class="footnote-definition" id="faster_whisper"><sup class="footnote-definition-label">5</sup>
+<p>Klein, Guillaume and others, "faster-whisper: Faster Whisper Transcription with CTranslate2", GitHub repository</p>
+</div>
+<div class="footnote-definition" id="bain2023whisperx"><sup class="footnote-definition-label">6</sup>
+<p>Bain, Max and Huh, Jaesung and Han, Tengda and Zisserman, Andrew, "WhisperX: Time-Accurate Speech Transcription of Long-Form Audio", Interspeech</p>
+</div>
+<div class="footnote-definition" id="kwon2023efficient"><sup class="footnote-definition-label">7</sup>
+<p>Kwon, Woosuk and Li, Zhuohan and others, "Efficient Memory Management for Large Language Model Serving with PagedAttention", Symposium on Operating Systems Principles</p>
+</div>
+<div class="footnote-definition" id="openvino2024"><sup class="footnote-definition-label">8</sup>
+<p>{Intel}, "OpenVINO Toolkit", Intel Developer Documentation</p>
+</div>
+<div class="footnote-definition" id="bentoml2024"><sup class="footnote-definition-label">9</sup>
+<p>{BentoML}, "BentoML: Unified Model Serving Framework", BentoML Documentation</p>
+</div>
+<div class="footnote-definition" id="moritz2018ray"><sup class="footnote-definition-label">10</sup>
+<p>Moritz, Philipp and Nishihara, Robert and others, "Ray: A Distributed Framework for Emerging AI Applications", Symposium on Operating Systems Design and Implementation</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part7/18-training-frameworks.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part7/20-production-systems.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part7/18-training-frameworks.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part7/20-production-systems.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

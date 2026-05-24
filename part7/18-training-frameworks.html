@@ -1,0 +1,684 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 18: Training Frameworks - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html" class="active"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part7/18-training-frameworks.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-18-training-frameworks-cho-speech-ai"><a class="header" href="#chương-18-training-frameworks-cho-speech-ai">Chương 18: Training Frameworks cho Speech AI</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Speech AI có một hệ sinh thái framework training riêng, khác với hệ sinh thái NLP/LLM thuần (HuggingFace Transformers, PyTorch Lightning). Lý do là Speech AI có các yêu cầu đặc thù: data loading audio variable-length, mel feature extraction GPU-side, CTC loss, RNN-T loss, forced alignment, decoding với language model, augmentation chuyên cho audio. Các framework Speech AI đóng gói các thành phần này thành recipe có sẵn để team có thể train được model production-grade trong thời gian ngắn.</p>
+<p>Chương này khảo sát các framework chính, tổ chức theo độ phổ biến và độ phù hợp với từng loại task:</p>
+<ul>
+<li><strong>WeNet (Mobvoi/Xiaomi, 2021+)</strong>: U2 architecture, đặc biệt mạnh cho streaming ASR, được dùng trong nhiều sản phẩm tiếng Trung và châu Á.</li>
+<li><strong>ESPnet (Watanabe và cộng sự, 2018)</strong>: framework học thuật phổ biến nhất, hỗ trợ ASR, TTS, ST, SE, recipe đa dạng.</li>
+<li><strong>NeMo (NVIDIA)</strong>: optimised cho hardware NVIDIA, hỗ trợ ASR/TTS/LM, tích hợp tốt với TensorRT.</li>
+<li><strong>SpeechBrain</strong>: framework PyTorch hiện đại, dễ học, hỗ trợ nhiều task speech.</li>
+<li><strong>K2/Icefall (Daniel Povey và cộng sự)</strong>: kế thừa Kaldi, hỗ trợ FST decoding, mạnh cho production ASR.</li>
+</ul>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: tổng quan landscape framework Speech AI và tiêu chí lựa chọn.</li>
+<li><strong>Phần 2</strong>: WeNet, deep dive vì là framework streaming ASR phổ biến nhất.</li>
+<li><strong>Phần 3</strong>: ESPnet, framework học thuật.</li>
+<li><strong>Phần 4</strong>: NeMo, K2/Icefall, SpeechBrain.</li>
+<li><strong>Phần 5</strong>: so sánh và khuyến nghị theo bài toán.</li>
+</ul>
+</blockquote>
+<h2 id="tổng-quan"><a class="header" href="#tổng-quan">Tổng quan</a></h2>
+<p>Chương này hướng dẫn chi tiết cách sử dụng các framework training speech models phổ biến nhất. Mục tiêu: <strong>NLP/LLM data scientist đọc xong là biết dùng ngay</strong> để train ASR, TTS, và các speech tasks khác.</p>
+<blockquote>
+<p><strong>📝 Chọn Framework nào?</strong></p>
+<p>Không có framework "tốt nhất" cho mọi trường hợp. Lựa chọn phụ thuộc vào:</p>
+<ol>
+<li><strong>Task</strong>: ASR, TTS, hay multi-task?</li>
+<li><strong>Scale</strong>: Research (1 GPU) hay production (multi-node)?</li>
+<li><strong>Customization</strong>: Cần modify architecture hay dùng off-the-shelf?</li>
+<li><strong>Deployment</strong>: Cần export ONNX/TensorRT hay chỉ cần training?</li>
+</ol>
+</blockquote>
+<h2 id="so-sánh-tổng-quan"><a class="header" href="#so-sánh-tổng-quan">So sánh Tổng quan</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Framework</th><th>Tổ chức</th><th>Tasks</th><th>Language</th><th>Production-ready</th><th>Learning Curve</th></tr></thead><tbody>
+<tr><td><strong>WeNet</strong></td><td>Seasalt AI</td><td>ASR</td><td>Python/C++</td><td>Rất cao</td><td>Trung bình</td></tr>
+<tr><td><strong>ESPnet</strong></td><td>CMU/JHU</td><td>ASR, TTS, ST, SE</td><td>Python</td><td>Trung bình</td><td>Cao</td></tr>
+<tr><td><strong>SpeechBrain</strong></td><td>Mila</td><td>All speech</td><td>Python</td><td>Trung bình</td><td>Thấp</td></tr>
+<tr><td><strong>NeMo</strong></td><td>NVIDIA</td><td>ASR, TTS, NLP</td><td>Python</td><td>Rất cao</td><td>Cao</td></tr>
+<tr><td><strong>fairseq</strong></td><td>Meta</td><td>ASR, ST</td><td>Python</td><td>Trung bình</td><td>Cao</td></tr>
+<tr><td><strong>k2/icefall</strong></td><td>Community</td><td>ASR</td><td>Python/C++</td><td>Cao</td><td>Rất cao</td></tr>
+<tr><td><strong>Coqui TTS</strong></td><td>Community</td><td>TTS</td><td>Python</td><td>Trung bình</td><td>Thấp</td></tr>
+</tbody></table>
+</div>
+<p>: So sánh Speech Training Frameworks <a id="tbl-frameworks-comparison"></a></p>
+<h2 id="wenet---chi-tiết"><a class="header" href="#wenet---chi-tiết">WeNet - Chi tiết <a id="sec-wenet"></a></a></h2>
+<h3 id="tổng-quan-wenet"><a class="header" href="#tổng-quan-wenet">Tổng quan WeNet</a></h3>
+<p>WeNet <sup class="footnote-reference"><a href="#zhang2022wenet">1</a></sup> là framework ASR production-grade từ Seasalt AI (trước đây Mobvoi):</p>
+<ul>
+<li><strong>Unified streaming/non-streaming</strong> ASR trong 1 model</li>
+<li><strong>Dynamic chunk training</strong> - train 1 model, deploy ở nhiều latency modes</li>
+<li><strong>C++ runtime</strong> cho production deployment</li>
+<li><strong>ONNX/TensorRT export</strong> built-in</li>
+</ul>
+<h3 id="cấu-trúc-project"><a class="header" href="#cấu-trúc-project">Cấu trúc Project</a></h3>
+<pre><code>wenet/
+├── wenet/
+│   ├── transformer/     # Conformer, Transformer encoders
+│   ├── transducer/      # RNN-T decoder
+│   ├── utils/           # Data loading, checkpointing
+│   └── bin/             # Training, inference scripts
+├── examples/
+│   ├── aishell/         # Chinese ASR recipe
+│   ├── librispeech/     # English ASR recipe
+│   └── multi_cn/        # Multi-dataset Chinese
+├── runtime/
+│   ├── core/            # C++ inference engine
+│   ├── server/          # gRPC/HTTP server
+│   └── onnxruntime/     # ONNX inference
+└── tools/               # Kaldi-style tools
+</code></pre>
+<h3 id="training-recipe-step-by-step"><a class="header" href="#training-recipe-step-by-step">Training Recipe (Step-by-step)</a></h3>
+<p><strong>Bước 1: Chuẩn bị Data</strong></p>
+<p>WeNet sử dụng format đơn giản - mỗi line là JSON:</p>
+<pre><code class="language-json">{"key": "utt001", "wav": "/data/audio/001.wav", "txt": "xin chào"}
+</code></pre>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Chuẩn bị data cho WeNet"
+import json
+from pathlib import Path
+from typing import Dict, List
+
+def prepare_wenet_data(
+    wav_dir: Path,
+    transcript_file: Path,
+    output_file: Path,
+) -&gt; int:
+    """Prepare data in WeNet format.
+
+    Args:
+        wav_dir: Directory containing .wav files
+        transcript_file: TSV file with (utt_id, transcript)
+        output_file: Output JSON-lines file
+
+    Returns:
+        Number of utterances processed
+    """
+    # Read transcripts
+    transcripts: Dict[str, str] = {}
+    with open(transcript_file, "r", encoding="utf-8") as f:
+        for line in f:
+            parts: List[str] = line.strip().split("\t")
+            if len(parts) &gt;= 2:
+                transcripts[parts[0]] = parts[1]
+
+    # Write WeNet format
+    count: int = 0
+    with open(output_file, "w", encoding="utf-8") as f:
+        for utt_id, text in sorted(transcripts.items()):
+            wav_path: Path = wav_dir / f"{utt_id}.wav"
+            if wav_path.exists():
+                entry: Dict[str, str] = {
+                    "key": utt_id,
+                    "wav": str(wav_path),
+                    "txt": text,
+                }
+                f.write(json.dumps(entry, ensure_ascii=False) + "\n")
+                count += 1
+
+    return count
+</code></pre>
+<p><strong>Bước 2: Config YAML</strong></p>
+<p>WeNet sử dụng YAML config cho toàn bộ training pipeline. Ví dụ cho Conformer CTC/Attention:</p>
+<pre><code class="language-yaml"># conf/train_conformer.yaml
+encoder: conformer
+encoder_conf:
+    output_size: 256
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 12
+    input_layer: conv2d
+    cnn_module_kernel: 15
+
+decoder: transformer
+decoder_conf:
+    attention_heads: 4
+    linear_units: 2048
+    num_blocks: 6
+
+model_conf:
+    ctc_weight: 0.3      # CTC loss weight (0.3 CTC + 0.7 Attention)
+    lsm_weight: 0.1      # Label smoothing
+    length_normalized_loss: false
+
+optim: adam
+optim_conf:
+    lr: 0.001
+scheduler: warmuplr
+scheduler_conf:
+    warmup_steps: 25000
+max_epoch: 100
+accum_grad: 4
+</code></pre>
+<p><strong>Bước 3: Training Commands</strong></p>
+<pre><code class="language-bash"># Single GPU training
+python wenet/bin/train.py \
+    --config conf/train_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer \
+    --num_workers 4
+
+# Multi-GPU training (DDP)
+torchrun --nproc_per_node=4 wenet/bin/train.py \
+    --config conf/train_conformer.yaml \
+    --data_type raw \
+    --train_data data/train/data.list \
+    --cv_data data/dev/data.list \
+    --model_dir exp/conformer
+</code></pre>
+<p><strong>Bước 4: Export và Inference</strong></p>
+<pre><code class="language-bash"># Export to ONNX
+python wenet/bin/export_onnx_cpu.py \
+    --config exp/conformer/train.yaml \
+    --checkpoint exp/conformer/final.pt \
+    --output_onnx_dir exp/conformer/onnx
+
+# C++ runtime inference
+./build/bin/decoder_main \
+    --chunk_size -1 \
+    --wav_path test.wav \
+    --model_path exp/conformer/final.zip \
+    --dict_path data/dict/units.txt
+</code></pre>
+<h3 id="dynamic-chunk-training"><a class="header" href="#dynamic-chunk-training">Dynamic Chunk Training</a></h3>
+<p>Điểm mạnh nhất của WeNet - <strong>1 model cho cả streaming và offline</strong>:</p>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Dynamic Chunk Size Selection"
+import random
+from typing import List
+
+def select_chunk_size(
+    training: bool = True,
+    static_chunk_size: int = -1,  # -1 = dynamic
+) -&gt; int:
+    """Select chunk size for training/inference.
+
+    During training: randomly select chunk size.
+    During inference: use static_chunk_size.
+
+    Returns:
+        chunk_size: number of frames per chunk.
+                    -1 means full utterance (offline mode).
+    """
+    if not training:
+        return static_chunk_size
+
+    # Dynamic chunk training: random selection
+    chunk_sizes: List[int] = [
+        4, 8, 16, 25,   # streaming modes (various latencies)
+        -1,              # offline mode (full attention)
+    ]
+    return random.choice(chunk_sizes)
+
+# Inference modes:
+# chunk_size = -1  -&gt; offline (best accuracy)
+# chunk_size = 16  -&gt; streaming, ~320ms latency
+# chunk_size = 4   -&gt; streaming, ~80ms latency (lowest quality)
+</code></pre>
+<h2 id="espnet"><a class="header" href="#espnet">ESPnet</a></h2>
+<h3 id="tổng-quan-espnet"><a class="header" href="#tổng-quan-espnet">Tổng quan ESPnet</a></h3>
+<p>ESPnet <sup class="footnote-reference"><a href="#watanabe2018espnet">2</a></sup> là framework nghiên cứu toàn diện nhất:</p>
+<ul>
+<li>Hỗ trợ <strong>ASR, TTS, ST, SE, SLU, codec, SSL</strong> trong 1 framework</li>
+<li><strong>200+ recipes</strong> cho các datasets phổ biến</li>
+<li>Tích hợp <strong>HuggingFace</strong> để dễ dàng share models</li>
+<li><strong>E-Branchformer</strong> là default encoder</li>
+</ul>
+<h3 id="training-asr-với-espnet"><a class="header" href="#training-asr-với-espnet">Training ASR với ESPnet</a></h3>
+<pre><code class="language-bash"># ESPnet2 recipe structure
+cd egs2/librispeech/asr1
+./run.sh --stage 1 --stop_stage 13 \
+    --asr_config conf/tuning/train_asr_e_branchformer.yaml \
+    --inference_config conf/decode_asr.yaml \
+    --ngpu 4
+
+# Stages:
+# 1-4: Data preparation
+# 5-7: LM training (optional)
+# 8-9: Tokenizer (BPE/char)
+# 10-11: ASR training
+# 12-13: Decoding + scoring
+</code></pre>
+<h3 id="so-sánh-wenet-vs-espnet"><a class="header" href="#so-sánh-wenet-vs-espnet">So sánh WeNet vs ESPnet</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>WeNet</th><th>ESPnet</th></tr></thead><tbody>
+<tr><td>Focus</td><td>Production ASR</td><td>Research (multi-task)</td></tr>
+<tr><td>Streaming</td><td>Built-in (dynamic chunk)</td><td>Add-on</td></tr>
+<tr><td>C++ Runtime</td><td>Có</td><td>Không</td></tr>
+<tr><td>ONNX Export</td><td>Built-in</td><td>Community</td></tr>
+<tr><td>TTS Support</td><td>Không</td><td>Có (VITS, etc.)</td></tr>
+<tr><td>Recipes</td><td>~20</td><td><strong>200+</strong></td></tr>
+<tr><td>Default Encoder</td><td>Conformer</td><td>E-Branchformer</td></tr>
+<tr><td>Learning Curve</td><td>Trung bình</td><td>Cao</td></tr>
+</tbody></table>
+</div>
+<p>: WeNet vs ESPnet <a id="tbl-wenet-vs-espnet"></a></p>
+<h2 id="speechbrain"><a class="header" href="#speechbrain">SpeechBrain</a></h2>
+<h3 id="tổng-quan-1"><a class="header" href="#tổng-quan-1">Tổng quan</a></h3>
+<p>SpeechBrain <sup class="footnote-reference"><a href="#ravanelli2021speechbrain">3</a></sup> từ Mila - thiết kế cho <strong>dễ sử dụng</strong>:</p>
+<ul>
+<li><strong>HyperPyYAML</strong> config system (linh hoạt hơn YAML thông thường)</li>
+<li>Hỗ trợ <strong>tất cả speech tasks</strong> trong 1 framework</li>
+<li><strong>HuggingFace integration</strong> sâu</li>
+<li>Rất tốt cho <strong>prototyping nhanh</strong></li>
+</ul>
+<h3 id="training-asr-với-speechbrain"><a class="header" href="#training-asr-với-speechbrain">Training ASR với SpeechBrain</a></h3>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "SpeechBrain ASR Brain Class"
+import torch
+from torch import Tensor
+
+# SpeechBrain uses a Brain class pattern:
+#
+# class ASRBrain(sb.Brain):
+#     def compute_forward(self, batch, stage):
+#         wavs = batch.sig           # [B, T] - float32
+#         wav_lens = batch.sig_lengths  # [B] - float32 (relative lengths)
+#         feats = self.hparams.compute_features(wavs)  # [B, T', F]
+#         enc_out = self.hparams.encoder(feats)         # [B, T', D]
+#         logits = self.hparams.ctc_head(enc_out)       # [B, T', V]
+#         return {"logits": logits}
+#
+#     def compute_objectives(self, predictions, batch, stage):
+#         return self.hparams.ctc_cost(
+#             predictions["logits"],
+#             batch.tokens,
+#             predictions["wav_lens"],
+#             batch.tokens_lengths,
+#         )
+
+# Example: inference with pretrained model
+# import speechbrain as sb
+# asr = sb.pretrained.EncoderDecoderASR.from_hparams(
+#     source="speechbrain/asr-conformer-librispeech",
+#     savedir="pretrained_models/asr-conformer",
+# )
+# transcription = asr.transcribe_file("audio.wav")
+</code></pre>
+<h2 id="nvidia-nemo"><a class="header" href="#nvidia-nemo">NVIDIA NeMo</a></h2>
+<h3 id="tổng-quan-2"><a class="header" href="#tổng-quan-2">Tổng quan</a></h3>
+<p>NeMo <sup class="footnote-reference"><a href="#kuchaiev2019nemo">4</a></sup> từ NVIDIA - framework production-grade:</p>
+<ul>
+<li><strong>ASR</strong>: Conformer, FastConformer, Canary</li>
+<li><strong>TTS</strong>: FastPitch, HiFi-GAN, VITS</li>
+<li><strong>NLP/LLM</strong>: GPT, BERT, Megatron</li>
+<li><strong>TensorRT/Triton</strong> integration</li>
+<li><strong>Multi-node training</strong> với Megatron parallelism</li>
+</ul>
+<h3 id="training-asr-với-nemo"><a class="header" href="#training-asr-với-nemo">Training ASR với NeMo</a></h3>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "NeMo ASR Training"
+# import nemo.collections.asr as nemo_asr
+# from omegaconf import OmegaConf
+# import pytorch_lightning as pl
+
+# Option 1: Fine-tune pretrained model
+# model = nemo_asr.models.EncDecCTCModelBPE.from_pretrained(
+#     "nvidia/stt_en_fastconformer_ctc_large"
+# )
+
+# Option 2: Train from scratch with config
+# config = OmegaConf.load("conf/fastconformer_ctc.yaml")
+# model = nemo_asr.models.EncDecCTCModelBPE(cfg=config.model)
+
+# Setup trainer
+# trainer = pl.Trainer(
+#     devices=4,
+#     accelerator="gpu",
+#     strategy="ddp",
+#     max_epochs=100,
+#     accumulate_grad_batches=4,
+#     precision="bf16-mixed",
+# )
+# trainer.fit(model)
+
+# Export to ONNX
+# model.export("model.onnx")
+</code></pre>
+<h3 id="nemo-cho-vietnamese"><a class="header" href="#nemo-cho-vietnamese">NeMo cho Vietnamese</a></h3>
+<pre><code class="language-bash"># Fine-tune Canary cho Vietnamese
+python examples/asr/asr_finetune.py \
+    --config-path=conf/canary \
+    --config-name=canary_1b_finetune \
+    model.train_ds.manifest_filepath=data/vi_train.json \
+    model.validation_ds.manifest_filepath=data/vi_dev.json \
+    trainer.devices=4 \
+    trainer.max_epochs=50
+</code></pre>
+<h2 id="k2icefall"><a class="header" href="#k2icefall">k2/icefall</a></h2>
+<h3 id="tổng-quan-3"><a class="header" href="#tổng-quan-3">Tổng quan</a></h3>
+<p>k2 <sup class="footnote-reference"><a href="#povey2021k2">5</a></sup> và icefall là framework từ Daniel Povey (tác giả Kaldi):</p>
+<ul>
+<li><strong>Differentiable FST</strong> operations (k2 library)</li>
+<li><strong>Zipformer</strong> encoder, thường được dùng như một kiến trúc hiệu quả cho ASR hiện đại</li>
+<li><strong>Pruned RNN-T</strong> loss (memory efficient)</li>
+<li><strong>Rất nhanh</strong> training và inference</li>
+</ul>
+<h3 id="Đặc-điểm-nổi-bật"><a class="header" href="#Đặc-điểm-nổi-bật">Đặc điểm nổi bật</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Feature</th><th>k2/icefall</th></tr></thead><tbody>
+<tr><td>FST Operations</td><td>CUDA-accelerated, differentiable</td></tr>
+<tr><td>Loss Functions</td><td>CTC, RNN-T, lattice-free MMI</td></tr>
+<tr><td>Encoder</td><td>Zipformer (multi-scale)</td></tr>
+<tr><td>Data Loading</td><td>Lhotse (lazy, scalable)</td></tr>
+<tr><td>Pruned RNN-T</td><td>Chỉ compute loss trên relevant (t, u) pairs</td></tr>
+</tbody></table>
+</div>
+<p>: k2/icefall features <a id="tbl-k2-features"></a></p>
+<h2 id="fairseq--fairseq2"><a class="header" href="#fairseq--fairseq2">fairseq / fairseq2</a></h2>
+<p>fairseq <sup class="footnote-reference"><a href="#ott2019fairseq">6</a></sup> từ Meta:</p>
+<ul>
+<li><strong>Wav2Vec 2.0, HuBERT, data2vec</strong> pretraining</li>
+<li><strong>SeamlessM4T</strong> speech translation</li>
+<li><strong>XLS-R / XLSR</strong> multilingual SSL</li>
+</ul>
+<blockquote>
+<p><strong>⚠️ fairseq maintenance</strong></p>
+<p>fairseq đang chuyển sang <strong>fairseq2</strong> và một số components sang HuggingFace. Cho research mới, nên dùng HuggingFace Transformers hoặc ESPnet thay thế.</p>
+</blockquote>
+<h2 id="so-sánh-với-nlp-training-frameworks"><a class="header" href="#so-sánh-với-nlp-training-frameworks">So sánh với NLP Training Frameworks</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Tiêu chí</th><th>HF Trainer</th><th>Lightning</th><th>WeNet</th><th>ESPnet</th><th>NeMo</th></tr></thead><tbody>
+<tr><td>Speech-specific</td><td>Không</td><td>Không</td><td>ASR</td><td>All</td><td>All</td></tr>
+<tr><td>Data pipeline</td><td>datasets</td><td>Manual</td><td>Built-in</td><td>Built-in</td><td>Built-in</td></tr>
+<tr><td>Streaming ASR</td><td>Không</td><td>Không</td><td><strong>Có</strong></td><td>Có</td><td>Có</td></tr>
+<tr><td>C++ Runtime</td><td>Không</td><td>Không</td><td><strong>Có</strong></td><td>Không</td><td>Có (Triton)</td></tr>
+<tr><td>Multi-GPU</td><td>Có</td><td>Có</td><td>DDP</td><td>DDP</td><td><strong>Megatron</strong></td></tr>
+<tr><td>Config system</td><td>TrainingArgs</td><td>Manual</td><td>YAML</td><td>YAML</td><td>OmegaConf</td></tr>
+<tr><td>Pre-built recipes</td><td>Không</td><td>Không</td><td>~20</td><td><strong>200+</strong></td><td>~50</td></tr>
+</tbody></table>
+</div>
+<p>: Speech Frameworks vs NLP Frameworks <a id="tbl-speech-vs-nlp-frameworks"></a></p>
+<blockquote>
+<p><strong>📝 Khi nào dùng HF Trainer cho Speech?</strong></p>
+<p>HuggingFace Trainer phù hợp khi:</p>
+<ol>
+<li>Fine-tune <strong>pretrained models</strong> (Whisper, Wav2Vec 2.0)</li>
+<li><strong>Prototype nhanh</strong> với ít code</li>
+<li>Cần <strong>HuggingFace Hub</strong> integration</li>
+</ol>
+<p>Nhưng KHÔNG phù hợp khi cần <strong>streaming ASR</strong>, <strong>CTC/RNN-T decoding</strong> tối ưu, hay <strong>production C++ runtime</strong>.</p>
+</blockquote>
+<h2 id="recommendation"><a class="header" href="#recommendation">Recommendation</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Mục đích</th><th>Framework đề xuất</th></tr></thead><tbody>
+<tr><td>Production ASR (streaming)</td><td><strong>WeNet</strong> hoặc <strong>NeMo</strong></td></tr>
+<tr><td>Research (multi-task)</td><td><strong>ESPnet</strong></td></tr>
+<tr><td>Quick prototyping</td><td><strong>SpeechBrain</strong> hoặc <strong>HF Trainer</strong></td></tr>
+<tr><td>Vietnamese ASR</td><td><strong>WeNet</strong> hoặc <strong>NeMo</strong> (Canary fine-tune)</td></tr>
+<tr><td>TTS</td><td><strong>ESPnet</strong> hoặc <strong>Coqui TTS</strong></td></tr>
+<tr><td>SSL pretraining</td><td><strong>fairseq</strong> hoặc <strong>HF Trainer</strong></td></tr>
+<tr><td>Maximum throughput</td><td><strong>k2/icefall</strong> (Zipformer + pruned RNN-T)</td></tr>
+</tbody></table>
+</div>
+<p>: Framework recommendations <a id="tbl-framework-recommendations"></a></p>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<ol>
+<li><strong>WeNet</strong>: phù hợp mạnh cho production streaming ASR nhờ C++ runtime, ONNX export, dynamic chunk</li>
+<li><strong>ESPnet</strong>: phù hợp mạnh cho research nhờ 200+ recipes, multi-task, E-Branchformer</li>
+<li><strong>SpeechBrain</strong>: phù hợp cho người mới bắt đầu nhờ API dễ học và HuggingFace integration</li>
+<li><strong>NeMo</strong>: phù hợp với NVIDIA stack nhờ FastConformer, TensorRT và multi-node training</li>
+<li><strong>k2/icefall</strong>: phù hợp khi cần tối ưu hiệu năng ASR nâng cao, đặc biệt với Zipformer và pruned RNN-T</li>
+<li><strong>HF Trainer</strong>: Phù hợp fine-tune pretrained models, không cho from-scratch training</li>
+</ol>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="zhang2022wenet"><sup class="footnote-definition-label">1</sup>
+<p>Zhang, Binbin and Wu, Di and Peng, Zhendong and others, "WeNet 2.0: More Productive End-to-End Speech Recognition Toolkit", Interspeech</p>
+</div>
+<div class="footnote-definition" id="watanabe2018espnet"><sup class="footnote-definition-label">2</sup>
+<p>Watanabe, Shinji and Hori, Takaaki and others, "ESPnet: End-to-End Speech Processing Toolkit", Interspeech</p>
+</div>
+<div class="footnote-definition" id="ravanelli2021speechbrain"><sup class="footnote-definition-label">3</sup>
+<p>Ravanelli, Mirco and Parcollet, Titouan and others, "SpeechBrain: A General-Purpose Speech Toolkit", arXiv preprint arXiv:2106.04624</p>
+</div>
+<div class="footnote-definition" id="kuchaiev2019nemo"><sup class="footnote-definition-label">4</sup>
+<p>Kuchaiev, Oleksii and Li, Jason and others, "NeMo: A Toolkit for Building AI Applications Using Neural Modules", arXiv preprint arXiv:1909.09577</p>
+</div>
+<div class="footnote-definition" id="povey2021k2"><sup class="footnote-definition-label">5</sup>
+<p>Povey, Daniel and others, "k2: FSA/FST Algorithms for PyTorch", GitHub repository</p>
+</div>
+<div class="footnote-definition" id="ott2019fairseq"><sup class="footnote-definition-label">6</sup>
+<p>Ott, Myle and Edunov, Sergey and Baevski, Alexei and others, "fairseq: A Fast, Extensible Toolkit for Sequence Modeling", North American Chapter of the Association for Computational Linguistics: Demonstrations</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part6/17-vietnamese-datasets.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part7/19-inference-engines.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part6/17-vietnamese-datasets.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part7/19-inference-engines.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

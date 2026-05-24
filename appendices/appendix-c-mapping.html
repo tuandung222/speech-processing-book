@@ -1,0 +1,356 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>C. NLP↔Speech Mapping - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html" class="active"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/appendices/appendix-c-mapping.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="phụ-lục-c-nlp--speech-complete-mapping"><a class="header" href="#phụ-lục-c-nlp--speech-complete-mapping">Phụ lục C: NLP ↔ Speech Complete Mapping</a></h1>
+<h2 id="mục-đích"><a class="header" href="#mục-đích">Mục đích</a></h2>
+<p>Phụ lục C mở rộng Bảng NLP↔Speech của Chương 1 thành một bảng tham chiếu đầy đủ. Mỗi khái niệm NLP/LLM quen thuộc (Transformer, BPE, BERT, RLHF, KV cache, in-context learning) đều có ánh xạ sang Speech AI tương ứng. Đây là reference mà người đọc NLP/LLM nên bookmark khi đọc paper Speech AI và gặp thuật ngữ lạ.</p>
+<h2 id="concept-mapping-table"><a class="header" href="#concept-mapping-table">Concept Mapping Table</a></h2>
+<p>Bảng ánh xạ đầy đủ giữa các khái niệm NLP và Speech, giúp NLP researchers nhanh chóng tìm được counterpart trong speech domain.</p>
+<h3 id="data--representation"><a class="header" href="#data--representation">Data &amp; Representation</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Concept</th><th>Speech Counterpart</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Raw text (string)</td><td>Raw waveform (1D signal)</td><td>Text: discrete characters. Audio: continuous samples</td></tr>
+<tr><td>Character</td><td>Audio sample (16-bit, 16kHz)</td><td>Smallest unit</td></tr>
+<tr><td>Word / Subword (BPE)</td><td>Phoneme / Syllable</td><td>Linguistic unit</td></tr>
+<tr><td>Vocabulary (32K–128K)</td><td>Codebook (1024 × 8 RVQ layers)</td><td>Discrete symbol set</td></tr>
+<tr><td>Token ID (integer)</td><td>Codec token (integer per codebook)</td><td>Index into vocabulary/codebook</td></tr>
+<tr><td>Token embedding</td><td>Audio frame embedding</td><td>Dense vector per unit</td></tr>
+<tr><td>Sentence</td><td>Utterance</td><td>Complete expression</td></tr>
+<tr><td>Document</td><td>Audio recording / Episode</td><td>Long-form content</td></tr>
+<tr><td>Corpus</td><td>Speech corpus (hours)</td><td>Training data</td></tr>
+<tr><td>Text length (tokens)</td><td>Duration (seconds / frames)</td><td>Sequence measure</td></tr>
+</tbody></table>
+</div>
+<h3 id="preprocessing"><a class="header" href="#preprocessing">Preprocessing</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP</th><th>Speech</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Tokenization (BPE/WordPiece)</td><td>Feature extraction (Mel/MFCC)</td><td>Convert raw → model input</td></tr>
+<tr><td>Lowercasing</td><td>Pre-emphasis filter</td><td>Normalization</td></tr>
+<tr><td>Stopword removal</td><td>Silence removal (VAD)</td><td>Remove uninformative parts</td></tr>
+<tr><td>Text normalization</td><td>Audio normalization</td><td>Standardize input</td></tr>
+<tr><td>Data augmentation (back-translation)</td><td>SpecAugment (time/freq masking)</td><td>Training regularization</td></tr>
+<tr><td>Positional encoding</td><td>Sinusoidal / Relative position</td><td>Encode sequence order</td></tr>
+</tbody></table>
+</div>
+<h3 id="model-architectures"><a class="header" href="#model-architectures">Model Architectures</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Model</th><th>Speech Model</th><th>Shared Principle</th></tr></thead><tbody>
+<tr><td>BERT</td><td>Wav2Vec 2.0 / HuBERT</td><td>Masked prediction pre-training</td></tr>
+<tr><td>GPT (autoregressive LM)</td><td>AudioLM / VALL-E</td><td>Next-token prediction</td></tr>
+<tr><td>T5 (encoder-decoder)</td><td>Whisper</td><td>Seq2seq with cross-attention</td></tr>
+<tr><td>Transformer encoder</td><td>Conformer</td><td>Feature extraction backbone</td></tr>
+<tr><td>Transformer decoder</td><td>Tacotron 2 decoder</td><td>Autoregressive generation</td></tr>
+<tr><td>VAE</td><td>VQ-VAE / VITS</td><td>Latent variable model</td></tr>
+<tr><td>Diffusion model</td><td>Grad-TTS / F5-TTS</td><td>Iterative denoising/flow</td></tr>
+<tr><td>GAN (text)</td><td>HiFi-GAN / WaveGAN</td><td>Adversarial training</td></tr>
+</tbody></table>
+</div>
+<h3 id="training-paradigms"><a class="header" href="#training-paradigms">Training Paradigms</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Paradigm</th><th>Speech Paradigm</th><th>Details</th></tr></thead><tbody>
+<tr><td>Masked Language Model (MLM)</td><td>Masked speech prediction</td><td>Mask → predict (BERT ↔ HuBERT)</td></tr>
+<tr><td>Causal LM (next token)</td><td>Codec LM (next audio token)</td><td>GPT ↔ AudioLM</td></tr>
+<tr><td>Contrastive learning (SimCLR)</td><td>Contrastive learning (Wav2Vec 2.0)</td><td>Positive/negative pairs</td></tr>
+<tr><td>Knowledge distillation</td><td>Distil-Whisper</td><td>Teacher → Student</td></tr>
+<tr><td>RLHF (preference learning)</td><td>MOS-based optimization</td><td>Human feedback</td></tr>
+<tr><td>Instruction tuning</td><td>Audio instruction tuning</td><td>Qwen2-Audio Stage 2</td></tr>
+<tr><td>Few-shot prompting</td><td>Zero-shot voice cloning (3s)</td><td>In-context learning</td></tr>
+</tbody></table>
+</div>
+<h3 id="tasks"><a class="header" href="#tasks">Tasks</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Task</th><th>Speech Task</th><th>Mapping</th></tr></thead><tbody>
+<tr><td>Text classification</td><td>Audio classification</td><td>Classify input</td></tr>
+<tr><td>Named Entity Recognition</td><td>Speaker diarization</td><td>Segment + label</td></tr>
+<tr><td>Machine Translation</td><td>Speech Translation</td><td>Cross-lingual</td></tr>
+<tr><td>Text Generation</td><td>Speech Synthesis (TTS)</td><td>Generate output</td></tr>
+<tr><td>Summarization</td><td>Audio summarization</td><td>Compress information</td></tr>
+<tr><td>Question Answering</td><td>Audio QA</td><td>Answer from input</td></tr>
+<tr><td>Sentiment Analysis</td><td>Emotion Recognition</td><td>Detect affect</td></tr>
+<tr><td>Language Identification</td><td>Language ID from audio</td><td>Detect language</td></tr>
+<tr><td>Text-to-Text</td><td>Speech-to-Speech</td><td>Direct transformation</td></tr>
+</tbody></table>
+</div>
+<h3 id="losses--metrics"><a class="header" href="#losses--metrics">Losses &amp; Metrics</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP</th><th>Speech</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Cross-entropy (token prediction)</td><td>Cross-entropy (CTC, token prediction)</td><td>Standard classification loss</td></tr>
+<tr><td>Perplexity</td><td>-</td><td>LM evaluation</td></tr>
+<tr><td>BLEU / ROUGE</td><td>WER / CER</td><td>Generation quality</td></tr>
+<tr><td>BERTScore</td><td>-</td><td>Semantic similarity</td></tr>
+<tr><td>-</td><td>MOS (Mean Opinion Score)</td><td>Human perceptual quality</td></tr>
+<tr><td>-</td><td>PESQ / ViSQOL</td><td>Automated audio quality</td></tr>
+<tr><td>-</td><td>Speaker similarity (cosine)</td><td>Voice cloning evaluation</td></tr>
+<tr><td>KL divergence</td><td>KL divergence (VAE)</td><td>Distribution matching</td></tr>
+</tbody></table>
+</div>
+<h3 id="production--deployment"><a class="header" href="#production--deployment">Production &amp; Deployment</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>NLP Production</th><th>Speech Production</th><th>Notes</th></tr></thead><tbody>
+<tr><td>Tokenizer latency</td><td>Feature extraction latency</td><td>Preprocessing time</td></tr>
+<tr><td>KV cache (autoregressive)</td><td>KV cache (Whisper decoder)</td><td>Memory optimization</td></tr>
+<tr><td>Quantization (INT8/INT4)</td><td>Quantization (INT8/FP16)</td><td>Model compression</td></tr>
+<tr><td>Batched inference</td><td>Dynamic batching</td><td>Throughput optimization</td></tr>
+<tr><td>Streaming (token-by-token)</td><td>Streaming ASR/TTS</td><td>Real-time processing</td></tr>
+<tr><td>vLLM / TGI</td><td>TensorRT-LLM + Triton</td><td>Inference servers</td></tr>
+<tr><td>Context window limit</td><td>Max audio duration (30s)</td><td>Input length constraint</td></tr>
+<tr><td>Token budget</td><td>Latency budget (&lt;1s)</td><td>Resource constraint</td></tr>
+</tbody></table>
+</div>
+<h2 id="architecture-mapping-diagram"><a class="header" href="#architecture-mapping-diagram">Architecture Mapping Diagram</a></h2>
+<pre class="mermaid">flowchart LR
+    subgraph NLP[&quot;NLP pipeline&quot;]
+        TXT[&quot;Text&quot;] --&gt; TOK[&quot;Tokenizer&quot;]
+        TOK --&gt; EMB[&quot;Token embeddings&quot;]
+        EMB --&gt; TR[&quot;Transformer&quot;]
+        TR --&gt; OUTT[&quot;Text logits / tokens&quot;]
+    end
+    subgraph Speech[&quot;Speech pipeline&quot;]
+        WAV[&quot;Waveform&quot;] --&gt; FEAT[&quot;Feature extractor&lt;br&gt;mel / SSL / codec&quot;]
+        FEAT --&gt; REP[&quot;Frame or codec embeddings&quot;]
+        REP --&gt; STR[&quot;Conformer / Transformer / Speech LLM&quot;]
+        STR --&gt; OUTS[&quot;Text, units, waveform, labels&quot;]
+    end
+    TOK -. conceptual analogue .- FEAT
+    EMB -. representation space .- REP
+    TR -. sequence model .- STR
+</pre>
+<p><strong>Hình:</strong> Mapping kiến trúc giữa NLP và Speech. Điểm khác biệt cốt lõi là speech phải biến tín hiệu liên tục thành frame, representation hoặc codec tokens trước khi áp dụng sequence modeling.</p>
+<h2 id="scale-comparison"><a class="header" href="#scale-comparison">Scale Comparison</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Dimension</th><th>NLP</th><th>Speech</th><th>Ratio</th></tr></thead><tbody>
+<tr><td>Input dim per step</td><td>1 (token ID)</td><td>80 (mel) or 16000 (raw)</td><td>80–16000×</td></tr>
+<tr><td>Typical sequence length</td><td>512–4096 tokens</td><td>1500 frames (30s) or 480K samples</td><td>~1–100×</td></tr>
+<tr><td>Vocabulary size</td><td>32K–128K</td><td>1024 (per codebook) × 8</td><td>4–16×</td></tr>
+<tr><td>Pre-training data</td><td>~1–15T tokens</td><td>~680K hours</td><td>Different units</td></tr>
+<tr><td>Model size (frontier public models)</td><td>70B–405B</td><td>1.5B–7B</td><td>10–100× smaller</td></tr>
+<tr><td>Inference speed</td><td>~50 tokens/s</td><td>Real-time (RTF ≤ 1)</td><td>Different metrics</td></tr>
+<tr><td>Human eval</td><td>Preference ranking</td><td>MOS (1–5 scale)</td><td>Different scales</td></tr>
+</tbody></table>
+</div>
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../appendices/appendix-b-proofs.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../appendices/appendix-d-code.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../appendices/appendix-b-proofs.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../appendices/appendix-d-code.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

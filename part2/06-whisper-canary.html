@@ -1,0 +1,619 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 6: Whisper &amp; Canary - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html" class="active"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part2/06-whisper-canary.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-6-whisper-canary-và-large-scale-weakly-supervised-asr"><a class="header" href="#chương-6-whisper-canary-và-large-scale-weakly-supervised-asr">Chương 6: Whisper, Canary và Large-Scale Weakly-Supervised ASR</a></h1>
+<h2 id="vì-sao-chương-này-quan-trọng"><a class="header" href="#vì-sao-chương-này-quan-trọng">Vì sao chương này quan trọng</a></h2>
+<p>Whisper (OpenAI, 2022) là một dấu mốc quan trọng cho ngành ASR. Một mô hình open-source duy nhất, train trên 680,000 giờ audio đa ngôn ngữ với supervision yếu, cho thấy khả năng tổng quát hóa mạnh trên nhiều domain, ngôn ngữ và mức nhiễu khác nhau. Sau Whisper là loạt mô hình kế tiếp đáng chú ý: Canary của NVIDIA (2024) bổ sung multitask cho ASR và speech translation, cùng nhiều Whisper-derivative cho ngôn ngữ ít tài nguyên, trong đó có PhoWhisper cho tiếng Việt (VinAI, ICLR Tiny Papers 2024).</p>
+<p>Chương này không chỉ trình bày kiến trúc Whisper, mà còn phân tích vì sao công thức "Transformer encoder-decoder cộng weak supervision ở quy mô lớn" lại hiệu quả đến vậy, và mặt trái của nó (hallucination, drift trên silence, kém với tonal language nếu không fine-tune).</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: Whisper, weak supervision at scale, kiến trúc encoder-decoder, multitask format.</li>
+<li><strong>Phần 2</strong>: phân tích thực nghiệm Whisper: hiệu suất theo ngôn ngữ, robustness, failure modes.</li>
+<li><strong>Phần 3</strong>: Canary của NVIDIA, multitask ASR + AST + diarization.</li>
+<li><strong>Phần 4</strong>: Whisper fine-tune cho ngôn ngữ ít tài nguyên, case study PhoWhisper cho tiếng Việt.</li>
+</ul>
+</blockquote>
+<h3 id="bản-đồ-chương"><a class="header" href="#bản-đồ-chương">Bản đồ chương</a></h3>
+<pre class="mermaid">flowchart LR
+    DATA[&quot;Weakly supervised web audio&quot;] --&gt; WH[&quot;Whisper&quot;]
+    WH --&gt; MT[&quot;Multitask tokens&quot;]
+    MT --&gt; ASR[&quot;Transcription&quot;]
+    MT --&gt; ST[&quot;Speech translation&quot;]
+    MT --&gt; TS[&quot;Timestamps&quot;]
+    WH --&gt; FAIL[&quot;Failure modes&lt;br&gt;hallucination, drift, domain gap&quot;]
+    WH --&gt; FT[&quot;Fine-tuning&lt;br&gt;PhoWhisper, domain ASR&quot;]
+    CAN[&quot;Canary / NeMo&quot;] --&gt; ASR
+    CAN --&gt; ST
+</pre>
+<p>Chương này nên được đọc như một case study về <strong>data scale + task formatting</strong>. Whisper không chỉ là một Transformer encoder-decoder; điểm mạnh của nó nằm ở cách chuẩn hóa nhiều task thành một protocol token duy nhất và train trên dữ liệu rất lớn.</p>
+<h2 id="phần-1--whisper-weak-supervision-at-scale"><a class="header" href="#phần-1--whisper-weak-supervision-at-scale">Phần 1 — Whisper: Weak Supervision at Scale</a></h2>
+<p>Whisper <sup class="footnote-reference"><a href="#radford2023robust">1</a></sup> là ASR model của OpenAI, được train trên <strong>680,000 giờ</strong> audio với weak supervision, không cần human-annotated transcriptions.</p>
+<h3 id="key-insight"><a class="header" href="#key-insight">Key Insight</a></h3>
+<p>Thay vì tự tạo labels (self-supervised) hay thuê người gán nhãn (supervised), Whisper thu thập <strong>audio + transcript pairs từ internet</strong>, noisy nhưng ở quy mô cực lớn:</p>
+<p><a id="eq-whisper-scale"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.2424em;vertical-align:-1.548em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-1.627em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Whisper (weak supervision)</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span class="svg-align" style="top:-2.352em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">680K hours</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.648em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.548em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≫</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2424em;vertical-align:-1.548em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-1.627em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">Wav2Vec 2.0 (self-supervised)</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span class="svg-align" style="top:-2.352em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">60K hours</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.648em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.548em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≫</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2424em;vertical-align:-1.548em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-1.627em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">LibriSpeech (supervised)</span></span></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord munder"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span class="svg-align" style="top:-2.352em;"><span class="pstrut" style="height:3em;"></span><span class="stretchy" style="height:0.548em;min-width:1.6em;"><span class="brace-left" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMinYMin slice'><path d='M0 6l6-6h17c12.688 0 19.313.3 20 1 4 4 7.313 8.3 10 13  35.313 51.3 80.813 93.8 136.5 127.5 55.688 33.7 117.188 55.8 184.5 66.5.688  0 2 .3 4 1 18.688 2.7 76 4.3 172 5h399450v120H429l-6-1c-124.688-8-235-61.7 -331-161C60.687 138.7 32.312 99.3 7 54L0 41V6z'/></svg></span><span class="brace-center" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMidYMin slice'><path d='M199572 214 c100.7 8.3 195.3 44 280 108 55.3 42 101.7 93 139 153l9 14c2.7-4 5.7-8.7 9-14  53.3-86.7 123.7-153 211-199 66.7-36 137.3-56.3 212-62h199568v120H200432c-178.3  11.7-311.7 78.3-403 201-6 8-9.7 12-11 12-.7.7-6.7 1-18 1s-17.3-.3-18-1c-1.3 0 -5-4-11-12-44.7-59.3-101.3-106.3-170-141s-145.3-54.3-229-60H0V214z'/></svg></span><span class="brace-right" style="height:0.548em;"><svg xmlns="http://www.w3.org/2000/svg" width='400em' height='0.548em' viewBox='0 0 400000 548' preserveAspectRatio='xMaxYMin slice'><path d='M399994 0l6 6v35l-6 11c-56 104-135.3 181.3-238 232-57.3  28.7-117 45-179 50H-300V214h399897c43.3-7 81-15 113-26 100.7-33 179.7-91 237 -174 2.7-5 6-9 10-13 .7-1 7.3-1 20-1h17z'/></svg></span></span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">960 hours</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.648em;"><span></span></span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.548em;"><span></span></span></span></span></span></span></span></span></span></p>
+<blockquote>
+<p><strong>💡 NLP Parallel</strong></p>
+<p>Cách tiếp cận của Whisper tương tự <strong>GPT pre-training</strong> ở tinh thần scaling: dữ liệu internet có noise, nhưng quy mô rất lớn giúp model học được nhiều biến thiên thực tế. Trong speech, nguồn dữ liệu có thể là audio kèm subtitles, podcast transcript hoặc caption tự động đã qua lọc.</p>
+</blockquote>
+<p>Weak supervision không có nghĩa là “dữ liệu kém chất lượng thì cứ ném vào model”. Ở quy mô lớn, filtering vẫn rất quan trọng: loại bỏ transcript lệch audio, đoạn im lặng, ngôn ngữ sai, phụ đề không đồng bộ, hoặc nội dung quá nhiễu. Bài học production là: nếu không có 680K giờ, chất lượng lọc dữ liệu càng quan trọng hơn.</p>
+<h2 id="architecture"><a class="header" href="#architecture">Architecture</a></h2>
+<h3 id="overview"><a class="header" href="#overview">Overview</a></h3>
+<p>Whisper là <strong>encoder-decoder Transformer</strong> kinh điển:</p>
+<pre class="mermaid">flowchart LR
+    A[&quot;Waveform&lt;br&gt;30 s window&quot;] --&gt; B[&quot;Log-mel spectrogram&lt;br&gt;80 x 3000&quot;]
+    B --&gt; C[&quot;Conv1d stack&lt;br&gt;downsample 2x&quot;]
+    C --&gt; D[&quot;Transformer Encoder&lt;br&gt;audio representation&quot;]
+    E[&quot;Task tokens&lt;br&gt;language, transcribe/translate, timestamps&quot;] --&gt; F[&quot;Autoregressive Text Decoder&quot;]
+    D --&gt; F
+    F --&gt; G[&quot;Text tokens&lt;br&gt;or timestamp tokens&quot;]
+</pre>
+<p><strong>Hình:</strong> Kiến trúc Whisper ở mức hệ thống. Điểm quan trọng là encoder xử lý log-mel spectrogram cố định, còn decoder nhận task tokens để cùng một model thực hiện transcription, translation và timestamp prediction.</p>
+<h3 id="vì-sao-whisper-dùng-cửa-sổ-30-giây"><a class="header" href="#vì-sao-whisper-dùng-cửa-sổ-30-giây">Vì sao Whisper dùng cửa sổ 30 giây?</a></h3>
+<p>Whisper chuẩn hóa audio thành các đoạn 30 giây, tương ứng log-mel shape <code>80 × 3000</code> ở 100 fps. Cách này có lợi vì encoder luôn nhận input shape gần cố định, dễ batch và dễ train. Nhưng nó cũng tạo trade-off:</p>
+<div class="table-wrapper"><table><thead><tr><th>Lựa chọn</th><th>Ưu điểm</th><th>Hạn chế</th></tr></thead><tbody>
+<tr><td>Window 30 giây</td><td>đủ context câu, batching đơn giản</td><td>không phải streaming tự nhiên</td></tr>
+<tr><td>Chunk ngắn hơn</td><td>latency thấp hơn</td><td>dễ mất context, tăng boundary errors</td></tr>
+<tr><td>Chunk dài hơn</td><td>nhiều context hơn</td><td>memory/attention cost lớn hơn</td></tr>
+<tr><td>VAD trước khi chunk</td><td>giảm silence/hallucination</td><td>phụ thuộc chất lượng VAD</td></tr>
+</tbody></table>
+</div>
+<p>Trong production, Whisper thường được bọc bằng VAD, chunking, overlap và stitching. Phần khó không chỉ là model, mà là cách cắt audio sao cho transcript không mất từ ở ranh giới chunk.</p>
+<h3 id="audio-encoder"><a class="header" href="#audio-encoder">Audio Encoder</a></h3>
+<p><a id="eq-whisper-encoder"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:6.0241em;vertical-align:-2.7621em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2621em;"><span style="top:-5.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">mel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-3.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-2.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span><span style="top:-0.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathbf">h</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7621em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2621em;"><span style="top:-5.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord mathbb">R</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">80</span><span class="mbin mtight">×</span><span class="mord mtight">3000</span></span></span></span></span></span></span></span></span></span></span><span style="top:-3.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">GELU</span></span><span class="mopen">(</span><span class="mord text"><span class="mord">Conv1d</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">mel</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mord"><span class="mrel">=</span></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mord"><span class="mrel">=</span></span><span class="mord">1</span><span class="mclose">))</span></span></span><span style="top:-2.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">GELU</span></span><span class="mopen">(</span><span class="mord text"><span class="mord">Conv1d</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.03148em;">k</span><span class="mord"><span class="mrel">=</span></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">s</span><span class="mord"><span class="mrel">=</span></span><span class="mord">2</span><span class="mclose">))</span></span></span><span style="top:-0.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">TransformerEncoder</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord"><span class="mord mathbf">p</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3175em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">sin</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7621em;"><span></span></span></span></span></span><span class="arraycolsep" style="width:1em;"></span><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:3.2621em;"><span style="top:-5.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// Log mel spectrogram</span></span></span></span><span style="top:-3.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// [d, 3000]</span></span></span></span><span style="top:-2.3979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// [d, 1500] - 2× downsampling</span></span></span></span><span style="top:-0.8979em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">// [1500, d]</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:2.7621em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h3 id="text-decoder"><a class="header" href="#text-decoder">Text Decoder</a></h3>
+<p>Autoregressive decoder với <strong>special tokens</strong> cho multitask:</p>
+<pre class="mermaid">flowchart LR
+    S[&quot;&lt;|startoftranscript|&gt;&quot;] --&gt; L[&quot;&lt;|vi|&gt; language token&quot;]
+    L --&gt; TASK[&quot;&lt;|transcribe|&gt; or &lt;|translate|&gt;&quot;]
+    TASK --&gt; TSO[&quot;timestamp control&quot;]
+    TSO --&gt; TXT[&quot;generated text tokens&quot;]
+    TXT --&gt; E[&quot;&lt;|endoftext|&gt;&quot;]
+</pre>
+<p>Đối với người học LLM, đây chính là instruction prompting ở mức tokenizer. Thay vì có nhiều model riêng cho language ID, transcription, translation và timestamp, Whisper đưa task spec vào prefix tokens.</p>
+<p><a id="eq-whisper-decoder"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2274em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">h</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">softmax</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathbf" style="margin-right:0.01597em;">W</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.016em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">o</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">TransformerDecoder</span></span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2274em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathbf">h</span><span class="mclose">))</span></span></span></span></span></p>
+<h3 id="model-sizes"><a class="header" href="#model-sizes">Model Sizes</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Layers</th><th>Width</th><th>Heads</th><th>Params</th><th>English WER</th></tr></thead><tbody>
+<tr><td>Tiny</td><td>4+4</td><td>384</td><td>6</td><td>39M</td><td>7.6%</td></tr>
+<tr><td>Base</td><td>6+6</td><td>512</td><td>8</td><td>74M</td><td>5.0%</td></tr>
+<tr><td>Small</td><td>12+12</td><td>768</td><td>12</td><td>244M</td><td>3.4%</td></tr>
+<tr><td>Medium</td><td>24+24</td><td>1024</td><td>16</td><td>769M</td><td>2.9%</td></tr>
+<tr><td>Large-v3</td><td>32+32</td><td>1280</td><td>20</td><td>1550M</td><td><strong>2.2%</strong></td></tr>
+</tbody></table>
+</div>
+<p>: Whisper model sizes <a id="tbl-whisper-sizes"></a></p>
+<h2 id="multitask-training-format"><a class="header" href="#multitask-training-format">Multitask Training Format</a></h2>
+<h3 id="special-token-protocol"><a class="header" href="#special-token-protocol">Special Token Protocol</a></h3>
+<p>Whisper sử dụng sequence of special tokens để chỉ định task:</p>
+<pre><code>&lt;|startoftranscript|&gt; &lt;|lang|&gt; &lt;|task|&gt; [&lt;|notimestamps|&gt;] ...text... &lt;|endoftext|&gt;
+</code></pre>
+<ul>
+<li><code>&lt;|lang|&gt;</code>: Language token (e.g., <code>&lt;|en|&gt;</code>, <code>&lt;|vi|&gt;</code>, <code>&lt;|zh|&gt;</code>)</li>
+<li><code>&lt;|task|&gt;</code>: <code>&lt;|transcribe|&gt;</code> hoặc <code>&lt;|translate|&gt;</code> (→ English)</li>
+<li><code>&lt;|notimestamps|&gt;</code>: Optional, nếu không cần word-level timestamps</li>
+</ul>
+<h3 id="timestamp-tokens"><a class="header" href="#timestamp-tokens">Timestamp tokens</a></h3>
+<p>Whisper biểu diễn timestamp bằng special tokens rời rạc. Điều này cho phép decoder sinh xen kẽ text và mốc thời gian, ví dụ một segment bắt đầu ở 12.40s và kết thúc ở 15.20s. Đây là một thiết kế rất thực dụng: timestamp trở thành bài toán token prediction, không cần thêm regression head riêng.</p>
+<p>Tuy nhiên, timestamp của Whisper thường phù hợp ở mức segment hơn là word-level tuyệt đối. Nếu sản phẩm cần word-level alignment chính xác để karaoke/subtitle, cần thêm forced alignment hoặc model chuyên dụng.</p>
+<h3 id="tasks"><a class="header" href="#tasks">Tasks</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Task</th><th>Input</th><th>Output</th><th>Token</th></tr></thead><tbody>
+<tr><td>Transcription</td><td>Audio (any lang)</td><td>Text (same lang)</td><td>`&lt;</td></tr>
+<tr><td>Translation</td><td>Audio (any lang)</td><td>Text (English)</td><td>`&lt;</td></tr>
+<tr><td>Language ID</td><td>Audio</td><td>Language token</td><td>Predict `&lt;</td></tr>
+<tr><td>VAD</td><td>Audio</td><td>Timestamps</td><td>`&lt;</td></tr>
+</tbody></table>
+</div>
+<p>: Whisper multitask format <a id="tbl-whisper-tasks"></a></p>
+<blockquote>
+<p><strong>📝 Multitask = Prompt Engineering for ASR</strong></p>
+<p>Whisper's special token system tương đương <strong>prompt engineering</strong> cho LLM. Thay vì train riêng models cho mỗi task, dùng prompt tokens để điều khiển behavior  -  giống GPT-3 instruction following.</p>
+</blockquote>
+<h2 id="failure-modes-của-whisper"><a class="header" href="#failure-modes-của-whisper">Failure modes của Whisper</a></h2>
+<p>Whisper robust, nhưng không hoàn hảo. Các lỗi quan trọng cần hiểu:</p>
+<div class="table-wrapper"><table><thead><tr><th>Failure mode</th><th>Biểu hiện</th><th>Nguyên nhân thường gặp</th><th>Cách giảm rủi ro</th></tr></thead><tbody>
+<tr><td>Hallucination trên silence</td><td>sinh câu dù audio im lặng</td><td>decoder LM quá mạnh, VAD kém</td><td>VAD, no-speech threshold, temperature fallback</td></tr>
+<tr><td>Repetition</td><td>lặp cụm từ nhiều lần</td><td>decoding drift, chunk boundary</td><td>compression ratio threshold, beam/temperature tuning</td></tr>
+<tr><td>Language mis-ID</td><td>nhận nhầm ngôn ngữ</td><td>code-switching, audio ngắn</td><td>force language token khi biết trước</td></tr>
+<tr><td>Timestamp drift</td><td>mốc thời gian lệch</td><td>long audio, chunk stitching</td><td>overlap, alignment hậu xử lý</td></tr>
+<tr><td>Domain terms sai</td><td>tên riêng, thuật ngữ</td><td>thiếu domain data</td><td>fine-tune, biasing, glossary/post-edit</td></tr>
+<tr><td>Tone/diacritics sai</td><td>lỗi dấu tiếng Việt</td><td>tonal/accent mismatch</td><td>fine-tune tiếng Việt, eval theo vùng miền</td></tr>
+</tbody></table>
+</div>
+<p>Điểm cần nhớ: Whisper có decoder giống language model. Khi acoustic evidence yếu, decoder có thể “đoán hợp lý” theo ngôn ngữ, nhưng đoán hợp lý không đồng nghĩa đúng transcript.</p>
+<h2 id="training-details"><a class="header" href="#training-details">Training Details</a></h2>
+<h3 id="data-distribution"><a class="header" href="#data-distribution">Data Distribution</a></h3>
+<ul>
+<li><strong>680K hours</strong> total audio</li>
+<li><strong>96 languages</strong> (nhưng phân bố rất không đều)</li>
+<li>English: ~438K hours (~65%)</li>
+<li>Top 10 languages: ~90% tổng data</li>
+<li>Vietnamese: không được công bố chi tiết trong paper; các ước lượng bên ngoài cần được đọc thận trọng</li>
+</ul>
+<h3 id="training-setup"><a class="header" href="#training-setup">Training Setup</a></h3>
+<p><a id="eq-whisper-training"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:7.6661em;vertical-align:-3.583em;"></span><span class="mord"><span class="mtable"><span class="col-align-r"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.083em;"><span style="top:-6.2189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Optimizer</span></span></span></span><span style="top:-4.7189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">LR schedule</span></span></span></span><span style="top:-3.2189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Batch size</span></span></span></span><span style="top:-1.6948em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Total steps</span></span></span></span><span style="top:-0.077em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">Total compute</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.583em;"><span></span></span></span></span></span><span class="col-align-l"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:4.083em;"><span style="top:-6.2189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">AdamW</span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mopen">(</span><span class="mord">0.9</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">0.98</span><span class="mclose">)</span><span class="mpunct">,</span><span class="mspace" style="margin-right:1em;"></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">ϵ</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mord">0</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">−</span><span class="mord mtight">6</span></span></span></span></span></span></span></span></span></span></span><span style="top:-4.7189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">Linear warmup (2048 steps)</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">cosine decay</span></span></span></span><span style="top:-3.2189em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">256</span><span class="mord text"><span class="mord"> segments</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mord">30</span><span class="mord text"><span class="mord">s</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">2.13</span><span class="mord text"><span class="mord"> hours/batch</span></span></span></span><span style="top:-1.6948em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:∼</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8641em;"><span style="top:-3.113em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">20</span></span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≈</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord">1</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">048</span><span class="mord"><span class="mpunct">,</span></span><span class="mord">576</span></span></span><span style="top:-0.077em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord"></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">:</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mord text"><span class="mord">kh</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span><span class="mord">ng n</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">e</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span><span class="mord">n xem l</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">a</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˋ</span></span></span></span></span></span></span><span class="mord"> con s</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord"> t</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">a</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">i lập </span><span class="mord latin_fallback">đơ</span><span class="mord">n giản n</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">e</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">u thi</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">e</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">u setup g</span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.9579em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord accent"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord">o</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˆ</span></span></span></span></span></span></span></span><span style="top:-3.2634em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.25em;"><span class="mord">ˊ</span></span></span></span></span></span></span><span class="mord">c</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:3.583em;"><span></span></span></span></span></span></span></span></span></span></span></span></p>
+<h3 id="loss-function"><a class="header" href="#loss-function">Loss Function</a></h3>
+<p>Standard cross-entropy trên text tokens:</p>
+<p><a id="eq-whisper-loss"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathcal">L</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:3.0954em;vertical-align:-1.2671em;"></span><span class="mord">−</span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3214em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.10903em;">U</span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord">1</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop op-limits"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.8283em;"><span style="top:-1.8829em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">u</span><span class="mrel mtight">=</span><span class="mord mtight">1</span></span></span></span><span style="top:-3.05em;"><span class="pstrut" style="height:3.05em;"></span><span><span class="mop op-symbol large-op">∑</span></span></span><span style="top:-4.3em;margin-left:0em;"><span class="pstrut" style="height:3.05em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.10903em;">U</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:1.2671em;"><span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">P</span><span class="mopen">(</span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">u</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.2274em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mrel mtight">&lt;</span><span class="mord mathnormal mtight">u</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1774em;"><span></span></span></span></span></span></span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord mathbf">h</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">encoder</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<h2 id="inference--decoding"><a class="header" href="#inference--decoding">Inference &amp; Decoding</a></h2>
+<pre><code class="language-python">#| eval: false
+#| code-fold: true
+#| code-summary: "Whisper-style encoder-decoder"
+import torch
+import torch.nn as nn
+import math
+from torch import Tensor
+
+
+class WhisperEncoder(nn.Module):
+    """Simplified Whisper audio encoder.
+
+    Conv1d downsampling + Transformer encoder.
+    """
+
+    def __init__(
+        self,
+        n_mels: int = 80,
+        d_model: int = 512,
+        n_heads: int = 8,
+        n_layers: int = 6,
+        max_len: int = 1500,
+    ) -&gt; None:
+        super().__init__()
+        # Two conv layers for downsampling
+        self.conv1 = nn.Conv1d(
+            n_mels, d_model, kernel_size=3, padding=1,
+        )  # [B, 80, T] -&gt; [B, d, T]
+        self.conv2 = nn.Conv1d(
+            d_model, d_model, kernel_size=3, stride=2, padding=1,
+        )  # [B, d, T] -&gt; [B, d, T//2]
+        self.gelu = nn.GELU()
+
+        # Sinusoidal positional encoding
+        pe: Tensor = torch.zeros(max_len, d_model)  # [max_len, d]
+        position: Tensor = torch.arange(0, max_len).unsqueeze(1).float()
+        div_term: Tensor = torch.exp(
+            torch.arange(0, d_model, 2).float() * (-math.log(10000.0) / d_model)
+        )
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pe", pe)  # [max_len, d]
+
+        # Transformer encoder layers
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=n_heads,
+            dim_feedforward=d_model * 4,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=True,
+        )
+        self.transformer = nn.TransformerEncoder(
+            encoder_layer, num_layers=n_layers,
+        )
+        self.ln = nn.LayerNorm(d_model)
+
+    def forward(self, mel: Tensor) -&gt; Tensor:
+        """Encode mel spectrogram.
+
+        Args:
+            mel: [batch, n_mels, T_frames] - float32
+                 T_frames = 3000 for 30s audio at 100fps
+
+        Returns:
+            h: [batch, T_frames//2, d_model] - float32
+               T_frames//2 = 1500 for 30s audio
+        """
+        x: Tensor = self.gelu(self.conv1(mel))  # [B, d, T] - float32
+        x = self.gelu(self.conv2(x))  # [B, d, T//2] - float32
+        x = x.transpose(1, 2)  # [B, T//2, d] - float32
+
+        T: int = x.size(1)
+        x = x + self.pe[:T]  # [B, T//2, d] - float32
+
+        h: Tensor = self.transformer(x)  # [B, T//2, d] - float32
+        h = self.ln(h)  # [B, T//2, d] - float32
+        return h
+
+
+class WhisperDecoder(nn.Module):
+    """Simplified Whisper text decoder."""
+
+    def __init__(
+        self,
+        vocab_size: int = 51865,
+        d_model: int = 512,
+        n_heads: int = 8,
+        n_layers: int = 6,
+        max_len: int = 448,
+    ) -&gt; None:
+        super().__init__()
+        self.token_emb = nn.Embedding(vocab_size, d_model)
+        self.pos_emb = nn.Embedding(max_len, d_model)
+
+        decoder_layer = nn.TransformerDecoderLayer(
+            d_model=d_model,
+            nhead=n_heads,
+            dim_feedforward=d_model * 4,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=True,
+        )
+        self.transformer = nn.TransformerDecoder(
+            decoder_layer, num_layers=n_layers,
+        )
+        self.ln = nn.LayerNorm(d_model)
+        self.proj = nn.Linear(d_model, vocab_size, bias=False)
+
+    def forward(
+        self,
+        tokens: Tensor,    # [batch, U] - int64
+        encoder_out: Tensor,  # [batch, T', d_model] - float32
+    ) -&gt; Tensor:
+        """Decode tokens with encoder context.
+
+        Args:
+            tokens: Input token IDs [B, U] - int64
+            encoder_out: Encoder output [B, T', d] - float32
+
+        Returns:
+            logits: [B, U, vocab_size] - float32
+        """
+        U: int = tokens.size(1)
+        positions: Tensor = torch.arange(
+            U, device=tokens.device
+        )  # [U]
+
+        x: Tensor = self.token_emb(tokens) + self.pos_emb(positions)
+        # [B, U, d] - float32
+
+        # Causal mask
+        causal_mask: Tensor = nn.Transformer.generate_square_subsequent_mask(
+            U, device=tokens.device,
+        )  # [U, U] - float32
+
+        h: Tensor = self.transformer(
+            x, encoder_out, tgt_mask=causal_mask,
+        )  # [B, U, d] - float32
+
+        h = self.ln(h)  # [B, U, d] - float32
+        logits: Tensor = self.proj(h)  # [B, U, vocab] - float32
+        return logits
+</code></pre>
+<h2 id="canary-và-nemo-asr"><a class="header" href="#canary-và-nemo-asr">Canary và NeMo ASR</a></h2>
+<p>Canary là họ mô hình encoder-decoder của NVIDIA NeMo hướng tới multitask speech recognition và speech translation. Về mặt tư duy, Canary nằm cùng gia đình “large-scale encoder-decoder ASR” với Whisper, nhưng được phát triển trong ecosystem NeMo, thuận tiện cho fine-tuning, deployment và tích hợp pipeline NVIDIA.</p>
+<div class="table-wrapper"><table><thead><tr><th>Khía cạnh</th><th>Whisper</th><th>Canary / NeMo</th></tr></thead><tbody>
+<tr><td>Kiến trúc tổng quát</td><td>encoder-decoder Transformer</td><td>encoder-decoder, thường trong NeMo stack</td></tr>
+<tr><td>Task</td><td>ASR, translate-to-English, timestamps, LID</td><td>ASR và speech translation đa ngôn ngữ tùy checkpoint</td></tr>
+<tr><td>Ecosystem</td><td>open-source weights, nhiều implementation</td><td>NeMo training/fine-tuning/deployment recipes</td></tr>
+<tr><td>Production angle</td><td>phổ biến qua faster-whisper/CTranslate2</td><td>mạnh khi dùng NVIDIA stack</td></tr>
+<tr><td>Điểm cần kiểm tra</td><td>hallucination, chunking, language forcing</td><td>license, checkpoint language coverage, latency</td></tr>
+</tbody></table>
+</div>
+<p>Canary quan trọng về mặt giáo trình vì nó cho thấy Whisper không phải công thức duy nhất. Cùng là encoder-decoder ASR, nhưng data recipe, tokenizer, training objective, language coverage và deployment tooling có thể khác nhau đáng kể.</p>
+<pre class="mermaid">flowchart LR
+    MEL[&quot;Audio features&quot;] --&gt; ENC[&quot;Encoder&quot;]
+    PREFIX[&quot;Task / language control&quot;] --&gt; DEC[&quot;Decoder&quot;]
+    ENC --&gt; DEC
+    DEC --&gt; OUT[&quot;Transcript or translation&quot;]
+    OUT --&gt; EVAL[&quot;WER / BLEU / latency eval&quot;]
+</pre>
+<h3 id="khi-nào-cân-nhắc-canary"><a class="header" href="#khi-nào-cân-nhắc-canary">Khi nào cân nhắc Canary?</a></h3>
+<ul>
+<li>Khi bạn đã dùng NVIDIA NeMo cho training/inference.</li>
+<li>Khi cần recipe fine-tune ASR hoặc speech translation có cấu trúc rõ.</li>
+<li>Khi muốn benchmark một encoder-decoder ASR khác Whisper trên domain của mình.</li>
+<li>Khi triển khai trên GPU NVIDIA và muốn tận dụng tooling sẵn có.</li>
+</ul>
+<h2 id="faster-whisper--optimizations"><a class="header" href="#faster-whisper--optimizations">Faster Whisper &amp; Optimizations</a></h2>
+<h3 id="distil-whisper"><a class="header" href="#distil-whisper">Distil-Whisper</a></h3>
+<p>Distil-Whisper <sup class="footnote-reference"><a href="#gandhi2023distilwhisper">2</a></sup> giảm kích thước và tăng tốc inference bằng knowledge distillation:</p>
+<p><a id="eq-distil-whisper"></a></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">distil</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord mathcal">L</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">CE</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1944em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:-0.0359em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">student</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">KL</span></span><span class="mopen">(</span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">teacher</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mord">∥</span><span class="mord"><span class="mord accent"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.6944em;"><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="mord mathnormal">p</span></span><span style="top:-3em;"><span class="pstrut" style="height:3em;"></span><span class="accent-body" style="left:-0.1667em;"><span class="mord">^</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.1944em;"><span></span></span></span></span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3361em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">student</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mclose">)</span></span></span></span></span></p>
+<div class="table-wrapper"><table><thead><tr><th>Model</th><th>Params</th><th>Speed (vs Large-v3)</th><th>WER (test-clean)</th></tr></thead><tbody>
+<tr><td>Whisper Large-v3</td><td>1550M</td><td>1×</td><td>2.2% trong benchmark được báo cáo</td></tr>
+<tr><td>Distil-Whisper Large-v3</td><td>756M</td><td>6.3×</td><td>2.5% trong benchmark được báo cáo</td></tr>
+</tbody></table>
+</div>
+<p>: Distil-Whisper performance <a id="tbl-distil-whisper"></a></p>
+<h3 id="faster-whisper-ctranslate2"><a class="header" href="#faster-whisper-ctranslate2">faster-whisper (CTranslate2)</a></h3>
+<p>Tối ưu inference bằng:</p>
+<ul>
+<li><strong>INT8 quantization</strong>: Giảm memory 2–4×</li>
+<li><strong>KV-cache optimization</strong>: Reuse computed attention keys/values</li>
+<li><strong>Batched beam search</strong>: Parallel decoding</li>
+<li><strong>VAD-based chunking</strong>: Chỉ process segments có speech</li>
+</ul>
+<blockquote>
+<p><strong>⚠️ Latency Warning</strong></p>
+<div class="table-wrapper"><table><thead><tr><th>Configuration</th><th>RTF (Real-Time Factor)</th><th>Latency (30s audio)</th><th>VRAM</th></tr></thead><tbody>
+<tr><td>Whisper Large-v3 (FP16, A100)</td><td>0.03</td><td>~1s</td><td>6 GB</td></tr>
+<tr><td>Whisper Large-v3 (INT8, T4)</td><td>0.15</td><td>~4.5s</td><td>3 GB</td></tr>
+<tr><td>faster-whisper Large-v3 (INT8, T4)</td><td>0.05</td><td>~1.5s</td><td>2 GB</td></tr>
+<tr><td>Distil-Whisper (INT8, T4)</td><td>0.02</td><td>~0.6s</td><td>1.5 GB</td></tr>
+</tbody></table>
+</div></blockquote>
+<h3 id="whisper-cho-tiếng-việt"><a class="header" href="#whisper-cho-tiếng-việt">Whisper cho Tiếng Việt</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Cấu hình</th><th>Kỳ vọng tương đối</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>Whisper Tiny/Base</td><td>thường yếu hơn rõ rệt</td><td>phù hợp demo nhanh, không nên dùng để kết luận chất lượng tiếng Việt</td></tr>
+<tr><td>Whisper Small/Medium</td><td>cân bằng hơn</td><td>cần benchmark trên domain thực tế</td></tr>
+<tr><td>Whisper Large-v3</td><td>thường mạnh hơn các bản nhỏ</td><td>nặng hơn về VRAM/latency</td></tr>
+<tr><td>PhoWhisper/fine-tuned variants</td><td>có thể tốt hơn cho tiếng Việt</td><td>phụ thuộc tập fine-tune và benchmark</td></tr>
+</tbody></table>
+</div>
+<p>: Đọc kết quả Whisper tiếng Việt theo hướng tương đối <a id="tbl-whisper-vi"></a></p>
+<blockquote>
+<p><strong>📝 Vietnamese Challenges</strong></p>
+<p>Tiếng Việt là tonal language (6 tones)  -  Whisper thường gặp lỗi với:</p>
+<ul>
+<li><strong>Hỏi vs Ngã</strong> tone confusion (Southern dialect merger)</li>
+<li><strong>Regional accents</strong>: Bắc/Trung/Nam rất khác biệt</li>
+<li><strong>Code-switching</strong>: Vietnamese + English trong business contexts</li>
+<li><strong>Proper nouns</strong>: Tên riêng Việt Nam thường bị sai</li>
+</ul>
+<p>Fine-tuning trên dữ liệu tiếng Việt thường giúp cải thiện lỗi domain, dấu thanh và tên riêng, nhưng cần đánh giá riêng theo vùng miền và điều kiện thu. Xem thêm các chương về dữ liệu và tiếng Việt ở Phần VI.</p>
+</blockquote>
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<div class="table-wrapper"><table><thead><tr><th>Aspect</th><th>Whisper</th></tr></thead><tbody>
+<tr><td>Architecture</td><td>Encoder-decoder Transformer</td></tr>
+<tr><td>Pre-training</td><td>680K hours weak supervision</td></tr>
+<tr><td>Input</td><td>30s mel spectrogram (80, 3000)</td></tr>
+<tr><td>Tasks</td><td>Transcription, translation, timestamps, language ID</td></tr>
+<tr><td>Multilingual</td><td>96 languages trong paper gốc</td></tr>
+<tr><td>Strength</td><td>robust zero-shot/multilingual ASR trong nhiều điều kiện</td></tr>
+<tr><td>Vietnamese</td><td>cần benchmark riêng; fine-tuned variants như PhoWhisper đáng cân nhắc</td></tr>
+<tr><td>Optimization</td><td>Distil-Whisper, faster-whisper, INT8</td></tr>
+</tbody></table>
+</div>
+<p>: Whisper summary <a id="tbl-whisper-summary"></a></p>
+<p>Chương tiếp theo chuyển sang <strong>Streaming ASR</strong>, nơi ta phân tích latency, chunking, endpointing, partial hypothesis và các ràng buộc production realtime.</p>
+<hr />
+<!-- References (auto-generated from .bib) -->
+<div class="footnote-definition" id="radford2023robust"><sup class="footnote-definition-label">1</sup>
+<p>Radford, Alec and Kim, Jong Wook and Xu, Tao and Brockman, Greg and McLeavey, Christine and Sutskever, Ilya, "Robust Speech Recognition via Large-Scale Weak Supervision", International Conference on Machine Learning</p>
+</div>
+<div class="footnote-definition" id="gandhi2023distilwhisper"><sup class="footnote-definition-label">2</sup>
+<p>Gandhi, Sanchit and von Platen, Patrick and Rush, Alexander M, "Distil-Whisper: Robust Knowledge Distillation via Large-Scale Pseudo Labelling", arXiv preprint arXiv:2311.00430</p>
+</div>
+<div class="footnote-definition" id="nvidia2024canary"><sup class="footnote-definition-label">3</sup>
+<p>NVIDIA NeMo Team, "Canary: multilingual ASR and speech translation models", NVIDIA NeMo documentation and model cards, 2024.</p>
+</div>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../part2/05-modern-asr.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part2/07-streaming-asr.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../part2/05-modern-asr.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part2/07-streaming-asr.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>

@@ -1,0 +1,781 @@
+<!DOCTYPE HTML>
+<html lang="vi" class="navy" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Chương 0: Linguistics, Acoustics, DSP, Traditional ML - S-AI</title>
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="Speech AI: From Signal Processing to Full-Duplex Dialogue — Sách học thuật về Speech AI dành cho data scientist NLP/LLM (tiếng Việt)">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="../highlight.css">
+        <link rel="stylesheet" href="../tomorrow-night.css">
+        <link rel="stylesheet" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+    </head>
+    <body class="sidebar-visible no-js">
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "../";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "navy";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('navy')
+            html.classList.add(theme);
+            var body = document.querySelector('body');
+            body.classList.remove('no-js')
+            body.classList.add('js');
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var body = document.querySelector('body');
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            body.classList.remove('sidebar-visible');
+            body.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded affix "><a href="../index.html">Trang chủ</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần 0 — Nền tảng cổ điển</li><li class="chapter-item expanded "><a href="../part0/00-foundations-review.html" class="active"><strong aria-hidden="true">1.</strong> Chương 0: Linguistics, Acoustics, DSP, Traditional ML</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần I — Cầu nối khái niệm</li><li class="chapter-item expanded "><a href="../part1/01-nlp-to-speech.html"><strong aria-hidden="true">2.</strong> Chương 1: Từ NLP đến Speech</a></li><li class="chapter-item expanded "><a href="../part1/02-audio-fundamentals.html"><strong aria-hidden="true">3.</strong> Chương 2: Audio Signal Fundamentals</a></li><li class="chapter-item expanded "><a href="../part1/03-speech-representations.html"><strong aria-hidden="true">4.</strong> Chương 3: Speech Representations</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần II — Nhận dạng Giọng nói (ASR)</li><li class="chapter-item expanded "><a href="../part2/04-asr-foundations.html"><strong aria-hidden="true">5.</strong> Chương 4: ASR Foundations</a></li><li class="chapter-item expanded "><a href="../part2/05-modern-asr.html"><strong aria-hidden="true">6.</strong> Chương 5: Modern ASR Architectures</a></li><li class="chapter-item expanded "><a href="../part2/06-whisper-canary.html"><strong aria-hidden="true">7.</strong> Chương 6: Whisper & Canary</a></li><li class="chapter-item expanded "><a href="../part2/07-streaming-asr.html"><strong aria-hidden="true">8.</strong> Chương 7: Streaming ASR</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần III — Tổng hợp Giọng nói (TTS)</li><li class="chapter-item expanded "><a href="../part3/08-tts-foundations.html"><strong aria-hidden="true">9.</strong> Chương 8: TTS Foundations</a></li><li class="chapter-item expanded "><a href="../part3/09-end-to-end-tts.html"><strong aria-hidden="true">10.</strong> Chương 9: End-to-End TTS</a></li><li class="chapter-item expanded "><a href="../part3/10-audio-codecs.html"><strong aria-hidden="true">11.</strong> Chương 10: Audio Codecs</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần IV — Speech LLMs & Multimodal</li><li class="chapter-item expanded "><a href="../part4/11-speech-llms.html"><strong aria-hidden="true">12.</strong> Chương 11: Speech LLMs</a></li><li class="chapter-item expanded "><a href="../part4/12-multimodal-omni.html"><strong aria-hidden="true">13.</strong> Chương 12: Multimodal Omni</a></li><li class="chapter-item expanded "><a href="../part4/13-full-duplex.html"><strong aria-hidden="true">14.</strong> Chương 13: Full-Duplex Dialogue</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần V — Understanding & Translation</li><li class="chapter-item expanded "><a href="../part5/14-speech-classification.html"><strong aria-hidden="true">15.</strong> Chương 14: Speech Classification</a></li><li class="chapter-item expanded "><a href="../part5/15-speech-translation.html"><strong aria-hidden="true">16.</strong> Chương 15: Speech Translation</a></li><li class="chapter-item expanded "><a href="../part5/21-wake-word-detection.html"><strong aria-hidden="true">17.</strong> Chương 21: Wake-Word Detection (KWS)</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VI — Tiếng Việt</li><li class="chapter-item expanded "><a href="../part6/16-vietnamese-speech.html"><strong aria-hidden="true">18.</strong> Chương 16: Vietnamese Speech</a></li><li class="chapter-item expanded "><a href="../part6/17-vietnamese-datasets.html"><strong aria-hidden="true">19.</strong> Chương 17: Vietnamese Datasets</a></li><li class="chapter-item expanded affix "><li class="part-title">Phần VII — Tools & Production</li><li class="chapter-item expanded "><a href="../part7/18-training-frameworks.html"><strong aria-hidden="true">20.</strong> Chương 18: Training Frameworks</a></li><li class="chapter-item expanded "><a href="../part7/19-inference-engines.html"><strong aria-hidden="true">21.</strong> Chương 19: Inference Engines</a></li><li class="chapter-item expanded "><a href="../part7/20-production-systems.html"><strong aria-hidden="true">22.</strong> Chương 20: Production Systems</a></li><li class="chapter-item expanded affix "><li class="part-title">Phụ lục</li><li class="chapter-item expanded "><a href="../appendices/appendix-a-notation.html"><strong aria-hidden="true">23.</strong> A. Notation Reference</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-b-proofs.html"><strong aria-hidden="true">24.</strong> B. Proofs & Derivations</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-c-mapping.html"><strong aria-hidden="true">25.</strong> C. NLP↔Speech Mapping</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-d-code.html"><strong aria-hidden="true">26.</strong> D. Code Snippets</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-e-vietnamese-resources.html"><strong aria-hidden="true">27.</strong> E. Vietnamese Resources</a></li><li class="chapter-item expanded "><a href="../appendices/appendix-f-tool-comparison.html"><strong aria-hidden="true">28.</strong> F. Tool Comparison</a></li><li class="chapter-item expanded affix "><a href="../references.html">Tài liệu tham khảo</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <!-- Track and set sidebar scroll position -->
+        <script>
+            var sidebarScrollbox = document.querySelector('#sidebar .sidebar-scrollbox');
+            sidebarScrollbox.addEventListener('click', function(e) {
+                if (e.target.tagName === 'A') {
+                    sessionStorage.setItem('sidebar-scroll', sidebarScrollbox.scrollTop);
+                }
+            }, { passive: true });
+            var sidebarScrollTop = sessionStorage.getItem('sidebar-scroll');
+            sessionStorage.removeItem('sidebar-scroll');
+            if (sidebarScrollTop) {
+                // preserve sidebar scroll position when navigating via links within sidebar
+                sidebarScrollbox.scrollTop = sidebarScrollTop;
+            } else {
+                // scroll sidebar to current active section when navigating via "next/previous chapter" buttons
+                var activeSection = document.querySelector('#sidebar .active');
+                if (activeSection) {
+                    activeSection.scrollIntoView({ block: 'center' });
+                }
+            }
+        </script>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">S-AI</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI" title="Git repository" aria-label="Git repository">
+                            <i id="git-repository-button" class="fa fa-github"></i>
+                        </a>
+                        <a href="https://github.com/tuandung222/S-AI/edit/main/src/part0/00-foundations-review.md" title="Suggest an edit" aria-label="Suggest an edit">
+                            <i id="git-edit-button" class="fa fa-edit"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="chương-0-nền-tảng-cổ-điển--ngôn-ngữ-học-Âm-học-dsp-và-ml-truyền-thống"><a class="header" href="#chương-0-nền-tảng-cổ-điển--ngôn-ngữ-học-Âm-học-dsp-và-ml-truyền-thống">Chương 0: Nền tảng cổ điển — Ngôn ngữ học, Âm học, DSP và ML truyền thống</a></h1>
+<h2 id="vì-sao-cần-một-chương-ôn-tập"><a class="header" href="#vì-sao-cần-một-chương-ôn-tập">Vì sao cần một chương "ôn tập"</a></h2>
+<p>Cuốn sách này được thiết kế cho data scientist nền tảng NLP/LLM và CV chuyển sang Speech AI. Phần lớn độc giả mục tiêu đã thành thạo Transformer, attention, BPE, fine-tuning, và RLHF. Nhưng có một số khái niệm cơ bản mà mọi giáo trình Speech AI đều giả định người đọc đã biết: phoneme là gì, mel scale từ đâu ra, định lý lấy mẫu nói gì, HMM khác seq2seq ở đâu. Nếu thiếu một trong số này, các chương sau sẽ thường xuyên dùng thuật ngữ không định nghĩa, và bạn phải dừng lại tra Google liên tục.</p>
+<p>Chương 0 phục vụ đúng mục đích này: bù lấp gap về <strong>ngôn ngữ học</strong>, <strong>âm học</strong>, <strong>digital signal processing (DSP)</strong> và <strong>machine learning cổ điển</strong> trước khi bước vào deep learning hiện đại. Mục tiêu không phải biến bạn thành phonetician hay DSP engineer, mà là cung cấp vốn từ và mô hình tư duy tối thiểu để bạn đọc các chương sau trôi chảy.</p>
+<p>Nếu bạn đã có background EE/CS với một khoá xử lý tín hiệu và đã từng làm việc với HMM trong Kaldi hoặc CMU Sphinx, chương này có thể đọc lướt hoặc bỏ qua. Nếu bạn từ pure CS/NLP/CV, đầu tư 2-3 giờ ở đây sẽ làm các chương về Audio Fundamentals (Chương 2), ASR Foundations (Chương 4), và Modern ASR (Chương 5) trở nên dễ thở hơn rất nhiều.</p>
+<blockquote>
+<p><strong>Cấu trúc chương</strong></p>
+<ul>
+<li><strong>Phần 1</strong>: ngôn ngữ học cơ bản (phonetics, phonology, prosody) và đặc thù tiếng Việt.</li>
+<li><strong>Phần 2</strong>: âm học (sóng âm, thính giác, source-filter model, các thang nhận thức).</li>
+<li><strong>Phần 3</strong>: DSP nền tảng (sampling, quantization, convolution, Fourier).</li>
+<li><strong>Phần 4</strong>: machine learning cổ điển cho speech (DTW, HMM, GMM, hybrid GMM-HMM, i-vectors).</li>
+<li><strong>Phần 5</strong>: cầu nối sang Speech AI hiện đại, vì sao deep learning thay thế các cách tiếp cận truyền thống.</li>
+</ul>
+</blockquote>
+<blockquote>
+<p><strong>Tham khảo sâu hơn</strong></p>
+<ul>
+<li>Jurafsky, D. và Martin, J. H. (2024). <em>Speech and Language Processing</em> (SLP3). Free online: <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a>. Chương 16, 25, 26 cover phonetics, HMM-ASR và speech recognition cổ điển rất kỹ.</li>
+<li>Aalto University. <em>Speech Processing Book</em>. <a href="https://speechprocessingbook.aalto.fi/">https://speechprocessingbook.aalto.fi/</a>. Modern, interactive, free.</li>
+<li>Rabiner, L. R. và Schafer, R. W. (2010). <em>Theory and Applications of Digital Speech Processing</em>. Pearson. Engineering reference toàn diện về DSP cho speech.</li>
+<li>Huang, X., Acero, A., và Hon, H. W. (2001). <em>Spoken Language Processing</em>. Prentice Hall. Sách classical về speech recognition pre-deep-learning.</li>
+</ul>
+</blockquote>
+<h3 id="bản-đồ-học-tập-của-chương-0"><a class="header" href="#bản-đồ-học-tập-của-chương-0">Bản đồ học tập của Chương 0</a></h3>
+<p>Hãy xem Chương 0 như một “bộ chuyển đổi hệ tọa độ”. Nếu bạn đến từ NLP, bạn quen với text token, embedding, Transformer và language modeling. Speech AI thêm một lớp thực tại vật lý trước khi dữ liệu đi vào model: con người tạo ra âm thanh bằng cơ quan phát âm, âm thanh lan truyền như sóng, microphone số hóa sóng đó, rồi DSP biến waveform thành feature mà neural network có thể học.</p>
+<pre class="mermaid">flowchart LR
+    LING[&quot;Ngôn ngữ học&lt;br&gt;phoneme, tone, prosody&quot;] --&gt; ACO[&quot;Âm học&lt;br&gt;source-filter, formant, pitch&quot;]
+    ACO --&gt; DSP[&quot;DSP&lt;br&gt;sampling, FFT, STFT, mel&quot;]
+    DSP --&gt; CLASSIC[&quot;ML cổ điển&lt;br&gt;DTW, HMM-GMM, i-vector&quot;]
+    CLASSIC --&gt; DEEP[&quot;Deep Speech AI&lt;br&gt;CTC, RNN-T, SSL, codec LM&quot;]
+    DEEP --&gt; PROD[&quot;Production&lt;br&gt;ASR, TTS, voice agent&quot;]
+</pre>
+<p><strong>Cách đọc chương này hiệu quả:</strong> đừng cố học thuộc mọi công thức. Điều quan trọng là nắm được câu hỏi mà mỗi khái niệm trả lời:</p>
+<div class="table-wrapper"><table><thead><tr><th>Câu hỏi</th><th>Khái niệm trả lời</th><th>Chương sau dùng lại</th></tr></thead><tbody>
+<tr><td>Âm nào làm thay đổi nghĩa?</td><td>phoneme, tone, phonology</td><td>Ch4, Ch8, Ch16</td></tr>
+<tr><td>Vì sao giọng người có phổ đặc trưng?</td><td>source-filter, formant, F0</td><td>Ch2, Ch8, Ch10</td></tr>
+<tr><td>Vì sao audio thành ma trận mel?</td><td>sampling, STFT, mel scale</td><td>Ch2, Ch6</td></tr>
+<tr><td>Làm sao train khi không biết alignment?</td><td>HMM, Viterbi, forward-backward</td><td>Ch4, Appendix B</td></tr>
+<tr><td>Vì sao deep learning thay thế pipeline cũ?</td><td>representation learning, end-to-end</td><td>Ch3-Ch7</td></tr>
+</tbody></table>
+</div>
+<h3 id="kết-quả-học-tập-kỳ-vọng"><a class="header" href="#kết-quả-học-tập-kỳ-vọng">Kết quả học tập kỳ vọng</a></h3>
+<p>Sau Chương 0, bạn nên tự tin trả lời được năm câu hỏi cơ bản:</p>
+<ol>
+<li><strong>Phoneme khác chữ cái như thế nào?</strong> Ví dụ tiếng Việt có chữ “ngh”, “ng”, “g” nhưng đơn vị âm học không trùng hoàn toàn với chữ viết.</li>
+<li><strong>Pitch, formant và loudness khác nhau ở đâu?</strong> Pitch liên quan F0 và tone; formant liên quan hình dạng vocal tract; loudness liên quan năng lượng cảm nhận theo log scale.</li>
+<li><strong>Vì sao speech thường dùng 16 kHz?</strong> Vì dải quan trọng cho intelligibility nằm dưới khoảng 8 kHz, nên Nyquist gợi ý sample rate 16 kHz.</li>
+<li><strong>Vì sao STFT cần window 25 ms và hop 10 ms?</strong> Vì speech gần stationary trong đoạn rất ngắn, nhưng thay đổi nhanh theo thời gian.</li>
+<li><strong>HMM-GMM để lại di sản gì cho ASR hiện đại?</strong> Alignment, Viterbi, forced alignment và tư duy probabilistic decoding vẫn còn trong CTC/RNN-T.</li>
+</ol>
+<hr />
+<h2 id="phần-1--ngôn-ngữ-học-cơ-bản"><a class="header" href="#phần-1--ngôn-ngữ-học-cơ-bản">Phần 1 — Ngôn ngữ học cơ bản</a></h2>
+<h3 id="11-phonetics-và-phonology-hai-mặt-của-cùng-một-đối-tượng"><a class="header" href="#11-phonetics-và-phonology-hai-mặt-của-cùng-một-đối-tượng">1.1 Phonetics và phonology, hai mặt của cùng một đối tượng</a></h3>
+<p>Hai thuật ngữ này thường bị nhầm lẫn, nhưng phân biệt rõ ngay từ đầu giúp định hướng tư duy.</p>
+<p><strong>Phonetics</strong> nghiên cứu vật lý của âm thanh ngôn ngữ: sóng âm được tạo ra như thế nào, lan truyền ra sao, được tai người tiếp nhận thế nào. Có ba nhánh chính:</p>
+<ul>
+<li><strong>Articulatory phonetics</strong>: cơ chế sinh học tạo ra âm (môi, lưỡi, dây thanh).</li>
+<li><strong>Acoustic phonetics</strong>: tính chất vật lý của sóng âm khi truyền trong không khí (tần số, biên độ, thời lượng).</li>
+<li><strong>Auditory phonetics</strong>: cách tai và não xử lý âm.</li>
+</ul>
+<p><strong>Phonology</strong> thì khác. Phonology nghiên cứu hệ thống và quy luật của âm thanh trong một ngôn ngữ cụ thể: âm nào phân biệt nghĩa, âm nào không, các âm kết hợp theo quy tắc nào.</p>
+<p>Một cách tóm tắt: phonetics là vật lý cộng sinh học, phonology là logic cộng ngữ pháp âm thanh.</p>
+<p>Đối với người làm Speech AI, <strong>acoustic phonetics</strong> là phần liên quan trực tiếp nhất, vì mô hình xử lý chính là tín hiệu acoustic.</p>
+<p>Một ví dụ thực tế: khi một ASR model nhầm “ban” và “bang”, lỗi có thể không nằm ở language model mà nằm ở acoustic evidence của âm cuối. Nếu đoạn audio bị cắt sớm hoặc noise che mất nasal coda /ŋ/, model khó phân biệt hai từ. Vì vậy, hiểu phonetics giúp ta debug lỗi ASR sâu hơn thay vì chỉ nhìn WER tổng thể.</p>
+<div class="table-wrapper"><table><thead><tr><th>Góc nhìn</th><th>Câu hỏi chính</th><th>Ví dụ lỗi trong Speech AI</th></tr></thead><tbody>
+<tr><td>Phonetics</td><td>Âm được tạo ra và nghe như thế nào?</td><td>TTS phát /s/ quá sắc hoặc /t/ thiếu burst</td></tr>
+<tr><td>Phonology</td><td>Âm nào phân biệt nghĩa trong ngôn ngữ này?</td><td>ASR bỏ thanh hỏi/ngã trong tiếng Việt</td></tr>
+<tr><td>Orthography</td><td>Chữ viết biểu diễn âm ra sao?</td><td>G2P đọc sai tên riêng hoặc từ vay mượn</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>Ghi nhớ cho người học NLP</strong></p>
+<p>Text model thường nhìn thấy chữ viết đã được chuẩn hóa. Speech model nhìn thấy hiện tượng vật lý trước khi nhìn thấy ngôn ngữ. Vì vậy, cùng một câu “tôi đi học” có thể có nhiều waveform rất khác nhau tùy speaker, micro, tốc độ nói, phương ngữ và cảm xúc.</p>
+</blockquote>
+<h3 id="12-phoneme-đơn-vị-âm-có-ý-nghĩa-nhỏ-nhất"><a class="header" href="#12-phoneme-đơn-vị-âm-có-ý-nghĩa-nhỏ-nhất">1.2 Phoneme, đơn vị âm có ý nghĩa nhỏ nhất</a></h3>
+<p><strong>Phoneme</strong> là đơn vị âm nhỏ nhất có khả năng phân biệt nghĩa trong một ngôn ngữ. Ví dụ trong tiếng Anh:</p>
+<ul>
+<li>/p/ trong <em>pen</em> và /b/ trong <em>Ben</em> là hai phoneme khác nhau, vì thay /p/ bằng /b/ làm thay đổi nghĩa.</li>
+<li>/t/ trong <em>top</em> và /t/ trong <em>stop</em> là cùng một phoneme, dù phát âm hơi khác (một có aspiration, một không). Các biến thể như vậy gọi là <strong>allophones</strong> của cùng một phoneme.</li>
+</ul>
+<p>Tiếng Anh có khoảng 44 phoneme. Tiếng Việt có khoảng 46 phoneme tuỳ cách đếm phương ngữ.</p>
+<blockquote>
+<p><strong>Bắc cầu sang NLP</strong></p>
+<p>Nếu bạn quen với BPE tokens, phoneme là analog gần nhất ở mức "tiền-ngôn-ngữ". Tuy nhiên có khác biệt quan trọng: BPE token tự nó mang một mảnh nghĩa (subword), còn phoneme chỉ là một đơn vị âm thanh không mang nghĩa riêng. Một từ là chuỗi phoneme cộng với nghĩa được gán bởi từ vựng; một phoneme đơn độc không có nghĩa.</p>
+</blockquote>
+<h3 id="13-ipa-hệ-ký-hiệu-phổ-quát"><a class="header" href="#13-ipa-hệ-ký-hiệu-phổ-quát">1.3 IPA, hệ ký hiệu phổ quát</a></h3>
+<p><strong>International Phonetic Alphabet (IPA)</strong> là hệ ký hiệu universal cho phép viết mọi âm thanh ngôn ngữ một cách thống nhất, một-một, không ambiguity giữa các ngôn ngữ.</p>
+<div class="table-wrapper"><table><thead><tr><th>Từ</th><th>IPA</th><th>Ghi chú</th></tr></thead><tbody>
+<tr><td>English <em>cat</em></td><td>/kæt/</td><td>/æ/ là nguyên âm mở front</td></tr>
+<tr><td>English <em>see</em></td><td>/siː/</td><td>/iː/ là long vowel</td></tr>
+<tr><td>English <em>thin</em></td><td>/θɪn/</td><td>/θ/ là voiceless dental fricative</td></tr>
+<tr><td>Tiếng Việt <em>cát</em></td><td>/kaːt˧˥/</td><td>superscript 35 ký hiệu thanh sắc (rising)</td></tr>
+<tr><td>Tiếng Việt <em>tôi</em></td><td>/toj˧/</td><td>/j/ là semi-vowel, ˧ là thanh ngang</td></tr>
+</tbody></table>
+</div>
+<p>Bạn không cần học thuộc bảng IPA. Nhưng khi đọc paper ASR/TTS gặp ký hiệu kiểu /ʃ/, /θ/, /ŋ/, bạn nên biết đó là IPA notation và tra cứu khi cần.</p>
+<p>Trong production TTS, IPA hoặc phoneme inventory thường xuất hiện ở bước <strong>G2P</strong> (grapheme-to-phoneme). G2P trả lời câu hỏi: từ một chuỗi chữ, model nên phát âm thành chuỗi âm nào? Với tiếng Anh, đây là bài toán khó vì chữ viết không regular: <em>read</em> có thể là /riːd/ hoặc /rɛd/. Với tiếng Việt, chữ viết regular hơn nhưng vẫn có thách thức: tên riêng, từ nước ngoài, viết tắt, số, đơn vị đo và code-switching.</p>
+<p>Ví dụ:</p>
+<div class="table-wrapper"><table><thead><tr><th>Input text</th><th>Vấn đề G2P/TTS</th></tr></thead><tbody>
+<tr><td>“AI”</td><td>đọc là “ây ai”, “ai”, hay giữ tiếng Anh tùy ngữ cảnh</td></tr>
+<tr><td>“TP.HCM”</td><td>cần expand thành “Thành phố Hồ Chí Minh” hoặc đọc từng chữ</td></tr>
+<tr><td>“Qwen3-Omni”</td><td>tên model nước ngoài, cần chính sách đọc nhất quán</td></tr>
+<tr><td>“1.5 giây”</td><td>text normalization trước G2P: “một phẩy năm giây”</td></tr>
+</tbody></table>
+</div>
+<p>Điều này giải thích vì sao TTS production không chỉ là neural network. Nó luôn có một lớp text normalization và pronunciation policy trước model.</p>
+<h3 id="14-vowels-và-consonants-hai-loại-âm-với-tính-chất-acoustic-khác-nhau"><a class="header" href="#14-vowels-và-consonants-hai-loại-âm-với-tính-chất-acoustic-khác-nhau">1.4 Vowels và consonants, hai loại âm với tính chất acoustic khác nhau</a></h3>
+<p><strong>Vowels</strong> (nguyên âm) được tạo ra với vocal tract mở, vocal cords rung. Đặc điểm acoustic:</p>
+<ul>
+<li>Thời lượng tương đối dài (50-200 ms).</li>
+<li>Phổ ổn định, có các <strong>formant</strong> (đỉnh năng lượng ở tần số cụ thể) rõ ràng.</li>
+<li>Dễ visualize trong spectrogram.</li>
+</ul>
+<p><strong>Consonants</strong> (phụ âm) được tạo ra với một dạng cản trở nào đó trong vocal tract: tắc hoàn toàn (như /p/, /t/, /k/), ma sát (như /s/, /f/, /ʃ/), hoặc tắc-mở (như /tʃ/). Đặc điểm:</p>
+<ul>
+<li>Thời lượng ngắn hơn (20-50 ms).</li>
+<li>Phổ thay đổi nhanh.</li>
+<li>Phụ thuộc mạnh vào ngữ cảnh xung quanh (co-articulation).</li>
+</ul>
+<p>Đối với ASR, vowels nói chung dễ nhận dạng hơn vì có signal mạnh và ổn định. Consonants khó hơn, đặc biệt là voiceless stops như /p/, /t/, /k/, vốn về bản chất là một khoảng silence ngắn theo sau một burst năng lượng. Đây là một trong những nguyên nhân khiến error rate của ASR thường cao hơn ở các consonant này.</p>
+<h3 id="15-phonology-allophones-phonotactics-và-những-quy-luật"><a class="header" href="#15-phonology-allophones-phonotactics-và-những-quy-luật">1.5 Phonology: allophones, phonotactics, và những quy luật</a></h3>
+<p>Phonology cung cấp các quy luật mà phoneme tuân theo trong một ngôn ngữ cụ thể.</p>
+<p><strong>Allophones</strong> là các realization khác nhau của cùng một phoneme tuỳ ngữ cảnh. Ví dụ /t/ trong tiếng Anh:</p>
+<ul>
+<li><em>top</em>: aspirated [tʰ], có một puff of air sau /t/.</li>
+<li><em>stop</em>: unaspirated [t], không có puff.</li>
+<li><em>butter</em> (American English): flapped [ɾ], một tap nhanh gần như /d/.</li>
+</ul>
+<p>Người bản ngữ không nhận biết các allophone này là khác nhau, vì chúng không phân biệt nghĩa. Nhưng ASR model phải implicit học cách xử lý chúng, và TTS model phải sinh đúng allophone trong từng ngữ cảnh để output nghe tự nhiên.</p>
+<p><strong>Phonotactics</strong> là các quy luật về việc phoneme nào có thể đứng cạnh phoneme nào. Tiếng Anh cho phép cluster /str-/ (như <em>string</em>) nhưng không cho phép /tlb-/. Tiếng Việt có một cấu trúc syllable rất chặt chẽ sẽ được trình bày ở mục sau.</p>
+<h3 id="16-prosody-đặc-trưng-siêu-đoạn-quyết-định-tự-nhiên"><a class="header" href="#16-prosody-đặc-trưng-siêu-đoạn-quyết-định-tự-nhiên">1.6 Prosody, đặc trưng siêu đoạn quyết định "tự nhiên"</a></h3>
+<p>Prosody là tập hợp các đặc trưng vượt cấp phoneme: pitch contour, stress, rhythm, intonation, tone. Đây là phần mà nhiều người đến từ NLP/LLM thường bỏ qua nhưng cực kỳ quan trọng cho Speech AI.</p>
+<p>Cùng một chuỗi phoneme với prosody khác nhau cho ra nghĩa khác hoàn toàn:</p>
+<ul>
+<li><em>Really?</em> (intonation đi lên ở cuối, biểu hiện câu hỏi hoặc ngạc nhiên).</li>
+<li><em>Really.</em> (intonation đi xuống, statement bình thường).</li>
+</ul>
+<p>Trong tiếng Việt:</p>
+<ul>
+<li>"Anh ăn cơm chưa?" (rising intonation cuối câu, câu hỏi).</li>
+<li>"Anh ăn cơm rồi." (falling intonation, statement).</li>
+</ul>
+<p>Đối với TTS, prosody quyết định mức độ tự nhiên (<em>naturalness</em>). Một hệ TTS robot thường là một hệ TTS không model được prosody tốt: mọi câu có cùng pitch contour, cùng rhythm, cùng pacing. Các hệ TTS hiện đại như VITS, F5-TTS, hay các sản phẩm thương mại như ElevenLabs đầu tư rất nhiều vào modeling prosody, hoặc explicit (qua predictor cho duration, pitch, energy) hoặc implicit (qua codec token).</p>
+<p>Đối với Speech LLMs (Moshi, GPT-Realtime), prosody được preserve qua codec token. Khi người dùng nói "What?" với intonation ngạc nhiên, model phải nhận biết được surprise và phản hồi tương ứng, không chỉ transcribe văn bản chữ.</p>
+<h3 id="17-Đặc-thù-tiếng-việt-mà-người-làm-speech-ai-phải-nắm"><a class="header" href="#17-Đặc-thù-tiếng-việt-mà-người-làm-speech-ai-phải-nắm">1.7 Đặc thù tiếng Việt mà người làm Speech AI phải nắm</a></h3>
+<p>Nếu bạn xây dựng sản phẩm Speech AI cho thị trường Việt Nam, có ba đặc điểm sau bạn phải nắm rõ.</p>
+<h4 id="171-sáu-thanh-điệu-tonal-language"><a class="header" href="#171-sáu-thanh-điệu-tonal-language">1.7.1 Sáu thanh điệu (tonal language)</a></h4>
+<p>Tiếng Việt là một <strong>tonal language</strong>: cùng chuỗi nguyên âm và phụ âm, nếu thanh điệu khác nhau thì nghĩa khác hoàn toàn. Ví dụ kinh điển với âm tiết <em>ma</em>:</p>
+<div class="table-wrapper"><table><thead><tr><th>Thanh điệu</th><th>Dấu</th><th>Pitch contour</th><th>Từ</th><th>Nghĩa</th></tr></thead><tbody>
+<tr><td>Ngang</td><td>(không dấu)</td><td>Mid level, phẳng</td><td><em>ma</em></td><td>ghost</td></tr>
+<tr><td>Huyền</td><td>`</td><td>Low, falling</td><td><em>mà</em></td><td>but</td></tr>
+<tr><td>Sắc</td><td>´</td><td>High, rising</td><td><em>má</em></td><td>mother (phương ngữ Nam)</td></tr>
+<tr><td>Hỏi</td><td>̉</td><td>Low, dipping rồi rising nhẹ</td><td><em>mả</em></td><td>tomb</td></tr>
+<tr><td>Ngã</td><td>˜</td><td>Rising với glottal stop</td><td><em>mã</em></td><td>horse</td></tr>
+<tr><td>Nặng</td><td>̣</td><td>Low, ngắn, glottalized</td><td><em>mạ</em></td><td>rice seedling</td></tr>
+</tbody></table>
+</div>
+<p>Đối với ASR tiếng Việt, model phải capture chính xác F0 (fundamental frequency, tức pitch contour). Nếu model chỉ học mel spectrogram mà không nhấn mạnh pitch, các thanh điệu sẽ bị nhầm liên tục.</p>
+<blockquote>
+<p><strong>Vì sao Whisper kém trên tiếng Việt hơn trên tiếng Anh</strong></p>
+<p>Whisper được train chủ yếu trên dữ liệu tiếng Anh, vốn không phải tonal language. Model học các đặc trưng phổ mà không có động lực mạnh để nhấn mạnh pitch contour. Khi áp dụng cho tiếng Việt, thanh điệu thường bị bỏ sót. Đó là lý do PhoWhisper (VinAI fine-tune Whisper trên 844 giờ tiếng Việt) đạt WER thấp hơn Whisper-large-v3 khoảng 35% trên benchmark VLSP 2020 Task-1 (Le và cộng sự, ICLR Tiny Papers 2024).</p>
+</blockquote>
+<h4 id="172-ba-phương-ngữ-bắc-trung-nam"><a class="header" href="#172-ba-phương-ngữ-bắc-trung-nam">1.7.2 Ba phương ngữ (Bắc, Trung, Nam)</a></h4>
+<p>Tiếng Việt có ba phương ngữ chính, với khác biệt rõ rệt về phonology:</p>
+<ul>
+<li><strong>Bắc (Hà Nội)</strong>: sáu thanh điệu distinct, /tr/ phát âm rõ thành [tʂ] (ví dụ <em>trời</em> phát âm rõ).</li>
+<li><strong>Trung (Huế và một số vùng lân cận)</strong>: một số thanh điệu sát nhập (đặc biệt hỏi-ngã), một số nguyên âm khác biệt.</li>
+<li><strong>Nam (Sài Gòn)</strong>: thanh hỏi sát nhập với thanh ngã, /tr/ thường phát âm thành /j/ hoặc /tʃ/.</li>
+</ul>
+<p>Phần lớn ASR và TTS tiếng Việt được train chủ yếu trên dữ liệu Bắc, dẫn đến error rate cao hơn cho người nói Trung và Nam. Đây là một bài toán mở của ngành.</p>
+<h4 id="173-cấu-trúc-syllable-chặt-chẽ-và-syllable-timed"><a class="header" href="#173-cấu-trúc-syllable-chặt-chẽ-và-syllable-timed">1.7.3 Cấu trúc syllable chặt chẽ và syllable-timed</a></h4>
+<p>Tiếng Việt là một ngôn ngữ <strong>syllable-timed</strong>, với cấu trúc CVCT chặt chẽ cho mỗi âm tiết:</p>
+<ul>
+<li><strong>C</strong> (consonant onset, tuỳ chọn).</li>
+<li><strong>V</strong> (vowel nucleus, bắt buộc, có thể là diphthong).</li>
+<li><strong>C</strong> (consonant coda, tuỳ chọn).</li>
+<li><strong>T</strong> (tone, bắt buộc, đánh dấu trên nguyên âm).</li>
+</ul>
+<p>Ví dụ <em>việt</em> = v + iê + t + thanh sắc.</p>
+<p>Điều này có một hệ quả thực tiễn: tiếng Việt <strong>dễ tokenize ở mức syllable</strong> hơn tiếng Anh, vì syllable boundary trong chữ viết hoàn toàn rõ ràng (mỗi âm tiết là một "từ" cách nhau bằng khoảng trắng). Đây là một lợi thế khi thiết kế vocabulary cho ASR và TTS tiếng Việt.</p>
+<h4 id="174-case-study-vì-sao-tiếng-việt-khó-hơn-vẻ-ngoài"><a class="header" href="#174-case-study-vì-sao-tiếng-việt-khó-hơn-vẻ-ngoài">1.7.4 Case study: vì sao tiếng Việt khó hơn vẻ ngoài</a></h4>
+<p>Nhiều người nghĩ tiếng Việt “dễ” cho Speech AI vì chữ viết khá gần âm đọc. Nhận định này chỉ đúng một phần. Tiếng Việt dễ hơn ở G2P cơ bản, nhưng khó hơn ở tone, phương ngữ và code-switching.</p>
+<div class="table-wrapper"><table><thead><tr><th>Hiện tượng</th><th>Vì sao khó cho ASR</th><th>Vì sao khó cho TTS</th></tr></thead><tbody>
+<tr><td>Thanh hỏi/ngã sát nhập ở miền Nam</td><td>transcript chuẩn vẫn phân biệt hỏi/ngã, audio thì có thể gần nhau</td><td>nếu sinh sai contour, người nghe thấy “không Việt”</td></tr>
+<tr><td>Âm cuối /n/ và /ŋ/</td><td>bị che bởi noise hoặc micro kém</td><td>cần đóng âm đúng, nếu không nghe như accent lạ</td></tr>
+<tr><td>Code-switching “deploy model lên cloud”</td><td>language ID thay đổi trong cùng câu</td><td>phải quyết định đọc tiếng Anh theo accent nào</td></tr>
+<tr><td>Tên riêng “Nguyễn”, “Quỳnh”, “Trương”</td><td>nhiều biến thể phát âm theo vùng</td><td>G2P phải xử lý tên ngoài từ điển</td></tr>
+<tr><td>Tốc độ nói nhanh</td><td>co-articulation mạnh, âm bị nuốt</td><td>duration model phải tự nhiên, không đều như robot</td></tr>
+</tbody></table>
+</div>
+<blockquote>
+<p><strong>Bài học sản phẩm</strong></p>
+<p>Với tiếng Việt, một test set chỉ có giọng Hà Nội đọc câu sạch trong studio không đủ để kết luận model tốt cho thị trường. Cần tách test theo miền, giới tính, độ tuổi, noise, thiết bị thu, domain từ vựng và mức code-switching.</p>
+</blockquote>
+<h3 id="18-bài-tập-tư-duy-ngắn"><a class="header" href="#18-bài-tập-tư-duy-ngắn">1.8 Bài tập tư duy ngắn</a></h3>
+<p>Không cần code, hãy tự trả lời trước khi sang Phần 2:</p>
+<ol>
+<li>Vì sao cùng một chữ “ma” nhưng sáu thanh điệu lại tạo ra sáu từ khác nghĩa?</li>
+<li>Nếu một ASR model thường nhầm “tin” và “tinh”, bạn sẽ nghi ngờ lỗi ở acoustic feature, language model hay data distribution?</li>
+<li>Vì sao TTS đọc đúng chữ nhưng vẫn có thể nghe “không tự nhiên”?</li>
+<li>Với một voice agent tiếng Việt, bạn sẽ ưu tiên thu thêm dữ liệu phương ngữ nào nếu sản phẩm hướng tới toàn quốc?</li>
+</ol>
+<hr />
+<h2 id="phần-2--Âm-học-cơ-bản"><a class="header" href="#phần-2--Âm-học-cơ-bản">Phần 2 — Âm học cơ bản</a></h2>
+<h3 id="21-sóng-âm-bản-chất-vật-lý"><a class="header" href="#21-sóng-âm-bản-chất-vật-lý">2.1 Sóng âm: bản chất vật lý</a></h3>
+<p>Âm thanh là sóng cơ học dọc lan truyền trong môi trường đàn hồi (không khí, nước, vật rắn). Bốn đại lượng cơ bản:</p>
+<ul>
+<li><strong>Tần số (Hz)</strong>: số dao động trên một giây. Tai người nghe được khoảng 20 Hz đến 20,000 Hz.</li>
+<li><strong>Biên độ</strong>: độ lớn của dao động áp suất.</li>
+<li><strong>Bước sóng (m)</strong>: $\lambda = c / f$ trong đó $c$ là tốc độ âm trong môi trường (khoảng 343 m/s trong không khí ở 20°C).</li>
+<li><strong>Pha</strong>: vị trí trong chu kỳ.</li>
+</ul>
+<p>Đối với speech, phần lớn năng lượng nằm trong dải 80 Hz đến 4000 Hz. Băng thông điện thoại cổ điển (300-3400 Hz) đủ cho intelligibility. Âm nhạc cần dải đầy đủ 20-20,000 Hz để chất lượng tốt.</p>
+<p>Một cách trực giác: speech không cần toàn bộ phổ để hiểu nội dung. Ta vẫn nghe được lời nói qua điện thoại cũ vì phoneme và formant quan trọng nằm trong dải hẹp. Nhưng “nghe được nội dung” khác với “nghe tự nhiên”. TTS chất lượng cao cần giữ nhiều chi tiết hơn: breathiness, sibilance, room tone, timbre và micro-prosody.</p>
+<div class="table-wrapper"><table><thead><tr><th>Mục tiêu</th><th>Dải tần quan trọng</th><th>Hệ quả engineering</th></tr></thead><tbody>
+<tr><td>ASR điện thoại</td><td>khoảng 300-3400 Hz</td><td>8 kHz hoặc 16 kHz có thể đủ</td></tr>
+<tr><td>ASR wideband</td><td>đến khoảng 8 kHz</td><td>16 kHz là chuẩn phổ biến</td></tr>
+<tr><td>TTS tự nhiên</td><td>cao hơn, tùy target quality</td><td>22.05 kHz, 24 kHz hoặc 48 kHz thường được dùng</td></tr>
+<tr><td>Music/audio generation</td><td>gần full-band</td><td>cần sample rate cao và codec tốt hơn</td></tr>
+</tbody></table>
+</div>
+<p>Đây là lý do cùng là “audio model” nhưng ASR, TTS và music generation có yêu cầu input/output rất khác nhau.</p>
+<h3 id="22-hệ-thính-giác-con-người-cơ-sở-sinh-học-của-mel-scale"><a class="header" href="#22-hệ-thính-giác-con-người-cơ-sở-sinh-học-của-mel-scale">2.2 Hệ thính giác con người: cơ sở sinh học của mel scale</a></h3>
+<p>Hiểu cách tai người nghe giúp giải thích tại sao mel filterbank và MFCC là feature design tốt cho speech.</p>
+<h4 id="221-cochlea-fft-sinh-học"><a class="header" href="#221-cochlea-fft-sinh-học">2.2.1 Cochlea, "FFT sinh học"</a></h4>
+<p><strong>Cochlea</strong> (ốc tai) là cấu trúc hình ốc sên trong tai trong, thực hiện phân tích phổ. Các vị trí khác nhau dọc theo cochlea phản ứng với các tần số khác nhau, và quan trọng nhất, sự phân bố này là <strong>logarithmic</strong>:</p>
+<ul>
+<li>Tần số thấp (20-1000 Hz): phân bố gần linear, độ phân giải mịn.</li>
+<li>Tần số cao (trên 1000 Hz): phân bố logarithmic, độ phân giải thô.</li>
+</ul>
+<p>Đây chính là cơ sở sinh học của <strong>mel scale</strong>: chúng ta thiết kế mel filterbank theo logarithmic distribution của tần số để bắt chước cách cochlea xử lý âm. Đó là lý do mel spectrogram là feature tốt hơn linear spectrogram cho speech, vì nó phù hợp với perceptual sensitivity của tai người.</p>
+<h4 id="222-auditory-masking-và-ứng-dụng-trong-codec"><a class="header" href="#222-auditory-masking-và-ứng-dụng-trong-codec">2.2.2 Auditory masking và ứng dụng trong codec</a></h4>
+<p>Tai người không thể nghe một âm nhỏ nếu có một âm lớn ở tần số tương tự (frequency masking) hoặc gần kề thời gian (temporal masking).</p>
+<p>Hiện tượng này được khai thác bởi các audio codec (MP3, AAC, và hiện đại hơn là EnCodec, Mimi) để nén audio: thông tin bị masked có thể bị loại bỏ mà tai vẫn không phát hiện ra mất mát.</p>
+<h4 id="223-nhận-thức-về-độ-to-loudness"><a class="header" href="#223-nhận-thức-về-độ-to-loudness">2.2.3 Nhận thức về độ to (loudness)</a></h4>
+<p>Cảm nhận về độ to không tuyến tính theo biên độ. Tai người phản ứng theo log:</p>
+<p>$$
+L_{\text{dB SPL}} = 20 \log_{10}\left(\frac{p}{p_0}\right)
+$$</p>
+<p>trong đó $p$ là áp suất âm, $p_0 = 20\ \mu\text{Pa}$ là áp suất tham chiếu (ngưỡng nghe).</p>
+<p>Hệ quả: trong Speech AI, <strong>log-mel</strong> features thường được dùng thay vì linear-mel, vì log scale phù hợp hơn với perceptual loudness.</p>
+<h3 id="23-source-filter-model-của-tiếng-nói"><a class="header" href="#23-source-filter-model-của-tiếng-nói">2.3 Source-filter model của tiếng nói</a></h3>
+<p>Một mô hình kinh điển từ speech engineering, vẫn được dùng rộng rãi:</p>
+<p>$$
+\text{Speech signal} = \text{Source} \times \text{Filter}
+$$</p>
+<ul>
+<li><strong>Source</strong>: rung động của dây thanh đối với voiced sounds (vowels, /b/, /d/, /g/, ...) hoặc turbulence đối với voiceless sounds (/s/, /f/, ...).</li>
+<li><strong>Filter</strong>: cấu hình vocal tract (vị trí lưỡi, môi, hàm) shape phổ của source.</li>
+</ul>
+<p>Phân tách này là cơ sở của:</p>
+<ul>
+<li><strong>Linear Predictive Coding (LPC)</strong>, codec cổ điển trong viễn thông.</li>
+<li><strong>WaveNet, WaveRNN, HiFi-GAN</strong>, các neural vocoder hiện đại, học cách map đặc trưng phổ (representing filter) sang waveform.</li>
+</ul>
+<pre class="mermaid">flowchart LR
+    AIR[&quot;Air from lungs&quot;] --&gt; GLOTTIS[&quot;Vocal folds&lt;br&gt;source / F0&quot;]
+    GLOTTIS --&gt; TRACT[&quot;Vocal tract&lt;br&gt;filter / formants&quot;]
+    TRACT --&gt; LIPS[&quot;Lips and nose&lt;br&gt;radiation&quot;]
+    LIPS --&gt; WAVE[&quot;Speech waveform&quot;]
+</pre>
+<p><strong>Trực giác:</strong> source quyết định “cao hay thấp” ở mức pitch, còn filter quyết định “âm gì”. Nếu cùng một F0 đi qua vocal tract shape khác nhau, ta nghe thành các nguyên âm khác nhau. Nếu cùng vocal tract shape nhưng F0 khác nhau, ta nghe cùng âm nhưng giọng cao hoặc thấp hơn.</p>
+<p>Trong TTS, tách source và filter giúp hiểu vì sao có các predictor riêng cho <strong>pitch</strong>, <strong>duration</strong>, <strong>energy</strong> và acoustic decoder. Trong voice conversion, mục tiêu thường là giữ linguistic content nhưng thay đổi speaker identity, tức can thiệp vào phần source/filter theo cách có kiểm soát.</p>
+<h3 id="24-các-thang-nhận-thức-perceptual-scales"><a class="header" href="#24-các-thang-nhận-thức-perceptual-scales">2.4 Các thang nhận thức (perceptual scales)</a></h3>
+<p>Ngoài mel scale, một số thang khác xuất hiện trong literature:</p>
+<h4 id="241-mel-scale"><a class="header" href="#241-mel-scale">2.4.1 Mel scale</a></h4>
+<p>$$
+\text{mel}(f) = 2595 \log_{10}\left(1 + \frac{f}{700}\right)
+$$</p>
+<p>Đây là thang chuẩn cho mel spectrogram và MFCC. Phổ biến nhất trong Speech AI.</p>
+<h4 id="242-bark-scale"><a class="header" href="#242-bark-scale">2.4.2 Bark scale</a></h4>
+<p>$$
+\text{Bark}(f) = 13 \arctan(0.00076 f) + 3.5 \arctan\left(\left(\frac{f}{7500}\right)^2\right)
+$$</p>
+<p>Dùng trong phân tích <strong>critical bands</strong> (dải tần mà trong đó masking xảy ra mạnh). Ít phổ biến hơn mel trong deep learning hiện đại, nhưng xuất hiện trong các codec cổ điển.</p>
+<h4 id="243-erb-scale-equivalent-rectangular-bandwidth"><a class="header" href="#243-erb-scale-equivalent-rectangular-bandwidth">2.4.3 ERB scale (Equivalent Rectangular Bandwidth)</a></h4>
+<p>Một thang khác mô tả độ rộng của các filter cochlear. Dùng trong các nghiên cứu psychoacoustics.</p>
+<hr />
+<h2 id="phần-3--digital-signal-processing-nền-tảng"><a class="header" href="#phần-3--digital-signal-processing-nền-tảng">Phần 3 — Digital Signal Processing nền tảng</a></h2>
+<p>DSP là nền tảng toán học cho việc xử lý audio. Phần này phủ các khái niệm tối thiểu để hiểu Chương 2 (Audio Fundamentals), không đi sâu vào chứng minh kỹ thuật.</p>
+<h3 id="31-Định-lý-lấy-mẫu-nyquist-shannon"><a class="header" href="#31-Định-lý-lấy-mẫu-nyquist-shannon">3.1 Định lý lấy mẫu Nyquist-Shannon</a></h3>
+<p><strong>Định lý</strong>: một tín hiệu liên tục có thể được tái tạo hoàn hảo từ các mẫu rời rạc nếu và chỉ nếu tần số lấy mẫu $f_s$ ít nhất bằng hai lần tần số cao nhất $f_{\max}$ có trong tín hiệu:</p>
+<p>$$
+f_s \geq 2 f_{\max}
+$$</p>
+<p><strong>Ứng dụng cho speech</strong>: tiếng nói con người có năng lượng đáng kể đến khoảng 8 kHz. Do đó lấy mẫu ở $f_s = 16$ kHz (Nyquist = 8 kHz) là đủ. Đây là chuẩn cho ASR và TTS hiện đại.</p>
+<p><strong>Ứng dụng cho âm nhạc</strong>: cần $f_s = 44.1$ kHz (chuẩn CD) hoặc 48 kHz (chuẩn studio).</p>
+<p><strong>Aliasing</strong>: nếu bạn lấy mẫu dưới Nyquist, các tần số cao sẽ "fold" xuống các tần số thấp hơn, làm hỏng tín hiệu. Để tránh, luôn áp dụng anti-aliasing low-pass filter trước khi lấy mẫu.</p>
+<pre class="mermaid">flowchart LR
+    HI[&quot;High-frequency component&lt;br&gt;above Nyquist&quot;] --&gt; SAMPLE[&quot;Undersampling&quot;]
+    SAMPLE --&gt; LOW[&quot;Appears as false&lt;br&gt;low-frequency component&quot;]
+    LOW --&gt; ERROR[&quot;ASR/TTS feature distortion&quot;]
+</pre>
+<p>Một ví dụ số: nếu sample rate là 8 kHz, Nyquist frequency là 4 kHz. Một thành phần ở 5 kHz không thể được biểu diễn đúng; nó sẽ bị “gập” xuống vùng thấp hơn và xuất hiện như một tín hiệu giả. Trong audio production, đây là lỗi rất khó sửa sau khi đã xảy ra, vì model không biết thành phần thấp đó là tín hiệu thật hay alias.</p>
+<blockquote>
+<p><strong>Quy tắc thực hành</strong></p>
+<p>Khi chuẩn hóa dataset speech, hãy resample bằng thư viện đáng tin cậy (<code>sox</code>, <code>torchaudio</code>, <code>librosa</code> với resampler chất lượng cao) thay vì chỉ drop samples thủ công. Resampling sai có thể tạo artifact mà model học nhầm là đặc trưng speaker hoặc microphone.</p>
+</blockquote>
+<h3 id="32-quantization"><a class="header" href="#32-quantization">3.2 Quantization</a></h3>
+<p>Sau khi lấy mẫu, biên độ phải được biểu diễn bằng số rời rạc. Số bit quyết định độ phân giải:</p>
+<div class="table-wrapper"><table><thead><tr><th>Bit depth</th><th>Số mức</th><th>SNR xấp xỉ</th><th>Ứng dụng</th></tr></thead><tbody>
+<tr><td>8-bit</td><td>256</td><td>48 dB</td><td>Thấp, voice over phone cổ</td></tr>
+<tr><td>16-bit</td><td>65,536</td><td>96 dB</td><td>Chuẩn cho speech và CD</td></tr>
+<tr><td>24-bit</td><td>16,777,216</td><td>144 dB</td><td>Studio chuyên nghiệp</td></tr>
+</tbody></table>
+</div>
+<p>Speech AI mặc định dùng <strong>16-bit signed integer</strong> (-32768 đến 32767) làm format input.</p>
+<h3 id="33-tín-hiệu-rời-rạc-và-các-phép-biến-đổi-cơ-bản"><a class="header" href="#33-tín-hiệu-rời-rạc-và-các-phép-biến-đổi-cơ-bản">3.3 Tín hiệu rời rạc và các phép biến đổi cơ bản</a></h3>
+<p>Một tín hiệu rời rạc $x[n]$ là một chuỗi mẫu đánh chỉ số bằng số nguyên $n$.</p>
+<h4 id="331-convolution"><a class="header" href="#331-convolution">3.3.1 Convolution</a></h4>
+<p>$$
+(x * h)[n] = \sum_{k=-\infty}^{\infty} x[k] \cdot h[n - k]
+$$</p>
+<p>Convolution là phép toán nền tảng: filter (low-pass, high-pass), reverb (impulse response của phòng), và CNN layer trong deep learning đều dựa trên convolution.</p>
+<h4 id="332-filter"><a class="header" href="#332-filter">3.3.2 Filter</a></h4>
+<p>Một filter biến đổi phổ của tín hiệu:</p>
+<ul>
+<li><strong>Low-pass</strong>: giữ tần số thấp, loại tần số cao. Dùng cho anti-aliasing.</li>
+<li><strong>High-pass</strong>: ngược lại. Dùng cho pre-emphasis trong speech.</li>
+<li><strong>Band-pass</strong>: giữ một dải tần. Dùng trong mel filterbank.</li>
+<li><strong>Band-stop / notch</strong>: loại một dải tần. Dùng để loại bỏ noise điện 50/60 Hz.</li>
+</ul>
+<h4 id="333-pre-emphasis-filter-một-bước-tiền-xử-lý-kinh-điển-cho-speech"><a class="header" href="#333-pre-emphasis-filter-một-bước-tiền-xử-lý-kinh-điển-cho-speech">3.3.3 Pre-emphasis filter, một bước tiền xử lý kinh điển cho speech</a></h4>
+<p>Pre-processing chuẩn cho speech truyền thống:</p>
+<p>$$
+y[n] = x[n] - 0.97 \cdot x[n-1]
+$$</p>
+<p>Đây là một high-pass filter nhẹ, bù lại độ suy giảm tự nhiên của phổ glottal source ở tần số cao. Các hệ thống ASR cổ điển (HMM-GMM) luôn dùng pre-emphasis.</p>
+<p>Trong deep learning hiện đại (Whisper, Wav2Vec 2.0), pre-emphasis thường được bỏ qua vì model có thể tự học biến đổi tương đương.</p>
+<h3 id="34-phân-tích-trong-miền-tần-số"><a class="header" href="#34-phân-tích-trong-miền-tần-số">3.4 Phân tích trong miền tần số</a></h3>
+<p><strong>Discrete Fourier Transform (DFT)</strong> chuyển tín hiệu từ miền thời gian sang miền tần số:</p>
+<p>$$
+X[k] = \sum_{n=0}^{N-1} x[n] \cdot e^{-j 2\pi k n / N}
+$$</p>
+<p>Trực giác: $X[k]$ biểu thị "thành phần tần số $k$ trong tín hiệu $x[n]$ mạnh đến đâu".</p>
+<ul>
+<li>Đầu vào: $N$ mẫu trong miền thời gian.</li>
+<li>Đầu ra: $N$ hệ số phức trong miền tần số, mỗi hệ số chứa magnitude và phase.</li>
+</ul>
+<p><strong>Fast Fourier Transform (FFT)</strong> tính DFT trong $O(N \log N)$ thay vì $O(N^2)$ naive.</p>
+<p>Trong Speech AI, chúng ta áp dụng DFT trên các cửa sổ ngắn (thường 25 ms), gọi là <strong>Short-Time Fourier Transform (STFT)</strong>. STFT là cơ sở của mel spectrogram, MFCC, và phần lớn feature extraction pipeline. Chương 2 sẽ phát triển STFT chi tiết với hình vẽ minh hoạ.</p>
+<pre class="mermaid">flowchart LR
+    W[&quot;Waveform&quot;] --&gt; FR[&quot;Frame into 25 ms windows&quot;]
+    FR --&gt; WIN[&quot;Apply Hann window&quot;]
+    WIN --&gt; FFT[&quot;FFT per frame&quot;]
+    FFT --&gt; MAG[&quot;Magnitude spectrogram&quot;]
+    MAG --&gt; MEL[&quot;Mel filterbank&quot;]
+    MEL --&gt; LOG[&quot;Log-mel features&quot;]
+</pre>
+<p>Điểm sư phạm quan trọng: STFT không phải “biến toàn bộ audio thành tần số” một lần duy nhất. Nó lặp lại phân tích tần số trên từng frame ngắn, vì speech thay đổi liên tục. Đây chính là lý do spectrogram có hai trục: thời gian và tần số.</p>
+<div class="table-wrapper"><table><thead><tr><th>Tham số</th><th>Giá trị thường gặp</th><th>Ý nghĩa trực giác</th></tr></thead><tbody>
+<tr><td>Frame length</td><td>25 ms</td><td>đủ ngắn để gần stationary, đủ dài để thấy phổ</td></tr>
+<tr><td>Hop length</td><td>10 ms</td><td>cứ 10 ms cập nhật một frame mới</td></tr>
+<tr><td>FFT size</td><td>400 hoặc 512 ở 16 kHz</td><td>độ phân giải tần số</td></tr>
+<tr><td>Mel bins</td><td>80</td><td>nén phổ theo thính giác người</td></tr>
+</tbody></table>
+</div>
+<p>Chương 2 sẽ đi vào công thức chi tiết. Ở đây, chỉ cần nhớ pipeline: <strong>waveform → frame → window → FFT → mel → log</strong>.</p>
+<h3 id="35-windowing-và-spectral-leakage"><a class="header" href="#35-windowing-và-spectral-leakage">3.5 Windowing và spectral leakage</a></h3>
+<p>Vì sao cần windowing trước khi tính STFT? Một tín hiệu có độ dài hữu hạn implicit có một "rectangular window", gây ra <strong>spectral leakage</strong>, làm bẩn phổ.</p>
+<p>$$
+y[n] = x[n] \cdot w[n]
+$$</p>
+<p>trong đó $w[n]$ là một hàm cửa sổ tapered (giảm dần ở hai đầu). Các cửa sổ phổ biến:</p>
+<ul>
+<li><strong>Rectangular</strong>: $w[n] = 1$ trong cửa sổ, 0 ngoài. Gây leakage mạnh.</li>
+<li><strong>Hann</strong>: $w[n] = 0.5 - 0.5 \cos\left(\frac{2\pi n}{N-1}\right)$. Smooth taper, ít leakage.</li>
+<li><strong>Hamming</strong>: $w[n] = 0.54 - 0.46 \cos\left(\frac{2\pi n}{N-1}\right)$. Tương tự Hann, hơi khác về roll-off.</li>
+</ul>
+<p>Speech AI thường dùng Hann window.</p>
+<hr />
+<h2 id="phần-4--machine-learning-cổ-điển-cho-speech"><a class="header" href="#phần-4--machine-learning-cổ-điển-cho-speech">Phần 4 — Machine learning cổ điển cho speech</a></h2>
+<p>Trước khi deep learning bùng nổ vào khoảng năm 2014, speech recognition chủ yếu dùng HMM-GMM, GMM-UBM cho speaker verification, và DTW cho keyword spotting. Hiểu các phương pháp này có ba lợi ích:</p>
+<ol>
+<li>Giúp đọc legacy code và paper trước 2015.</li>
+<li>Hiểu vì sao deep learning là một breakthrough thực sự, không chỉ là incremental.</li>
+<li>Một số khái niệm (forced alignment, Viterbi decoding) vẫn còn dùng trong các framework hiện đại.</li>
+</ol>
+<h3 id="41-hidden-markov-model-hmm"><a class="header" href="#41-hidden-markov-model-hmm">4.1 Hidden Markov Model (HMM)</a></h3>
+<p><strong>Hidden Markov Model</strong> là mô hình xác suất cho dữ liệu tuần tự, trong đó trạng thái thực sự là "ẩn" (hidden) nhưng các quan sát phát ra từ trạng thái thì có thể đo được.</p>
+<p>Một HMM được đặc trưng bởi:</p>
+<ul>
+<li>Tập trạng thái ${s_1, s_2, \ldots, s_N}$, hidden, trong ASR thường đại diện cho các sub-unit của phoneme (mỗi phoneme có 3 trạng thái).</li>
+<li><strong>Transition probabilities</strong> $A_{ij} = P(s_t = j \mid s_{t-1} = i)$.</li>
+<li><strong>Emission probabilities</strong> $b_j(o_t) = P(o_t \mid s_t = j)$, xác suất phát ra quan sát $o_t$ khi đang ở trạng thái $j$.</li>
+<li><strong>Initial probabilities</strong> $\pi_i = P(s_1 = i)$.</li>
+</ul>
+<p>Trong ASR cổ điển:</p>
+<ul>
+<li>Trạng thái = sub-unit phoneme (3 trạng thái cho mỗi phoneme).</li>
+<li>Quan sát = vector feature acoustic, thường là MFCC 39 chiều (13 MFCC + 13 delta + 13 delta-delta).</li>
+<li>Phân phối phát = <strong>Gaussian Mixture Model (GMM)</strong>, hỗn hợp các Gaussian.</li>
+</ul>
+<h4 id="411-ba-thuật-toán-kinh-điển-của-hmm"><a class="header" href="#411-ba-thuật-toán-kinh-điển-của-hmm">4.1.1 Ba thuật toán kinh điển của HMM</a></h4>
+<ol>
+<li><strong>Forward-backward algorithm</strong>: tính xác suất chuỗi quan sát $P(O \mid \lambda)$ cho mô hình $\lambda = (A, B, \pi)$. Dùng để evaluate khả năng của một mô hình trên data.</li>
+<li><strong>Viterbi algorithm</strong>: tìm chuỗi trạng thái có xác suất cao nhất cho một chuỗi quan sát cho trước. Độ phức tạp $O(N^2 T)$. Đây là thuật toán decoding chính cho ASR HMM.</li>
+<li><strong>Baum-Welch algorithm</strong>: huấn luyện tham số HMM từ data bằng EM (Expectation-Maximization).</li>
+</ol>
+<p>Phụ lục B sẽ phát triển forward-backward chi tiết, vì nó cũng là cơ sở cho CTC forward-backward trong Chương 4.</p>
+<h4 id="412-pipeline-asr-hmm-gmm-cổ-điển"><a class="header" href="#412-pipeline-asr-hmm-gmm-cổ-điển">4.1.2 Pipeline ASR HMM-GMM cổ điển</a></h4>
+<pre class="mermaid">flowchart LR
+    A[&quot;Audio&quot;] --&gt; F[&quot;MFCC&lt;br&gt;39 dims per frame&quot;]
+    F --&gt; AM[&quot;GMM emissions&lt;br&gt;per HMM state&quot;]
+    AM --&gt; HMM[&quot;Phone HMMs&quot;]
+    LEX[&quot;Pronunciation lexicon&quot;] --&gt; DEC[&quot;Viterbi decoder&quot;]
+    LM[&quot;n-gram language model&quot;] --&gt; DEC
+    HMM --&gt; DEC
+    DEC --&gt; W[&quot;Word sequence&quot;]
+</pre>
+<p>Pipeline này nhìn phức tạp so với end-to-end ASR, nhưng rất có tính sư phạm: nó tách rõ ba nguồn tri thức. Acoustic model trả lời “âm thanh này giống phoneme nào”, lexicon trả lời “phoneme nào tạo thành từ nào”, language model trả lời “chuỗi từ nào hợp lý trong ngôn ngữ”.</p>
+<p>Mỗi phoneme có một HMM riêng. Word HMM được xây dựng bằng cách nối các phoneme HMM lại. Sentence HMM nối các word HMM, kết hợp với một <strong>language model</strong> (n-gram) cho prior xác suất chuỗi từ.</p>
+<p><strong>Hạn chế của HMM-GMM</strong>:</p>
+<ul>
+<li>GMM có capacity hữu hạn, không capture được các pattern acoustic phức tạp.</li>
+<li>HMM giả định Markov memoryless, quá hạn chế cho dependency dài.</li>
+<li>Pipeline phức tạp, nhiều stage tách rời (acoustic model, lexicon, language model, decoder).</li>
+</ul>
+<h3 id="42-gaussian-mixture-model-gmm"><a class="header" href="#42-gaussian-mixture-model-gmm">4.2 Gaussian Mixture Model (GMM)</a></h3>
+<p><strong>GMM</strong> xấp xỉ một phân phối bất kỳ bằng tổng có trọng số của nhiều Gaussian:</p>
+<p>$$
+p(x) = \sum_{k=1}^{K} \pi_k \cdot \mathcal{N}(x \mid \mu_k, \Sigma_k)
+$$</p>
+<p>trong đó:</p>
+<ul>
+<li>$K$ là số component.</li>
+<li>$\pi_k$ là weight, với $\sum_k \pi_k = 1$.</li>
+<li>$\mathcal{N}(x \mid \mu_k, \Sigma_k)$ là Gaussian với mean $\mu_k$ và covariance $\Sigma_k$.</li>
+</ul>
+<p>GMM được train bằng EM. Trong HMM-GMM ASR, mỗi trạng thái HMM có một GMM riêng làm emission distribution, với $K$ thường 16-32 component và covariance diagonal để giảm tham số.</p>
+<h3 id="43-dynamic-time-warping-dtw"><a class="header" href="#43-dynamic-time-warping-dtw">4.3 Dynamic Time Warping (DTW)</a></h3>
+<p><strong>DTW</strong> tính alignment tối ưu giữa hai chuỗi với độ dài khác nhau, thông qua programming động.</p>
+<p>Cho hai chuỗi $X = (x_1, \ldots, x_M)$ và $Y = (y_1, \ldots, y_N)$, DTW tính:</p>
+<p>$$
+d(i, j) = c(i, j) + \min{d(i-1, j),\ d(i, j-1),\ d(i-1, j-1)}
+$$</p>
+<p>trong đó $c(i, j)$ là local distance giữa $x_i$ và $y_j$ (thường Euclidean trên feature vector).</p>
+<p>DTW từng là phương pháp chủ đạo cho <strong>keyword spotting</strong> và <strong>isolated word recognition</strong> trước khi HMM thay thế. Hiện nay vẫn được dùng trong:</p>
+<ul>
+<li>Speaker verification dựa trên template.</li>
+<li>Wake-word detection cá nhân hoá (user-specific, ít data).</li>
+<li>So sánh similarity giữa các đoạn audio.</li>
+</ul>
+<p>Trực giác DTW rất gần với bài toán so khớp hai câu nói cùng nội dung nhưng tốc độ khác nhau. Người A nói “xin chào” trong 0.8 giây, người B nói trong 1.2 giây. Nếu so sánh frame-by-frame tuyến tính, hai chuỗi lệch nhau. DTW cho phép “kéo giãn” trục thời gian để tìm alignment có cost nhỏ nhất.</p>
+<pre class="mermaid">flowchart TD
+    X[&quot;Template: xin chào&lt;br&gt;shorter sequence&quot;] --&gt; GRID[&quot;Dynamic programming grid&quot;]
+    Y[&quot;Query: xin chào&lt;br&gt;slower sequence&quot;] --&gt; GRID
+    GRID --&gt; PATH[&quot;Minimum-cost warping path&quot;]
+    PATH --&gt; SCORE[&quot;Similarity score&quot;]
+</pre>
+<p>DTW không cần training lớn, nên hữu ích khi mỗi người dùng chỉ cung cấp vài mẫu wake-word. Nhưng nó kém robust hơn neural KWS khi có nhiều speaker, noise và phrase variations.</p>
+<h3 id="44-speaker-verification-cổ-điển-gmm-ubm-và-i-vectors"><a class="header" href="#44-speaker-verification-cổ-điển-gmm-ubm-và-i-vectors">4.4 Speaker verification cổ điển: GMM-UBM và i-vectors</a></h3>
+<p><strong>Speaker verification</strong> trả lời câu hỏi: "Audio này có phải do người đã đăng ký nói không?". Hai phương pháp chính trước deep learning:</p>
+<h4 id="441-gmm-ubm-universal-background-model"><a class="header" href="#441-gmm-ubm-universal-background-model">4.4.1 GMM-UBM (Universal Background Model)</a></h4>
+<p>Train một GMM lớn ("UBM") trên data của hàng nghìn speaker. Khi user mới đăng ký, adapt UBM bằng MAP adaptation để có một GMM riêng cho user. Tại thời điểm verification, so sánh likelihood giữa GMM của user và UBM.</p>
+<h4 id="442-i-vectors-dehak-và-cộng-sự-2011"><a class="header" href="#442-i-vectors-dehak-và-cộng-sự-2011">4.4.2 i-vectors (Dehak và cộng sự, 2011)</a></h4>
+<p><strong>i-vector</strong> là một vector cố định kích thước (thường 400-600) đại diện cho đặc trưng speaker và session, được trích xuất từ Total Variability subspace. Đây là một dạng tiền-thân của <strong>speaker embedding</strong> hiện đại (x-vector, ECAPA-TDNN).</p>
+<p>i-vector vẫn còn xuất hiện trong một số production pipeline, dù x-vector dựa trên TDNN (Snyder và cộng sự, 2018) là chuẩn mới.</p>
+<hr />
+<h2 id="phần-5--cầu-nối-sang-speech-ai-hiện-đại"><a class="header" href="#phần-5--cầu-nối-sang-speech-ai-hiện-đại">Phần 5 — Cầu nối sang Speech AI hiện đại</a></h2>
+<h3 id="51-vì-sao-deep-learning-thay-thế-hmm-gmm"><a class="header" href="#51-vì-sao-deep-learning-thay-thế-hmm-gmm">5.1 Vì sao deep learning thay thế HMM-GMM</a></h3>
+<p>Khoảng 2009-2014, hybrid HMM-DNN (giữ HMM nhưng thay GMM bằng DNN ở phần emission) bắt đầu vượt HMM-GMM với khoảng cách lớn (Hinton và cộng sự, 2012). Nguyên nhân:</p>
+<ol>
+<li><strong>DNN học representation tốt hơn GMM</strong>: DNN khai thác được correlations phức tạp giữa các feature dimensions mà GMM (với diagonal covariance) bỏ qua.</li>
+<li><strong>Pretraining và discriminative training</strong>: DNN có thể pretrain (RBM-style trong thời kỳ đầu, sau này supervised) và fine-tune end-to-end.</li>
+<li><strong>Capacity scale tốt</strong>: thêm tham số cho DNN cải thiện accuracy đều, GMM thì bão hoà.</li>
+</ol>
+<p>Đến khoảng 2015, <strong>end-to-end ASR</strong> (CTC, attention seq2seq, RNN-T) bắt đầu vượt cả hybrid HMM-DNN. Lý do:</p>
+<ul>
+<li>Loại bỏ pipeline phức tạp (acoustic model, lexicon, decoder thành một network).</li>
+<li>Học alignment cùng với recognition.</li>
+<li>Train trên data lớn hiệu quả hơn.</li>
+</ul>
+<h3 id="52-timeline-tiến-hoá-từ-template-matching-tới-speech-llm"><a class="header" href="#52-timeline-tiến-hoá-từ-template-matching-tới-speech-llm">5.2 Timeline tiến hoá: từ template matching tới Speech LLM</a></h3>
+<pre class="mermaid">flowchart LR
+    DTW[&quot;1970s-1980s&lt;br&gt;DTW / template matching&quot;] --&gt; HMM[&quot;1980s-2000s&lt;br&gt;HMM-GMM&quot;]
+    HMM --&gt; DNN[&quot;2009-2014&lt;br&gt;Hybrid DNN-HMM&quot;]
+    DNN --&gt; E2E[&quot;2015-2020&lt;br&gt;CTC / LAS / RNN-T&quot;]
+    E2E --&gt; SSL[&quot;2020-2023&lt;br&gt;Wav2Vec 2.0 / HuBERT / Whisper&quot;]
+    SSL --&gt; SLLM[&quot;2023-2026&lt;br&gt;Codec LM / Speech LLM / Omni&quot;]
+</pre>
+<p>Mỗi giai đoạn không xóa sạch giai đoạn trước. Nó hấp thụ một phần ý tưởng và thay thế phần còn yếu. CTC vẫn dùng forward-backward giống HMM. RNN-T vẫn là một mô hình alignment monotonic. Speech LLM vẫn cần codec, VAD, endpointing và latency engineering.</p>
+<h3 id="53-những-gì-còn-lại-từ-kỷ-nguyên-cổ-điển"><a class="header" href="#53-những-gì-còn-lại-từ-kỷ-nguyên-cổ-điển">5.3 Những gì còn lại từ kỷ nguyên cổ điển</a></h3>
+<p>Mặc dù deep learning đã thay thế HMM cho ASR chính, một số khái niệm cổ điển vẫn sống mạnh trong Speech AI hiện đại:</p>
+<div class="table-wrapper"><table><thead><tr><th>Khái niệm cổ điển</th><th>Vai trò hiện đại</th></tr></thead><tbody>
+<tr><td>Mel filterbank, MFCC</td><td>Vẫn là feature input chuẩn cho Whisper, Conformer, nhiều model ASR.</td></tr>
+<tr><td>Viterbi decoding</td><td>Vẫn dùng trong CTC decoding, beam search forced alignment.</td></tr>
+<tr><td>Forced alignment</td><td>Dùng cho TTS data preparation, để align text với audio.</td></tr>
+<tr><td>GMM-HMM</td><td>Vẫn dùng trong các framework legacy (Kaldi, Sphinx) cho low-resource languages.</td></tr>
+<tr><td>Phoneme dictionary, G2P</td><td>Dùng cho TTS (Tacotron, FastSpeech) và một số ASR.</td></tr>
+<tr><td>DTW</td><td>Dùng cho wake-word detection cá nhân hoá.</td></tr>
+</tbody></table>
+</div>
+<h3 id="54-sai-lầm-thường-gặp-khi-người-nlp-bắt-đầu-học-speech"><a class="header" href="#54-sai-lầm-thường-gặp-khi-người-nlp-bắt-đầu-học-speech">5.4 Sai lầm thường gặp khi người NLP bắt đầu học Speech</a></h3>
+<div class="table-wrapper"><table><thead><tr><th>Sai lầm</th><th>Vì sao sai</th><th>Cách nghĩ đúng</th></tr></thead><tbody>
+<tr><td>“Audio sample giống token text”</td><td>một sample không có nghĩa độc lập</td><td>cần frame, feature hoặc learned tokenizer</td></tr>
+<tr><td>“Mel spectrogram là lossless”</td><td>mel bỏ phase và nén tần số</td><td>mel là perceptual feature, không phải waveform đầy đủ</td></tr>
+<tr><td>“ASR chỉ là translation audio→text”</td><td>alignment monotonic và length mismatch rất khác MT</td><td>cần CTC/RNN-T/attention đặc thù</td></tr>
+<tr><td>“TTS chỉ cần đọc đúng chữ”</td><td>naturalness phụ thuộc prosody, duration, speaker, emotion</td><td>phải model acoustic và expressive speech</td></tr>
+<tr><td>“Tiếng Việt dễ vì chữ viết gần âm đọc”</td><td>tone, dialect, code-switching làm bài toán khó</td><td>cần evaluation theo miền và domain</td></tr>
+</tbody></table>
+</div>
+<h3 id="55-bản-đồ-sang-các-chương-tiếp-theo"><a class="header" href="#55-bản-đồ-sang-các-chương-tiếp-theo">5.5 Bản đồ sang các chương tiếp theo</a></h3>
+<p>Bốn mảng nền tảng trong chương này map sang các chương sau như sau:</p>
+<ul>
+<li><strong>Phonetics, phonology, prosody</strong>: nền tảng cho Chương 16 (Vietnamese Speech), Chương 8 (TTS Foundations), Chương 13 (Full-Duplex Dialogue).</li>
+<li><strong>Sóng âm, mel scale, source-filter</strong>: nền tảng cho Chương 2 (Audio Fundamentals) và Chương 10 (Audio Codecs).</li>
+<li><strong>DSP (sampling, FFT, windowing)</strong>: phát triển chi tiết trong Chương 2.</li>
+<li><strong>HMM, GMM, forced alignment, i-vectors</strong>: bối cảnh lịch sử cho Chương 4 (ASR Foundations), Chương 14 (Speech Classification), Chương 21 (Wake-Word Detection).</li>
+</ul>
+<hr />
+<h2 id="tóm-tắt"><a class="header" href="#tóm-tắt">Tóm tắt</a></h2>
+<p>Chương 0 cung cấp vốn từ cơ bản về bốn mảng nền tảng cho Speech AI:</p>
+<ol>
+<li><strong>Ngôn ngữ học</strong>: phoneme là đơn vị phân biệt nghĩa nhỏ nhất, prosody quyết định tự nhiên trong TTS và mang ngữ nghĩa thực dụng trong Speech LLM, tiếng Việt có sáu thanh điệu và ba phương ngữ chính cần được xử lý đặc thù.</li>
+<li><strong>Âm học</strong>: cochlea phân tích phổ theo thang logarithmic, đó là lý do mel scale phù hợp với perceptual sensitivity, source-filter model tách phát âm thành nguồn (dây thanh) và bộ lọc (vocal tract).</li>
+<li><strong>DSP</strong>: định lý Nyquist xác định tần số lấy mẫu tối thiểu (16 kHz cho speech), STFT là cơ sở cho mel spectrogram và MFCC, windowing với Hann là chuẩn để giảm spectral leakage.</li>
+<li><strong>ML cổ điển</strong>: HMM-GMM thống trị ASR đến khoảng 2012, DNN-HMM hybrid là cầu nối, end-to-end deep learning chiếm ưu thế từ 2015 trở đi, nhưng nhiều khái niệm cổ điển (Viterbi, forced alignment, mel filterbank, i-vector) vẫn còn nguyên giá trị.</li>
+</ol>
+<p>Đến đây, bạn đã có đủ vốn từ để đọc Chương 1 (NLP-to-Speech Bridge) mà không bị bí ở các khái niệm như mel spectrogram, phoneme, hay forced alignment. Các chương sau sẽ tham chiếu lại Chương 0 khi cần, đặc biệt là Chương 2 (Audio Fundamentals) phát triển kỹ thuật STFT, mel filterbank, MFCC ở mức chi tiết hơn, và Chương 4 (ASR Foundations) đặt CTC và attention seq2seq trong bối cảnh kế tiếp HMM-GMM.</p>
+<h3 id="checklist-tự-đánh-giá"><a class="header" href="#checklist-tự-đánh-giá">Checklist tự đánh giá</a></h3>
+<p>Trước khi sang Chương 1, hãy thử tự giải thích bằng lời của mình:</p>
+<ul>
+<li>Vì sao phoneme không giống chữ cái và cũng không giống BPE token?</li>
+<li>Vì sao tone làm tiếng Việt nhạy với F0 hơn nhiều ngôn ngữ không thanh điệu?</li>
+<li>Vì sao mel scale là logarithmic thay vì linear?</li>
+<li>Vì sao windowing cần thiết trước FFT?</li>
+<li>Vì sao HMM cần Viterbi, còn CTC cần forward-backward?</li>
+<li>Vì sao deep learning không làm các khái niệm cổ điển biến mất hoàn toàn?</li>
+</ul>
+<p>Nếu bạn trả lời được các câu này ở mức trực giác, bạn đã có nền đủ tốt để đi tiếp. Nếu chưa, hãy đọc lại các bảng trong chương này trước khi sang Chương 2.</p>
+<h2 id="tài-liệu-tham-khảo"><a class="header" href="#tài-liệu-tham-khảo">Tài liệu tham khảo</a></h2>
+<ol>
+<li>Jurafsky, D. và Martin, J. H. (2024). <em>Speech and Language Processing</em> (SLP3). Stanford. <a href="https://web.stanford.edu/~jurafsky/slp3/">https://web.stanford.edu/~jurafsky/slp3/</a>.</li>
+<li>Rabiner, L. R. và Schafer, R. W. (2010). <em>Theory and Applications of Digital Speech Processing</em>. Pearson.</li>
+<li>Huang, X., Acero, A., và Hon, H. W. (2001). <em>Spoken Language Processing</em>. Prentice Hall.</li>
+<li>Hinton, G. và cộng sự (2012). "Deep Neural Networks for Acoustic Modeling in Speech Recognition". <em>IEEE Signal Processing Magazine</em>.</li>
+<li>Dehak, N. và cộng sự (2011). "Front-End Factor Analysis for Speaker Verification". <em>IEEE TASLP</em>.</li>
+<li>Snyder, D. và cộng sự (2018). "X-vectors: Robust DNN Embeddings for Speaker Recognition". <em>ICASSP</em>.</li>
+<li>Le, T.-T., Nguyen, L. T., và Nguyen, D. Q. (2024). "PhoWhisper: Automatic Speech Recognition for Vietnamese". <em>ICLR Tiny Papers</em>.</li>
+<li>Aalto University. <em>Speech Processing Book</em>. <a href="https://speechprocessingbook.aalto.fi/">https://speechprocessingbook.aalto.fi/</a>.</li>
+</ol>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../index.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+                            <a rel="next prefetch" href="../part1/01-nlp-to-speech.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../index.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+                    <a rel="next prefetch" href="../part1/01-nlp-to-speech.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
+        <script src="../mermaid.min.js"></script>
+        <script src="../mermaid-init.js"></script>
+
+
+    </div>
+    </body>
+</html>
