@@ -361,9 +361,9 @@ Speaker encoder cần capture:
 
 ## Phần Mở rộng — Vietnamese Speech AI Industry Landscape
 
-Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam, kèm honest assessment về quality.
+Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam, đồng thời đưa ra đánh giá thận trọng dựa trên thông tin công khai. Với các hệ thống thương mại không công bố benchmark đầy đủ, phần này chỉ nên được xem như bản đồ hệ sinh thái, không phải leaderboard tuyệt đối.
 
-### VinAI (VinBigData) — Open-source leader
+### VinAI (VinBigData) — nghiên cứu mở và baseline tiếng Việt
 
 **Sản phẩm chính**:
 
@@ -391,7 +391,7 @@ Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam
 | PhoWhisper-medium | 8.4% | 11.2% | 13.1% |
 | **PhoWhisper-large** | **6.9%** | **9.4%** | **10.8%** |
 
-**Honest assessment**: PhoWhisper-large là SOTA open-source cho Vietnamese ASR. Reduces WER by ~35% vs Whisper-large-v3. Available trên HuggingFace, easy to use.
+**Đánh giá thận trọng**: theo kết quả được công bố trong paper PhoWhisper, PhoWhisper-large là một baseline open-source mạnh cho Vietnamese ASR và cải thiện rõ so với Whisper-large-v3 trên các split được báo cáo. Khi dùng cho sản phẩm, vẫn cần đánh giá lại trên dữ liệu nội bộ có đúng domain, phương ngữ và điều kiện nhiễu của hệ thống.
 
 ### ZaloAI — Consumer voice products
 
@@ -401,7 +401,7 @@ Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam
 - **ZaloPay voice**: voice commands cho ZaloPay payment app.
 - **Internal ASR/TTS**: Vietnamese-focused, not public.
 
-**Quality assessment**: Production-tested với hàng triệu Vietnamese users. Public benchmarks không có, nhưng UX feedback nhìn chung tốt cho domain commands (payment, navigation).
+**Đánh giá chất lượng**: các sản phẩm của ZaloAI đã được kiểm chứng trong môi trường consumer quy mô lớn. Tuy nhiên, do không có benchmark công khai đầy đủ, ta chỉ có thể kết luận rằng hệ thống phù hợp với các domain command hẹp như thanh toán, điều hướng hoặc thao tác trong ứng dụng, thay vì suy rộng sang mọi bài toán ASR/TTS tiếng Việt.
 
 **Limitations**: closed-source, không có public model weights.
 
@@ -413,9 +413,9 @@ Phần này khảo sát các công ty và sản phẩm voice AI tại Việt Nam
 - **FPT Voice TTS**: multiple voices Vietnamese.
 - **FPT.AI Conversation**: chatbot platform với voice integration.
 
-**Pricing**: subscription-based, contact sales for enterprise.
+**Pricing**: dạng subscription hoặc enterprise contract; cần kiểm tra trực tiếp với nhà cung cấp ở thời điểm triển khai.
 
-**Quality**: decent for clean Vietnamese, weaker for code-switching or noisy. Used by Vietnamese banks (VPBank, Sacombank chat).
+**Đánh giá chất lượng**: phù hợp với tiếng Việt sạch và các kịch bản enterprise phổ biến. Với code-switching, tiếng ồn mạnh hoặc domain chuyên ngành, vẫn cần pilot nội bộ trước khi chọn làm baseline production.
 
 ### VinFast (in-car voice)
 
@@ -423,7 +423,7 @@ In-car voice assistant cho VinFast vehicles:
 
 - Wake-word: "Ok VinFast" (custom KWS).
 - ASR: in-house Vietnamese model (likely fine-tuned from VinAI base).
-- LLM: GPT-4 or in-house?
+- LLM: không có thông tin công khai đầy đủ về cấu hình production.
 - TTS: Vietnamese neural TTS, multiple voices.
 
 **Use cases**: navigation, climate control, music, calling.
@@ -435,7 +435,7 @@ Specialized in voice biometrics for KYC (Know Your Customer):
 - **Voice ID**: speaker verification cho banking, insurance.
 - **Multimodal KYC**: voice + face + ID document.
 
-Deployed cho major Vietnamese banks. Not a general voice AI company, but important player in voice-based identity.
+Các giải pháp voice biometrics của nhóm này thuộc lớp identity verification, không phải general-purpose voice AI, nhưng vẫn là một mảnh quan trọng của hệ sinh thái speech tại Việt Nam.
 
 ### Viettel AI — Telecom-focused
 
@@ -445,25 +445,25 @@ Viettel (largest Vietnamese telco) has internal AI division:
 - TTS cho IVR systems.
 - Vietnamese-focused, but mostly internal use.
 
-### Honest assessment: Where Vietnamese voice AI stands in 2026
+### Đánh giá thận trọng: Vietnamese voice AI ở thời điểm 2026
 
 | Capability | Status | Best option |
 |---|---|---|
-| Vietnamese ASR (clean) | Mature | PhoWhisper-large (open) or FPT (commercial) |
-| Vietnamese ASR (noisy) | Improving | PhoWhisper + noise augmentation, fine-tuning needed |
-| Vietnamese TTS (natural) | Decent | ElevenLabs Multilingual or VinAI vibert-tts |
-| Vietnamese voice cloning | Behind English | XTTS fine-tuned on Vi data, or wait for native VI voice cloning |
+| Vietnamese ASR (clean) | Tương đối trưởng thành | PhoWhisper-large cho baseline mở; API thương mại cần benchmark lại theo domain |
+| Vietnamese ASR (noisy) | Đang cải thiện | Fine-tune với noise augmentation và dữ liệu domain-specific |
+| Vietnamese TTS (natural) | Có baseline dùng được | Cần human evaluation nội bộ trước production |
+| Vietnamese voice cloning | Chưa ổn định như tiếng Anh | Fine-tune model multilingual, kiểm soát consent và abuse risk |
 | Vietnamese wake-word | Custom for each product | Picovoice Porcupine custom or DIY |
-| Vietnamese voice agent | Cascaded works, end-to-end emerging | Vapi.ai + PhoWhisper + GPT + ElevenLabs |
-| Vietnamese Speech LLM | Catching up | Qwen3-Omni supports Vi text input + audio understanding |
+| Vietnamese voice agent | Cascaded pipeline khả thi, end-to-end còn mới | ASR + LLM + TTS với benchmark latency và cost riêng |
+| Vietnamese Speech LLM | Đang bắt kịp | Dùng model multimodal làm baseline, nhưng phải kiểm tra năng lực audio tiếng Việt riêng |
 
 ### Major gaps and opportunities
 
-1. **Vietnamese-native voice cloning** với 3-sec sample (như VALL-E for English). Currently English-dominant.
-2. **Vietnamese TTS** với expressive emotion (cười, nghiêm trọng). Most Vi TTS sound flat.
-3. **Code-switching ASR benchmark** chính thức cho Vi-En. Industry needs one to compare models.
-4. **On-device Vietnamese ASR** under 50 MB cho mobile. PhoWhisper too large.
-5. **Vietnamese voice agent SDK** comprehensive (như LiveKit + Pipecat + Vapi.ai bundle).
+1. **Vietnamese-native voice cloning** với prompt rất ngắn vẫn chưa có benchmark công khai mạnh như tiếng Anh.
+2. **Vietnamese TTS biểu cảm** cho cảm xúc, nhịp điệu và phong cách nói vẫn còn thiếu dữ liệu đánh giá công khai.
+3. **Code-switching ASR benchmark** chính thức cho Việt-Anh là nhu cầu thực tế để so sánh model một cách công bằng.
+4. **On-device Vietnamese ASR** dưới 50 MB cho mobile vẫn là khoảng trống quan trọng vì các model Whisper/PhoWhisper quá lớn cho nhiều thiết bị biên.
+5. **Vietnamese voice agent SDK** tích hợp sẵn ASR, TTS, endpointing, evaluation và compliance sẽ giúp giảm chi phí triển khai cho team sản phẩm.
 
 ---
 

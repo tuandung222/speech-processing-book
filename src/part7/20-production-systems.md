@@ -1,12 +1,12 @@
 # Chương 20: Production Speech Systems
 
-## Mở đầu: Tại sao "trained a SOTA model" KHÔNG bằng "shipped a product"
+## Mở đầu: Vì sao “train được model tốt” chưa đồng nghĩa với “triển khai được sản phẩm tốt”
 
-Có một bí mật mà mọi voice AI engineer học được sau lần production deploy đầu tiên: **paper benchmarks không reflect production reality**. Một mô hình Whisper Large-v3 với WER 3% trên LibriSpeech test set có thể có WER 15% trên user thật trong môi trường có tiếng ồn xe cộ. Một TTS với MOS 4.5 trong lab có thể bị user phàn nàn "robot quá" khi nghe qua loa rẻ tiền của phone cũ.
+Trong môi trường nghiên cứu, một hệ thống speech thường được đánh giá bằng benchmark có dữ liệu sạch, protocol cố định và metric rõ ràng như WER, MOS hoặc real-time factor. Khi đưa hệ thống đó vào sản phẩm, điều kiện vận hành thay đổi căn bản: người dùng nói qua microphone kém, có tiếng ồn nền, ngắt lời giữa chừng, code-switch giữa tiếng Việt và tiếng Anh, hoặc sử dụng thiết bị mạng không ổn định. Vì vậy, một model đạt kết quả tốt trong phòng thí nghiệm vẫn có thể tạo trải nghiệm kém nếu latency cao, endpointing sai, chi phí inference vượt ngân sách, hoặc observability không đủ để truy vết lỗi.
 
-Production speech systems sống trong một thế giới khác hẳn academic. Ở đây bạn không có dataset clean được curate kỹ. Ở đây user nói trong xe đang chạy, qua microphone laptop kém, đôi khi code-switch giữa Vi và En, đôi khi nói chồng lên nhau với người khác. Ở đây latency p99 quan trọng hơn p50 (vì user nhớ những lần chậm hơn những lần nhanh). Ở đây cost engineering quan trọng hơn accuracy 1-2% improvement (vì khác biệt giữa profitable startup và burn-out runway).
+Chương này đặt trọng tâm vào khoảng cách giữa **model quality** và **product quality**. Thay vì chỉ hỏi “WER thấp đến đâu?”, ta cần hỏi thêm: p95 latency là bao nhiêu, hệ thống chịu được bao nhiêu phiên đồng thời, chi phí trên mỗi phút hội thoại là gì, fallback hoạt động ra sao khi một vendor lỗi, và team vận hành sẽ debug một cuộc gọi thất bại bằng dữ liệu nào. Đây là những câu hỏi quyết định khả năng triển khai voice AI trong doanh nghiệp.
 
-Chương này được viết bởi quan điểm của một practitioner đã làm production speech systems cho enterprise. Mục tiêu không phải show off academic novelty mà chia sẻ what actually matters khi deploy: latency budget, cost economics, observability, common pitfalls, và những trade-off ít được ghi trong paper.
+Mục tiêu của chương là cung cấp một khung phân tích thực dụng cho production speech systems: latency budget, cost economics, observability, deployment patterns, failure modes, và các trade-off thường không xuất hiện đầy đủ trong paper.
 
 > **📝 Cấu trúc chương**
 >
@@ -18,50 +18,50 @@ Chương này được viết bởi quan điểm của một practitioner đã l
 > Phần 10: Vietnamese production reality (ZaloAI, VinAI, Trusting Social context).
 > Phần 11: recommended starter stack + summary.
 
-> **⚠️ Honesty disclaimer**
+> **Lưu ý về số liệu**
 >
-> Mọi con số trong chương này là từ public pricing pages, public talks, hoặc personal experience. Mình KHÔNG có insider info từ ElevenLabs, Cartesia, etc. Khi mình ước lượng, mình sẽ đánh dấu rõ "estimated from..." hoặc "approximate based on public docs". Khi mình KHÔNG biết, mình sẽ nói "không có public data". Tránh overclaim là priority số một của chương này.
+> Các con số trong chương này được diễn giải từ nguồn công khai như pricing pages, tài liệu kỹ thuật, bài viết engineering hoặc talk công khai. Những giá trị mang tính ước lượng sẽ được ghi rõ là `estimated` hoặc `approximate`. Khi không có dữ liệu công khai đáng tin cậy, chương này sẽ nói rõ “không có public data” thay vì suy đoán.
 
 ---
 
 ## Phần 1 — Production Constraints Reality Check
 
-Khi bạn từ academic transition sang production, có 4 constraints sẽ shock bạn nhất. Phần này deep dive từng cái.
+Khi chuyển từ môi trường nghiên cứu sang production, bốn ràng buộc thường tạo khác biệt lớn nhất là latency, concurrency, cost và SLA. Phần này phân tích từng ràng buộc theo cách có thể dùng để thiết kế hệ thống thật.
 
 ### 1.1 Latency: con người không kiên nhẫn như benchmark
 
-Trong academic, latency thường được report như "processed 10 hours of audio in 1 hour" (RTF 0.1). Đây là **throughput**, không phải **latency** mà user perceive.
+Trong nghiên cứu, latency đôi khi được báo cáo gián tiếp qua real-time factor, ví dụ xử lý 10 giờ audio trong 1 giờ tương ứng RTF 0.1. Chỉ số này đo **throughput**, không đo trực tiếp **interactive latency** mà người dùng cảm nhận trong hội thoại.
 
-Production latency được đo bằng "thời gian từ khi user nói xong đến khi user nghe được response". Cho một cuộc hội thoại tự nhiên giữa người với người, latency này khoảng 200-500 mili-giây. Khi voice AI vượt 1 giây, user bắt đầu cảm thấy "AI chậm". Khi vượt 2 giây, user bắt đầu nghĩ "AI hỏng".
+Trong sản phẩm voice agent, latency nên được đo từ thời điểm người dùng kết thúc lượt nói đến khi họ nghe được phản hồi đầu tiên. Trong hội thoại tự nhiên giữa người với người, khoảng ngắt giữa hai lượt nói thường rất ngắn, nên khi voice AI vượt 1 giây, độ trễ đã bắt đầu trở nên rõ ràng. Khi vượt 2 giây, nhiều người dùng sẽ lặp lại câu hỏi hoặc rời bỏ tương tác.
 
-Đây là baseline benchmarks từ neuroscience speech research:
+Bảng sau tóm tắt một cách thực dụng mối liên hệ giữa latency và cảm nhận của người dùng:
 
-| Latency | User perception |
+| Latency | Cảm nhận của người dùng |
 |---|---|
 | < 200 ms | Như đối thoại người với người (natural turn-taking) |
-| 200-500 ms | OK, hơi chậm nhưng acceptable |
-| 500 ms-1 sec | "AI đang nghĩ" (noticeable lag) |
-| 1-2 sec | "AI chậm" (user start to lose interest) |
-| > 2 sec | "AI bị treo?" (user repeat hoặc abandon) |
+| 200-500 ms | Chấp nhận được, bắt đầu có cảm giác hơi trễ |
+| 500 ms-1 s | Cảm giác hệ thống đang suy nghĩ, độ trễ đã rõ |
+| 1-2 s | Người dùng bắt đầu mất nhịp hội thoại |
+| > 2 s | Người dùng có xu hướng lặp lại yêu cầu hoặc rời bỏ tương tác |
 
-> **🤔 Tại sao 200ms là magic number?**
+> **Vì sao mốc 200 ms thường được nhắc đến?**
 >
-> Nghiên cứu conversational analysis (Stivers et al., 2009) cho thấy turn-taking gap giữa người với người trung bình ~200ms across cultures. Đây là evolutionary baseline mà brain của chúng ta được wire để expect. Vượt baseline này, brain nhận biết "có gì đó khác thường".
+> Nghiên cứu về turn-taking trong hội thoại (Stivers et al., 2009) cho thấy khoảng ngắt giữa hai lượt nói của con người thường quanh vài trăm mili-giây, với trung vị xấp xỉ 200 ms trong nhiều ngôn ngữ. Đây không phải một ngưỡng cứng, nhưng là mốc tham chiếu hữu ích khi thiết kế voice agent tương tác thời gian thực.
 >
-> Đây là lý do production voice agents target sub-1-second latency rất aggressive. Mỗi 100ms saved cải thiện user satisfaction đáng kể.
+> Vì vậy, production voice agents thường đặt mục tiêu dưới 1 giây cho phản hồi đầu tiên. Mỗi 100 ms giảm được ở endpointing, ASR, LLM hoặc TTS đều có thể cải thiện đáng kể cảm nhận hội thoại.
 
-### 1.2 Concurrency: 1 user vs 1000 users
+### 1.2 Concurrency: từ một phiên thử nghiệm đến hàng nghìn phiên đồng thời
 
-Academic typically test trên 1 sample at a time. Production phải handle hàng trăm đến hàng nghìn concurrent sessions. Hệ luỵ kiến trúc:
+Trong thử nghiệm nghiên cứu, ta thường đánh giá từng sample hoặc từng batch offline. Trong production, hệ thống phải phục vụ hàng trăm đến hàng nghìn phiên đồng thời, và điều này tạo ra các hệ quả kiến trúc rất cụ thể:
 
-1. **GPU sharing**: 1 GPU H100 có thể handle bao nhiêu Whisper-streaming sessions? Trả lời thực tế: ~50-100 với batched inference, ít hơn nhiều nếu không batch.
-2. **Memory pressure**: KV cache cho streaming ASR + TTS + LLM accumulates quickly. 100 sessions × 200MB KV cache = 20GB RAM. Cần KV cache offloading hoặc page-based memory management (vLLM PagedAttention).
-3. **Network bandwidth**: 1 audio stream 16kHz, 16-bit = 256 kbps. 1000 sessions = 250 Mbps. Server NIC + bandwidth provider cần dimension correctly.
-4. **Database/queue throughput**: nếu bạn log mọi transcript vào database, 1000 concurrent sessions × 4 transcripts/sec = 4000 writes/sec, vượt khả năng của most single-instance Postgres.
+1. **GPU sharing**: một GPU H100 có thể phục vụ bao nhiêu phiên Whisper streaming phụ thuộc mạnh vào batch scheduler, context length, precision và model size. Con số thực tế phải được đo bằng load test, không suy ra trực tiếp từ benchmark offline.
+2. **Memory pressure**: KV cache cho ASR streaming, LLM và TTS có thể tăng nhanh theo số phiên. Ví dụ 100 phiên, mỗi phiên dùng khoảng 200 MB trạng thái trung gian, đã tiêu thụ khoảng 20 GB RAM. Vì vậy cần quản lý bộ nhớ theo trang, offloading hoặc giới hạn context hợp lý.
+3. **Network bandwidth**: một stream audio 16 kHz, 16-bit mono tương đương khoảng 256 kbps trước nén. Với 1000 phiên đồng thời, băng thông thô có thể lên tới khoảng 250 Mbps. Thiết kế production cần tính cả overhead WebRTC, retransmission và region routing.
+4. **Database/queue throughput**: nếu log mọi partial transcript vào database, 1000 phiên đồng thời với 4 bản ghi mỗi giây tạo ra 4000 writes/sec. Đây là tải lớn với một instance Postgres đơn lẻ nếu không có batching, queue hoặc sampling.
 
 ### 1.3 Cost: economics quyết định khả thi
 
-Voice AI agent có cost structure complex hơn text chatbot. Hãy phân tích:
+Voice AI agent có cấu trúc chi phí phức tạp hơn text chatbot vì mỗi phút hội thoại kích hoạt nhiều lớp hạ tầng: WebRTC, VAD, ASR, LLM, TTS, logging và orchestration.
 
 **Per-minute cost cho voice agent đa năng (estimated từ public pricing tháng 11/2025)**:
 
@@ -74,19 +74,19 @@ Voice AI agent có cost structure complex hơn text chatbot. Hãy phân tích:
 | Voice agent orchestration | Vapi.ai bundle | 0.05 USD |
 | **TỔNG ESTIMATE** | (various) | **~0.05-0.15 USD/min** |
 
-Cho 1 user nói 30 phút/ngày × 30 ngày = 900 phút/tháng × 0.10 USD = 90 USD/tháng per user. Đây là **cao** so với text-based subscription (10-30 USD/tháng). Bạn cần monetize voice user heavily hoặc tìm cost reduction.
+Nếu một người dùng nói 30 phút mỗi ngày trong 30 ngày, tổng thời lượng là 900 phút/tháng. Với chi phí ước lượng 0.10 USD/phút, chi phí hạ tầng riêng cho voice đã khoảng 90 USD/tháng cho mỗi người dùng. Đây là mức cao so với nhiều sản phẩm subscription dạng text, vì vậy bài toán monetization và cost reduction phải được đặt từ đầu.
 
-**Ý nghĩa thực tế**: voice AI cho consumer mass market cần cost giảm 5-10x. Mimi 1.1 kbps + on-device inference là direction để giảm cost (eliminate streaming bandwidth, eliminate cloud LLM calls).
+**Ý nghĩa thực tế**: để voice AI phù hợp với consumer mass market, chi phí cần giảm đáng kể. Các hướng như codec bitrate thấp, on-device inference, mô hình nhỏ chuyên biệt và caching theo phiên đều nhằm giảm bandwidth, cloud inference và chi phí orchestration.
 
 ### 1.4 SLA: 99.9% và downtime planning
 
-Enterprise customers expect SLA 99.9% (downtime ~43 phút/tháng) hoặc 99.99% (4 phút/tháng). Cho voice AI, đây là challenging vì:
+Khách hàng enterprise thường kỳ vọng SLA 99.9% (downtime khoảng 43 phút/tháng) hoặc 99.99% (khoảng 4 phút/tháng). Với voice AI, mục tiêu này khó hơn web API thông thường vì:
 
 - GPU instances có failure rate cao hơn CPU.
-- Streaming sessions không recover gracefully khi server restart.
+- Streaming sessions khó khôi phục mượt mà khi server restart giữa cuộc gọi.
 - Multi-region failover khó với stateful conversations.
 
-Strategies thực dụng:
+Các chiến lược thực dụng gồm:
 
 1. **Multi-region active-active**: deploy ở 2+ regions, route based on health.
 2. **Graceful degradation**: nếu cloud LLM down, fallback to canned responses.
