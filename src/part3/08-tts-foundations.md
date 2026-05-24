@@ -21,6 +21,31 @@ Chương 9 sẽ tiếp tục với các mô hình end-to-end (VITS, F5-TTS, VALL
 > - **Phần 4**: vocoder (HiFi-GAN, BigVGAN), mel-to-wave.
 > - **Phần 5**: pipeline production và các trade-off giữa naturalness, latency, controllability.
 
+### Bản đồ tư duy của Chương 8
+
+```mermaid
+flowchart LR
+    RAW["Raw text"] --> TN["Text normalization"]
+    TN --> G2P["G2P / phoneme"]
+    G2P --> PROS["Prosody planning<br>duration, pitch, energy"]
+    PROS --> MEL["Acoustic model<br>mel spectrogram"]
+    MEL --> VOC["Vocoder"]
+    VOC --> WAV["Waveform"]
+    WAV --> EVAL["MOS / MUSHRA / latency"]
+```
+
+Nếu ASR là bài toán “nghe và viết lại”, TTS là bài toán “đọc và diễn xuất”. Đọc đúng chữ chỉ là điều kiện cần. Một hệ TTS tốt phải biết ngắt nghỉ, nhấn trọng âm, giữ tone, giữ speaker identity và không tạo artifact nghe khó chịu.
+
+### TTS khác text generation ở đâu?
+
+| Text generation | TTS |
+|---|---|
+| Output là chuỗi token rời rạc | Output cuối là waveform liên tục |
+| Lỗi nhỏ có thể sửa bằng edit text | Artifact âm thanh nghe thấy ngay |
+| Evaluation có BLEU/ROUGE/LLM judge | Evaluation cần human perception |
+| Latency tính theo token | Latency tính theo first audio và realtime factor |
+| Style là văn phong | Style là prosody, emotion, speaker, room tone |
+
 ## Phần 1 — Bài toán Text-to-Speech
 
 Text-to-Speech (TTS) là bài toán ngược của ASR  -  chuyển text thành waveform:
@@ -32,6 +57,18 @@ $$
 $$
 
 trong đó $Y = (y_1, \ldots, y_U)$ là chuỗi text tokens và $\mathbf{x}$ là waveform.
+
+Trong TTS production, $Y$ hiếm khi là raw text trực tiếp. Nó thường đi qua nhiều bước chuẩn hóa:
+
+| Raw input | Text normalization mong muốn |
+|---|---|
+| “1.5 giây” | “một phẩy năm giây” |
+| “TP.HCM” | “Thành phố Hồ Chí Minh” hoặc chính sách đọc viết tắt |
+| “Qwen3-Omni” | quy tắc đọc tên model nhất quán |
+| “10/05/2026” | ngày mười tháng năm năm hai nghìn không trăm hai mươi sáu, tùy locale |
+| “$12.50” | mười hai đô la năm mươi xu, nếu đọc tiếng Việt theo ngữ cảnh |
+
+Vì vậy, TTS không bắt đầu ở neural acoustic model. Nó bắt đầu ở **text normalization policy**.
 
 ### Two-Stage Pipeline
 
@@ -51,15 +88,53 @@ flowchart LR
 
 **Tại sao 2 stages?**
 
-- Mel spectrogram là intermediate representation **compact** (80 dims × 100 fps)
-- Waveform là **high-dimensional** (16,000 samples/sec)
-- Tách 2 stages cho phép **optimize từng phần** independently
+- Mel spectrogram là intermediate representation **compact** (80 dims × 100 fps).
+- Waveform là **high-dimensional** (16,000 samples/sec hoặc cao hơn).
+- Tách 2 stages cho phép **tối ưu từng phần** độc lập.
+- Debug dễ hơn: nếu mel sai prosody, lỗi nằm ở acoustic model; nếu mel ổn nhưng audio rè, lỗi nằm ở vocoder.
+
+| Stage | Câu hỏi cần trả lời | Lỗi thường gặp |
+|---|---|---|
+| Text normalization | đọc chữ/số/ký hiệu như thế nào? | đọc sai số, viết tắt, tên riêng |
+| G2P/phoneme | chuỗi chữ phát âm thành âm nào? | sai từ ngoại lai, code-switching |
+| Acoustic model | prosody và mel ra sao? | đều đều, sai duration, sai pitch |
+| Vocoder | waveform nghe tự nhiên không? | rè, metallic, noise, mất âm cuối |
 
 > **💡 NLP Parallel**
 >
-> Two-stage TTS giống **retrieval-augmented generation (RAG)**: Stage 1 tạo "plan" (mel), Stage 2 "execute" (vocoder). End-to-end TTS (VITS) giống standard autoregressive LM  -  xem Chương 7.
+> Two-stage TTS có thể xem như một pipeline “plan rồi render”: acoustic model tạo kế hoạch âm học ở dạng mel, vocoder render kế hoạch đó thành waveform. End-to-end TTS ở Chương 9 cố gắng học hai bước này trong một objective thống nhất hơn.
 
 
+
+## Frontend: Text normalization và G2P
+
+Trước khi vào Tacotron hoặc FastSpeech, text cần được biến thành đơn vị phát âm ổn định. Với tiếng Việt, chữ viết tương đối gần âm đọc, nhưng frontend vẫn rất quan trọng.
+
+### Text normalization
+
+Text normalization xử lý các dạng không nên đọc nguyên ký tự:
+
+| Loại | Ví dụ | Cách đọc phụ thuộc ngữ cảnh |
+|---|---|---|
+| Số | “2026” | “hai nghìn không trăm hai mươi sáu” hoặc “hai không hai sáu” |
+| Đơn vị | “5kg” | “năm ki lô gam” |
+| Tiền tệ | “100k” | “một trăm nghìn” |
+| URL/email | “a@b.com” | đọc từng phần hoặc bỏ qua tùy sản phẩm |
+| Viết tắt | “AI”, “GPU”, “TP.HCM” | đọc tiếng Anh, tiếng Việt, hoặc expand |
+
+### G2P và phoneme policy
+
+G2P trả lời câu hỏi: text đã chuẩn hóa nên được phát âm thành chuỗi âm nào. Trong tiếng Việt, phần khó thường nằm ở:
+
+- tên riêng Việt Nam có nhiều biến thể vùng miền;
+- từ tiếng Anh trong câu tiếng Việt;
+- acronym công nghệ;
+- dấu thanh và âm cuối;
+- lựa chọn giọng Bắc/Trung/Nam.
+
+> **Bài học production**
+>
+> Không có một cách đọc đúng tuyệt đối cho mọi sản phẩm. Một trợ lý ngân hàng có thể cần đọc số tiền rất chuẩn; một app học tiếng Anh cần đọc từ ngoại lai khác; một audiobook cần ngắt nghỉ tự nhiên hơn đọc từng ký tự.
 
 ## Tacotron 2
 
@@ -81,6 +156,18 @@ flowchart LR
 ```
 
 **Hình:** Tacotron 2 là seq2seq autoregressive. Attention alignment là thành phần then chốt, vì nếu alignment lệch, model có thể lặp từ, bỏ từ hoặc dừng sai thời điểm.
+
+### Alignment trong TTS: vì sao khó?
+
+Trong TTS, alignment đi từ text/phoneme sang mel frames. Khác ASR, output audio thường dài hơn nhiều so với input text. Một phoneme có thể kéo dài 3 frames hoặc 30 frames tùy tốc độ, ngữ cảnh, cảm xúc và dấu câu.
+
+| Alignment lỗi | Biểu hiện khi nghe | Nguyên nhân |
+|---|---|---|
+| Skip | bỏ mất từ/âm tiết | attention nhảy quá nhanh |
+| Repeat | lặp từ hoặc kéo dài âm | attention kẹt một token |
+| Early stop | câu bị cắt ngang | stop token dự đoán sớm |
+| Late stop | thêm noise/âm vô nghĩa cuối câu | stop token không chốt |
+| Non-monotonic | đọc đảo trật tự | attention không bị ràng buộc đủ |
 
 ### Location-Sensitive Attention
 
@@ -155,6 +242,18 @@ flowchart LR
 
 **Hình:** FastSpeech 2 thay attention autoregressive bằng duration prediction và length regulator. Thiết kế này giúp inference song song hơn và kiểm soát trực tiếp duration, pitch, energy.
 
+### Vì sao duration, pitch, energy quan trọng?
+
+FastSpeech 2 đưa prosody ra thành các biến explicit. Đây là bước rất quan trọng về mặt sư phạm: giọng nói tự nhiên không chỉ là “đúng phoneme”, mà là đúng thời lượng, cao độ và độ mạnh.
+
+| Biến | Người nghe cảm nhận là gì? | Lỗi nếu dự đoán sai |
+|---|---|---|
+| Duration | tốc độ, ngắt nghỉ, kéo dài âm | robot, quá nhanh, nuốt chữ |
+| Pitch / F0 | cao độ, tone, câu hỏi/cảm xúc | sai thanh điệu, thiếu tự nhiên |
+| Energy | độ nhấn, loudness tương đối | đều đều, thiếu trọng âm |
+
+Với tiếng Việt, pitch/F0 đặc biệt quan trọng vì thanh điệu phân biệt nghĩa. Một TTS tiếng Việt có thể phát âm đúng phụ âm/nguyên âm nhưng vẫn sai nghĩa nếu contour thanh điệu không đúng.
+
 ### Variance Adaptors
 
 **Duration predictor:**
@@ -189,6 +288,18 @@ $$
 \hat{e}(t) = \text{EnergyPredictor}(\mathbf{h}_{u(t)})
 $$
 
+### Ví dụ length regulator
+
+Giả sử phoneme sequence có 3 đơn vị `[a, n, _]` với durations `[3, 2, 1]`. Length regulator biến sequence phoneme-level thành mel-level:
+
+| Phoneme | Duration | Mel-level expansion |
+|---|---:|---|
+| `a` | 3 | `a a a` |
+| `n` | 2 | `n n` |
+| silence | 1 | `_` |
+
+Kết quả là chuỗi 6 frame-level representations. Decoder sau đó sinh mel spectrogram song song từ chuỗi đã được kéo dài này. Đây là lý do FastSpeech 2 nhanh hơn Tacotron: nó không cần autoregressive attention để quyết định token nào được đọc ở từng frame.
+
 ### Length Regulator
 
 Biến phoneme-level sequence thành mel-level sequence bằng cách repeat:
@@ -211,16 +322,16 @@ $$
 
 ### Speed Comparison
 
-| Model | Inference Speed (vs real-time) | Parallelizable | Robustness |
-|-------|-------------------------------|----------------|------------|
-| Tacotron 2 | ~0.5× (slower than RT) | No | Attention failures |
-| FastSpeech 2 | **50×** faster | **Yes** | **No attention failures** |
+| Model | Inference speed | Parallelizable | Robustness |
+|-------|-----------------|----------------|------------|
+| Tacotron 2 | chậm hơn do autoregressive decoder | Không | có thể gặp attention failures |
+| FastSpeech 2 | thường nhanh hơn đáng kể | Có | tránh attention autoregressive, nhưng phụ thuộc alignment/duration |
 
 : FastSpeech 2 vs Tacotron 2 speed <a id="tbl-fastspeech-speed"></a>
 
 > **⚠️ Latency Warning**
 >
-> FastSpeech 2 mel generation rất nhanh (~50× real-time) nhưng **vocoder vẫn là bottleneck**. Pipeline latency = mel generation + vocoder. Cần HiFi-GAN (realtime) thay vì WaveNet (100× slower than RT).
+> FastSpeech 2 mel generation thường rất nhanh, nhưng **vocoder vẫn có thể là bottleneck**. Pipeline latency = mel generation + vocoder. Với realtime TTS, cần vocoder non-autoregressive như HiFi-GAN/BigVGAN-style thay vì vocoder autoregressive kiểu WaveNet.
 
 
 
@@ -323,6 +434,21 @@ class LengthRegulator(nn.Module):
 
 ## Vocoders
 
+### Trực giác vocoder
+
+Mel spectrogram giống một bản nhạc tổng phổ rút gọn: nó nói năng lượng ở từng dải tần thay đổi ra sao theo thời gian, nhưng không giữ đầy đủ phase và chi tiết waveform. Vocoder phải “điền lại” chi tiết bị mất để tạo sóng âm nghe tự nhiên.
+
+```mermaid
+flowchart LR
+    MEL["Mel spectrogram<br>80 bands x T"] --> UP["Upsampling<br>match waveform rate"]
+    UP --> RES["Residual conv blocks<br>add fine detail"]
+    RES --> WAV["Waveform<br>samples"]
+    WAV --> DISC["Discriminators<br>judge realism"]
+    DISC --> RES
+```
+
+Một acoustic model tốt nhưng vocoder kém sẽ tạo giọng rè/kim loại. Ngược lại, vocoder tốt không thể cứu hoàn toàn mel spectrogram sai prosody hoặc sai phoneme.
+
 ### Bài toán Vocoder
 
 Vocoder chuyển mel spectrogram thành waveform  -  bài toán **super-resolution** vì mel (80 dims, 100 fps) chứa ít thông tin hơn waveform (1 dim, 16000 fps):
@@ -335,7 +461,7 @@ $$
 
 ### WaveNet (2016)
 
-WaveNet [^oord2016wavenet]  -  vocoder đầu tiên cho chất lượng human-level:
+WaveNet [^oord2016wavenet] là vocoder autoregressive có ảnh hưởng rất lớn trong lịch sử neural speech synthesis:
 
 <a id="eq-wavenet"></a>
 
@@ -347,13 +473,13 @@ $$
 
 > **⚠️ Latency Warning**
 >
-> WaveNet inference: ~0.01× real-time trên GPU (100× chậm hơn real-time). 1 giây audio cần ~100 giây compute. **Không khả thi cho production.**
+> WaveNet autoregressive rất chậm vì sinh từng sample tuần tự. Các triển khai gốc không phù hợp realtime production nếu không có distillation hoặc tối ưu đặc biệt.
 
 
 
 ### HiFi-GAN (2020)
 
-HiFi-GAN [^kong2020hifigan]  -  vocoder hiện đại, **nhanh** và **chất lượng cao**:
+HiFi-GAN [^kong2020hifigan] là vocoder GAN phổ biến, nhanh hơn nhiều so với vocoder autoregressive và cho chất lượng tốt trong nhiều pipeline TTS:
 
 **Generator**: Upsample mel → waveform qua transposed convolutions:
 
@@ -511,25 +637,47 @@ class HiFiGANGenerator(nn.Module):
 
 ### Vocoder Comparison
 
-| Vocoder | Year | Type | Speed (RTF) | Quality (MOS) |
-|---------|------|------|-------------|----------------|
-| WaveNet | 2016 | Autoregressive | 0.01× | 4.21 |
-| WaveRNN | 2018 | Autoregressive | 1× | 4.15 |
-| WaveGlow | 2019 | Flow-based | 20× | 4.09 |
-| **HiFi-GAN** | 2020 | GAN | **80×** | **4.23** |
-| BigVGAN | 2022 | GAN | 60× | **4.30** |
+| Vocoder | Year | Type | Tốc độ tương đối | Ghi chú chất lượng |
+|---------|------|------|------------------|--------------------|
+| WaveNet | 2016 | Autoregressive | rất chậm nếu sinh tuần tự | mốc lịch sử quan trọng |
+| WaveRNN | 2018 | Autoregressive tối ưu | nhanh hơn WaveNet | vẫn tuần tự |
+| WaveGlow | 2019 | Flow-based | parallel hơn | cần nhiều compute |
+| HiFi-GAN | 2020 | GAN | realtime-friendly trong nhiều setup | phổ biến trong TTS thực tế |
+| BigVGAN | 2022 | GAN | realtime tùy cấu hình | cải thiện fidelity trong nhiều benchmark |
 
 : Vocoder comparison <a id="tbl-vocoder-comparison"></a>
+
+## TTS tiếng Việt: các điểm cần đặc biệt chú ý
+
+| Thành phần | Thách thức tiếng Việt |
+|---|---|
+| Text normalization | số, đơn vị, viết tắt, tên cơ quan, code-switching |
+| G2P | từ tiếng Anh, tên riêng, lựa chọn giọng vùng miền |
+| Pitch/F0 | sáu thanh điệu, hỏi/ngã, nặng/sắc trong ngữ cảnh nhanh |
+| Duration | tiếng Việt syllable-timed, ngắt nghỉ theo cụm từ |
+| Vocoder | giữ âm cuối và tránh metallic artifact ở âm sắc cao |
+| Evaluation | MOS cần người nghe bản ngữ theo vùng miền |
+
+Một TTS tiếng Việt “đọc rõ” chưa chắc “đọc hay”. Sản phẩm audiobook, trợ lý ngân hàng và bot tổng đài có tiêu chí prosody khác nhau. Vì vậy cần thiết kế evaluation theo use case.
+
+## Production checklist
+
+- Chuẩn hóa text trước khi training và inference giống nhau.
+- Quyết định phoneme inventory và chính sách đọc từ ngoại lai.
+- Kiểm tra forced alignment/duration trước khi train FastSpeech-style model.
+- Đánh giá riêng acoustic model và vocoder.
+- Đo first-audio latency, RTF và memory, không chỉ MOS.
+- Với tiếng Việt, tách test theo vùng miền, tone confusion và code-switching.
 
 ## Tóm tắt
 
 | Component | Model | Key Idea | Speed |
 |-----------|-------|----------|-------|
-| Acoustic Model | Tacotron 2 | Attention-based autoregressive | Slow |
-| Acoustic Model | FastSpeech 2 | Non-autoregressive + variance adaptors | **Fast** |
-| Vocoder | WaveNet | Autoregressive sample-by-sample | Very slow |
-| Vocoder | HiFi-GAN | GAN + multi-scale discriminators | **Very fast** |
-| Best Pipeline | FastSpeech 2 + HiFi-GAN | Parallel mel + fast vocoder | Production-ready |
+| Acoustic Model | Tacotron 2 | Attention-based autoregressive | chậm hơn, dễ lỗi alignment |
+| Acoustic Model | FastSpeech 2 | Non-autoregressive + variance adaptors | nhanh hơn, dễ kiểm soát hơn |
+| Vocoder | WaveNet | Autoregressive sample-by-sample | rất chậm nếu không tối ưu |
+| Vocoder | HiFi-GAN | GAN + multi-scale discriminators | realtime-friendly trong nhiều setup |
+| Pipeline thực dụng | FastSpeech-style + GAN vocoder | parallel mel + fast vocoder | phù hợp nhiều sản phẩm TTS |
 
 : TTS pipeline summary <a id="tbl-tts-summary"></a>
 
