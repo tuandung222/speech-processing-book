@@ -23,6 +23,37 @@ Sau khi đọc xong, bạn có thể đọc một mel spectrogram, hiểu vì sa
 
 Tham khảo nền tảng nếu bạn cần đi sâu hơn: Rabiner và Schafer, *Theory and Applications of Digital Speech Processing*, hoặc Chương 16 của Jurafsky và Martin SLP3.
 
+### Bản đồ pipeline của chương
+
+Chương này đi theo đúng hành trình của một file audio trước khi vào model:
+
+```mermaid
+flowchart LR
+    A["Analog speech<br>air pressure wave"] --> B["Sampling<br>16 kHz"]
+    B --> C["Quantization<br>16-bit PCM"]
+    C --> D["Framing<br>25 ms windows"]
+    D --> E["FFT / STFT<br>frequency analysis"]
+    E --> F["Mel filterbank<br>perceptual compression"]
+    F --> G["Log-mel<br>model input"]
+    G --> H["SpecAugment<br>training only"]
+```
+
+Nếu bạn quen với NLP, hãy xem pipeline này như “tokenizer cho audio” ở mức handcrafted. Nó không tạo discrete token IDs như BPE, nhưng biến một waveform dài thành ma trận feature ngắn hơn, giàu thông tin hơn và phù hợp với neural network hơn.
+
+### Ví dụ shape xuyên suốt chương
+
+Giả sử ta có 1 giây speech mono ở 16 kHz:
+
+| Bước | Shape hoặc kích thước | Ý nghĩa |
+|---|---|---|
+| Waveform | `[16000]` | 16,000 samples trong 1 giây |
+| Frame 25 ms, hop 10 ms | khoảng 100 frames/s | mỗi frame nhìn một lát cắt ngắn |
+| STFT với `n_fft = 400` | `[201, 100]` | 201 frequency bins, 100 time frames |
+| Mel filterbank 80 bins | `[80, 100]` | nén frequency theo thính giác |
+| Batch input ASR | `[B, 80, T]` | tensor đưa vào encoder |
+
+Điểm quan trọng: audio raw có 16,000 điểm mỗi giây, nhưng model thường không xử lý trực tiếp từng sample. Feature extraction giảm độ dài và chuyển tín hiệu sang miền dễ học hơn.
+
 ## Phần 1 — Waveform và Sampling
 
 ### 1.1 Tín hiệu âm thanh từ analog tới digital
@@ -38,6 +69,16 @@ x[n] = x_a(n \cdot T_s), \quad n = 0, 1, 2, \ldots
 $$
 
 trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, và $f_s$ là **sample rate** (tần số lấy mẫu).
+
+Trực giác: sampling là chụp ảnh sóng âm theo thời gian. Sample rate càng cao, ta chụp càng dày. Nhưng chụp dày hơn không phải lúc nào cũng tốt hơn cho ASR, vì tăng sample rate làm sequence dài hơn và compute lớn hơn. Với speech, 16 kHz là điểm cân bằng tốt giữa đủ thông tin ngôn ngữ và chi phí xử lý.
+
+```mermaid
+flowchart LR
+    CONT["Continuous waveform"] --> S16["16 kHz sampling<br>speech standard"]
+    CONT --> S48["48 kHz sampling<br>studio / high-fidelity"]
+    S16 --> ASR["ASR / voice agent"]
+    S48 --> TTS["High-quality TTS<br>music / studio audio"]
+```
 
 ### Nyquist Theorem
 
@@ -63,6 +104,19 @@ trong đó $x_a(t)$ là tín hiệu analog, $T_s = 1/f_s$ là sampling period, v
 
 : Thông số chuẩn cho speech audio <a id="tbl-audio-params"></a>
 
+### Aliasing và resampling trong thực tế
+
+Nyquist không chỉ là một định lý đẹp. Nó là lý do resampling sai có thể phá dataset. Nếu audio 48 kHz được chuyển xuống 16 kHz, mọi thành phần trên 8 kHz phải được lọc bỏ trước. Nếu không, chúng sẽ gập xuống dải thấp và tạo artifact.
+
+| Tình huống | Rủi ro | Cách xử lý |
+|---|---|---|
+| Downsample 48 kHz → 16 kHz | aliasing nếu không low-pass | dùng resampler chất lượng cao |
+| Mix dataset 8 kHz và 16 kHz | domain shift theo bandwidth | ghi rõ sample rate, train/eval tách nhóm |
+| Upload qua telephony codec | mất high-frequency detail | benchmark riêng trên audio điện thoại |
+| Normalize loudness quá mạnh | mất dynamic cues | dùng gain chuẩn, tránh clipping |
+
+Trong production, metadata về sample rate, codec, microphone và kênh thu không phải chi tiết phụ. Chúng là một phần của data distribution.
+
 ### Pre-emphasis Filter
 
 Bộ lọc high-pass đơn giản để bù spectral rolloff tự nhiên của giọng nói:
@@ -77,12 +131,25 @@ $$
 >
 > Pre-emphasis có vai trò tương tự **text normalization** trong NLP: một bước tiền xử lý đơn giản nhưng cải thiện kết quả downstream. Các model hiện đại (Whisper, Wav2Vec 2.0) thường bỏ qua pre-emphasis, vì model có thể tự học biến đổi tương đương khi train trên data lớn.
 
+Pre-emphasis xuất hiện nhiều trong tài liệu cổ điển vì giọng nói tự nhiên có xu hướng năng lượng giảm ở tần số cao. High-pass nhẹ giúp consonants như /s/, /f/, /t/ rõ hơn trong feature. Nhưng với model lớn train end-to-end trên log-mel hoặc waveform, bước này không còn bắt buộc. Khi tái hiện paper cũ, hãy đọc kỹ preprocessing để tránh so sánh không công bằng.
+
 
 ## Discrete Fourier Transform (DFT)
 
 ### Công thức DFT
 
 DFT chuyển tín hiệu từ miền thời gian sang miền tần số:
+
+Nói trực giác, DFT trả lời câu hỏi: trong đoạn tín hiệu này có bao nhiêu “sóng sin” ở từng tần số? Một waveform phức tạp có thể được xem như tổng của nhiều sóng sin đơn giản. DFT tìm trọng số của từng sóng sin đó.
+
+| Miền thời gian | Miền tần số |
+|---|---|
+| Trục x là thời gian | Trục x là tần số |
+| Dễ thấy biên độ thay đổi | Dễ thấy thành phần phổ |
+| Hữu ích để biết “khi nào” | Hữu ích để biết “tần số nào” |
+| Waveform raw | Spectrum |
+
+Ví dụ, nguyên âm thường có formant rõ trong phổ; phụ âm ma sát như /s/ có năng lượng ở vùng tần số cao. Vì vậy phổ cung cấp thông tin âm vị mà waveform raw khó đọc bằng mắt.
 
 <a id="eq-dft"></a>
 
@@ -128,11 +195,26 @@ $$
 
 Khi $N = 512$: DFT cần ~262K phép tính, FFT chỉ cần ~4.6K.
 
+Trong speech, FFT không phải tối ưu nhỏ. Một câu 10 giây ở hop 10 ms có khoảng 1000 frames. Nếu mỗi frame phải tính DFT chậm, feature extraction sẽ thành bottleneck. FFT giúp STFT đủ nhanh để dùng trong training và streaming.
+
 ## Short-Time Fourier Transform (STFT)
 
 ### Tại sao cần STFT?
 
-DFT phân tích **toàn bộ** tín hiệu → không có thông tin về **khi nào** một tần số xuất hiện. Speech là non-stationary (tần số thay đổi theo thời gian), nên cần phân tích **từng đoạn ngắn**:
+DFT phân tích **toàn bộ** tín hiệu nên không có thông tin về **khi nào** một tần số xuất hiện. Speech là non-stationary, nghĩa là đặc tính phổ thay đổi liên tục theo thời gian. Vì vậy, ta cần phân tích **từng đoạn ngắn**:
+
+```mermaid
+flowchart LR
+    W["Waveform 1 second"] --> F1["Frame 1<br>0-25 ms"]
+    W --> F2["Frame 2<br>10-35 ms"]
+    W --> F3["Frame 3<br>20-45 ms"]
+    F1 --> FFT1["FFT"]
+    F2 --> FFT2["FFT"]
+    F3 --> FFT3["FFT"]
+    FFT1 --> SPEC["Spectrogram<br>frequency x time"]
+    FFT2 --> SPEC
+    FFT3 --> SPEC
+```
 
 <a id="eq-stft"></a>
 
@@ -215,6 +297,16 @@ $$
 
 ### Mel Filterbank
 
+Mel filterbank là một ma trận nhân vào power spectrogram để gom các frequency bins tuyến tính thành các bands theo thang mel. Các filter có dạng tam giác chồng lấn nhau: mỗi filter lấy nhiều bins lân cận, center frequency nhận trọng số cao nhất.
+
+```mermaid
+flowchart LR
+    P["Power spectrogram<br>201 frequency bins"] --> FB["Mel filterbank<br>80 triangular filters"]
+    FB --> M["Mel energies<br>80 bands"]
+    M --> LOG["Log compression"]
+    LOG --> LM["Log-mel spectrogram"]
+```
+
 Tập hợp $M$ bộ lọc tam giác trên mel scale:
 
 <a id="eq-mel-filterbank"></a>
@@ -239,6 +331,8 @@ S_{\text{mel}}(m, t) = \log\left(\sum_{k=0}^{N/2} H_m(k) \cdot P(t, k) + \epsilo
 $$
 
 với $\epsilon = 10^{-10}$ để tránh $\log(0)$.
+
+Log compression có hai tác dụng. Thứ nhất, nó làm dynamic range nhỏ lại, vì năng lượng audio có thể chênh nhiều bậc độ lớn. Thứ hai, nó gần với cách tai người cảm nhận loudness theo thang log. Đây là lý do nhiều model nhận **log-mel** thay vì mel tuyến tính.
 
 **Dimensions tiêu biểu:**
 
@@ -323,6 +417,8 @@ trong đó $c = 0, 1, \ldots, C-1$ là MFCC index (thường $C = 13$ hoặc $C 
 
 : Mel Spectrogram vs MFCC <a id="tbl-mel-vs-mfcc"></a>
 
+MFCC rất quan trọng trong lịch sử vì GMM-HMM hoạt động tốt hơn khi feature ít tương quan và có số chiều nhỏ. Deep learning hiện đại lại thích giữ nhiều thông tin hơn, để encoder tự học cách lọc. Vì vậy, log-mel thường thay thế MFCC trong Whisper, Conformer và TTS.
+
 > **⚠️ Latency Warning**
 >
 > MFCC bỏ mất thông tin spectral detail mà deep models có thể khai thác. Hầu hết models hiện đại (Whisper, Conformer, VITS) sử dụng **mel spectrogram trực tiếp** thay vì MFCC.
@@ -330,13 +426,23 @@ trong đó $c = 0, 1, \ldots, C-1$ là MFCC index (thường $C = 13$ hoặc $C 
 
 ## SpecAugment
 
-SpecAugment [^park2019specaugment] là kỹ thuật data augmentation cực kỳ hiệu quả cho ASR  -  giảm WER 10–25% relative mà không cần thêm dữ liệu.
+SpecAugment [^park2019specaugment] là kỹ thuật data augmentation rất phổ biến cho ASR. Trong nhiều thiết lập được báo cáo, nó giúp giảm WER tương đối đáng kể mà không cần thu thêm dữ liệu.
 
-### Ba Phép Augmentation
+### Ba phép augmentation
 
-1. **Time warping**: Biến dạng nhẹ theo trục thời gian
-2. **Frequency masking**: Che $F$ consecutive mel bands
-3. **Time masking**: Che $T$ consecutive time steps
+1. **Time warping**: biến dạng nhẹ theo trục thời gian.
+2. **Frequency masking**: che $F$ consecutive mel bands.
+3. **Time masking**: che $T$ consecutive time steps.
+
+```mermaid
+flowchart LR
+    MEL["Original log-mel"] --> FM["Frequency mask<br>hide bands"]
+    MEL --> TM["Time mask<br>hide frames"]
+    FM --> TRAIN["Robust ASR training"]
+    TM --> TRAIN
+```
+
+Trực giác: SpecAugment ép model không phụ thuộc quá mức vào một dải tần hoặc một đoạn thời gian cụ thể. Nếu một phần spectrogram bị che mà model vẫn nhận dạng đúng, representation học được sẽ robust hơn với noise, packet loss hoặc microphone khác nhau.
 
 <a id="eq-specaugment"></a>
 
@@ -524,6 +630,19 @@ class AudioFeatureExtractor(nn.Module):
 | SpecAugment | Random freq/time masking | Augmented features |
 
 : Tóm tắt các phép biến đổi audio <a id="tbl-audio-summary"></a>
+
+### Checklist thực hành
+
+Khi chuẩn bị audio cho ASR/TTS, hãy kiểm tra các điểm sau:
+
+- **Sample rate thống nhất**: 16 kHz cho ASR phổ biến, 22.05/24/48 kHz cho TTS tùy model.
+- **Không clipping**: waveform không bị cắt đỉnh ở -1 hoặc 1 sau normalization.
+- **Channel rõ ràng**: mono hay stereo, có cần downmix hay không.
+- **Loudness hợp lý**: tránh file quá nhỏ hoặc quá lớn so với phân phối train.
+- **Feature params khớp model**: `n_fft`, `hop_length`, `n_mels`, log base và normalization phải đúng.
+- **Train/test consistency**: preprocessing train và inference phải giống nhau.
+
+Một lỗi rất phổ biến là fine-tune model với feature extraction khác so với pretraining. Chỉ cần lệch `n_mels` hoặc normalization, performance có thể giảm mạnh dù architecture không đổi.
 
 Với nền tảng signal processing này, Chương 3 sẽ trình bày **Speech Representations** (Wav2Vec 2.0, HuBERT, codec tokens), và Chương 4 sẽ phát triển **ASR Foundations**: cách chuyển mel spectrogram thành text qua CTC, attention seq2seq, và RNN-Transducer.
 
