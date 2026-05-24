@@ -10,7 +10,7 @@ Dù trình biên dịch `mdbook-katex` không báo lỗi lúc build (0 parse err
 
 ### 1.1 Ký tự gạch dưới bị hiển thị backslash vô lý
 Trong Chương 2 và Chương 16, chúng ta có các ký tự biến số như `\text{frame\_length}` hoặc `\text{reference\_audio}`. KaTeX xử lý các cụm này không nhất quán:
-- Một số trình duyệt hiển thị rõ cả ký tự backslash thoát: `frame\_length` (trông rất chuối và không chuyên nghiệp).
+- Một số trình duyệt hiển thị rõ cả ký tự backslash thoát: `frame\_length` (không phù hợp với chuẩn trình bày học thuật).
 - **Giải pháp**: Đổi toàn bộ `\text{frame\_length}` thành `\mathrm{frame\_length}` hoặc `\text{frame length}` (không dùng gạch dưới bên trong block text toán học).
 
 ### 1.2 Căn lề và khoảng cách hiển thị công thức
@@ -36,7 +36,7 @@ Hệ thống highlight mặc định của mdBook khá đơn điệu và thiếu
 
 ## 3. Typography & Sắp xếp Font Chữ (Distill.pub Style)
 
-Typography hiện tại có cảm giác "chuối" và chưa đạt chuẩn tài liệu nghiên cứu cao cấp do các nguyên nhân:
+Typography ban đầu chưa đạt chuẩn tài liệu nghiên cứu cao cấp do các nguyên nhân:
 
 ### 3.1 Google Fonts Import gây chậm và FOUC
 - Việc sử dụng `@import` trực tiếp Google Fonts làm chậm tốc độ tải trang trên GitHub Pages. Khi trang vừa load, font hệ thống hiển thị trước rồi bị giật (Flash of Unstyled Text) khi font Source Serif 4 tải xong.
@@ -76,3 +76,17 @@ Rà soát lại toàn bộ 22 chương hiện có, chúng tôi phát hiện mộ
    - **Đề xuất**: Định rõ giới hạn: Chương 3 chỉ giới thiệu ở mức độ "khái niệm tương đương với BPE token trong NLP", còn Chương 10 mới đi sâu vào toán học Residual Vector Quantization (RVQ) và cấu trúc nén của EnCodec/Mimi.
 3. **Thiếu mảng Speech Enhancement**: Bộ tài liệu hiện có ASR, TTS, Translation, nhưng thiếu mảng Speech Enhancement (Denoising, Dereverberation, Speaker Separation) vốn là tiền xử lý bắt buộc trong mọi hệ thống voice thực tế.
    - **Đề xuất**: Bổ sung một mục chi tiết hoặc một chương phụ về Speech Enhancement trong Phần VII để hoàn thiện kỹ năng thực chiến.
+
+---
+
+## 6. Trạng thái sau vòng QA A-Z (2026-05-25)
+
+Vòng review, rewrite và verify hàng loạt đã xử lý các vấn đề chính được ghi nhận ở Phase QA-0:
+
+- **Math rendering**: quy tắc KaTeX đã được đồng bộ trong `docs/STYLE_GUIDE.md`; không dùng underscore trực tiếp bên trong `\text{}` khi nhãn có thể viết dạng văn xuôi.
+- **Build/deploy**: GitHub Actions đã cài thêm `mdbook-mermaid` để khớp với `book.toml`.
+- **Content rigor**: các claim kiểu `SOTA`, `best`, `outperform` đã được hạ giọng thành `frontier`, `baseline mạnh`, hoặc `theo technical report`, kèm nhắc lại điều kiện benchmark khi cần.
+- **Vietnamese chapters**: Chương 16 và 17 đã được chỉnh lại theo hướng thận trọng hơn về benchmark, model thương mại và dữ liệu công khai.
+- **Production chapter**: Chương 20 đã được rewrite phần mở đầu, disclaimer, latency/concurrency/cost/SLA để có giọng giảng viên chuyên nghiệp hơn.
+- **Visualization**: các hình kiến trúc trọng tâm và ASCII pipeline đã được thay bằng Mermaid diagrams; scanner public không còn `<img src="fig-...">`.
+- **Final scan public content**: `TBD = 0`, forbidden casual phrases = 0, static figure placeholders = 0.

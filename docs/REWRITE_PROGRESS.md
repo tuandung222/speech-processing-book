@@ -1,98 +1,47 @@
 # S-AI Rewrite Progress Tracker
 
-Updated continuously during autonomous A-Z rewrite session.
+Updated during the 2026-05-25 autonomous full content review, rewrite, and verification pass.
 
-## Baseline (2026-05-24)
+## Current Baseline
 
-- Git: clean.
-- Last commit before session: `bc64458` (style guide draft).
-- mdBook build: OK, no KaTeX errors across all chapters.
-- Total source lines: 11,939 across 30 `.md` files.
+- Repository: `/Users/admin/TuanDung/repos/speech-processing-book`.
+- Book engine: mdBook with `mdbook-katex` and `mdbook-mermaid`.
+- Public content scope: `src/index.md`, Chương 0-21, Phụ lục A-F, `src/references.md`.
+- Validation status: `mdbook build` passes locally.
 
 ## Phase Status
 
 | Phase | Description | Status | Notes |
 |---|---|---|---|
-| 0 | Baseline + tracker | done | This file. |
-| 1 | STYLE_GUIDE.md professional rewrite | done | Section 1.5 rewritten, duplicate 1.6 fixed. |
-| 2 | SUMMARY/index/book.toml/README sync | done | Phần 0 added; README later set to empty per user. |
-| 3 | Part 0 + Part I (Ch0-Ch3) | done | Ch0 new 510 lines; Ch1 tone audit; Ch2/Ch3 intros. |
-| 4 | Part II ASR (Ch4-Ch7) | done | Intros for Ch4-Ch7; Ch6 em-dash fix. |
-| 5 | Part III TTS+codecs (Ch8-Ch10) | done | Intros for Ch8-Ch10; Ch9 em-dash fix. |
-| 6 | Part IV Speech LLM (Ch11-Ch13) | done | Ch11 intro; Ch12 + Ch13 intros and expansions (Q4 2025/2026). |
-| 7 | Part V app layer (Ch14, Ch15, Ch21) | done | Ch14 intro; Ch15/Ch21 already had intros. |
-| 8 | Part VI Vietnamese (Ch16-Ch17 + App E) | done | Ch16/Ch17 intros; App E reorganized; typos fixed. |
-| 9 | Part VII production (Ch18-Ch20 + App F) | done | Ch18/Ch19 intros; Ch20 already had intro; App F reorganized. |
-| 10 | Appendices A-D + references.md | done | App A-D add Phụ lục N: prefix; references.md rewritten. |
-| 11 | Repo docs + theme polish | done | Theme already good; docs updated. |
-| 12 | Final QA + SESSION_REPORT | done | Build clean, 0 KaTeX errors, 0 forbidden phrases. |
+| A | Baseline build and QA scan | done | Build passed; scan found stale `TBD`, tone issues, static figures, and Mermaid CI gap. |
+| B | Build/deploy/style-guide consistency | done | CI now installs `mdbook-mermaid`; KaTeX underscore guidance corrected. |
+| C | High-risk content rewrite | done | Ch16, Ch17, Ch20 rewritten for evidence discipline and lecturer tone. |
+| D | Visualization upgrade | done | Core architecture figures converted from static placeholders to Mermaid diagrams. |
+| E | Frontier/SOTA claim normalization | done | Ch12, Ch13, Ch14, Ch15, Ch20, Ch21 and appendices adjusted to avoid overclaiming. |
+| F | Final verification and docs sync | in-progress | QA docs updated; final scan/build/commit/push pending. |
 
-## File-level tracking
+## File Groups Reviewed
 
-Legend: `pending` / `in-progress` / `done` / `blocked`. Status `audit` means already expanded in previous session but needs tone audit under the corrected style guide.
-
-### Documentation
-
-| File | Lines | Status | Last commit |
-|---|---|---|---|
-| `docs/STYLE_GUIDE.md` | 384 | pending (rewrite) | bc64458 |
-| `docs/research-q4-2025-models.md` | 162 | pending (polish) | (earlier) |
-| `docs/AUTONOMOUS_SESSION_REPORT.md` | 188 | pending (review) | (earlier) |
-| `README.md` | 62 | pending | (earlier) |
-
-### Root / Theme / Config
-
-| File | Status | Notes |
+| Group | Status | Notes |
 |---|---|---|
-| `book.toml` | pending | Metadata, math config review. |
-| `theme/custom.css` | pending | Typography, callouts, tables. |
-| `theme/custom.js` | pending | Minor utilities. |
-| `theme/katex-macros.txt` | pending | KaTeX macros. |
-| `.github/workflows/publish-mdbook.yml` | pending | Already minimal. |
-| `.gitignore` | pending | Verify `/book/`. |
+| Root/build | done | `.github/workflows/publish-mdbook.yml` now installs `mdbook-mermaid`. |
+| Style guide | done | `docs/STYLE_GUIDE.md` matches actual KaTeX safety rules. |
+| ASR/TTS/Codec visuals | done | Ch4, Ch6, Ch8, Ch9, Ch10 diagrams converted to Mermaid where they were core architecture figures. |
+| Speech LLM / Omni | done | Ch11 diagrams converted; Ch12 frontier claims tempered. |
+| Applications | done | Ch14, Ch15, Ch21 claims/tone normalized; Ch15 frontier language rewritten. |
+| Vietnamese content | done | Ch16/Ch17 benchmark and industry language rewritten more cautiously. |
+| Production | done | Ch20 rewritten for professional production-system framing. |
+| Appendices | done | Appendix C mapping figure converted; Appendix F SOTA wording normalized. |
 
-### Book source
+## Final Scanner Targets
 
-| File | Lines | Status | Notes |
-|---|---|---|---|
-| `src/index.md` | 257 | pending | Sync Phần 0. |
-| `src/SUMMARY.md` | 56 | pending | Add Chương 0. |
-| `src/references.md` | 2 | pending | Placeholder. |
-| `src/part0/00-foundations-review.md` | (new) | pending | Create from scratch. |
-| `src/part1/01-nlp-to-speech.md` | 938 | audit | Already comprehensive. |
-| `src/part1/02-audio-fundamentals.md` | 512 | pending | Expand DSP. |
-| `src/part1/03-speech-representations.md` | 321 | pending | Expand SSL. |
-| `src/part2/04-asr-foundations.md` | 549 | pending | |
-| `src/part2/05-modern-asr.md` | 313 | pending | |
-| `src/part2/06-whisper-canary.md` | 368 | pending | |
-| `src/part2/07-streaming-asr.md` | 270 | pending | |
-| `src/part3/08-tts-foundations.md` | 497 | pending | |
-| `src/part3/09-end-to-end-tts.md` | 429 | pending | |
-| `src/part3/10-audio-codecs.md` | 441 | pending | |
-| `src/part4/11-speech-llms.md` | 520 | audit | Already has Q4/2026 update. |
-| `src/part4/12-multimodal-omni.md` | 232 | pending | Expand. |
-| `src/part4/13-full-duplex.md` | 195 | pending | Expand. |
-| `src/part5/14-speech-classification.md` | 284 | pending | Expand. |
-| `src/part5/15-speech-translation.md` | 997 | audit | Already comprehensive. |
-| `src/part6/16-vietnamese-speech.md` | 476 | audit | Already has industry section. |
-| `src/part6/17-vietnamese-datasets.md` | 231 | pending | Expand. |
-| `src/part7/18-training-frameworks.md` | 482 | pending | Expand frameworks. |
-| `src/part7/19-inference-engines.md` | 1124 | audit | Already comprehensive. |
-| `src/part7/20-production-systems.md` | 777 | audit | Already comprehensive. |
-| `src/part7/21-wake-word-detection.md` | 753 | audit | Already comprehensive. |
-| `src/appendices/appendix-a-notation.md` | 113 | pending | |
-| `src/appendices/appendix-b-proofs.md` | 323 | pending | |
-| `src/appendices/appendix-c-mapping.md` | 115 | pending | Expand mapping. |
-| `src/appendices/appendix-d-code.md` | 152 | pending | Sync chapter numbers. |
-| `src/appendices/appendix-e-vietnamese-resources.md` | 94 | pending | Expand resources. |
-| `src/appendices/appendix-f-tool-comparison.md` | 118 | pending | Expand matrices. |
+The final verification pass checks public `src/**/*.md` for:
 
-## Stop conditions log
+- `TBD`, `TODO`, `FIXME`, `placeholder`, `coming soon`, `lorem`.
+- Forbidden casual phrases such as `Bùm`, `đừng hoảng`, `Anyway`, `Nói thật`, `cực kỳ elegant`.
+- Static figure placeholders matching `<img src="fig-`.
+- mdBook build errors, KaTeX parse errors, and Mermaid preprocessor failures.
 
-Empty (no blockers yet).
+## Stop Conditions
 
-## Build log
-
-| Timestamp | Trigger | Result | KaTeX errors |
-|---|---|---|---|
-| 2026-05-24 01:21 | Baseline | OK | 0 |
+No stop condition was triggered. No new chapter-scale restructuring was performed; changes stayed within the approved full review/rewrite/verify scope.

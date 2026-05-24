@@ -64,14 +64,21 @@ Toàn bộ chương public đã được audit theo `docs/STYLE_GUIDE.md`:
 - Bullet-dump đã được thay bằng văn xuôi narrative ở các đoạn diễn giải chính.
 - Mọi claim số liệu (WER, MOS, latency, pricing) đã được đánh dấu nguồn hoặc note "estimated".
 
-## Những điểm còn có thể tiếp tục cải thiện
+## Cập nhật sau vòng QA A-Z ngày 2026-05-25
 
-Plan có chừa không gian cho các vòng nâng cấp tiếp theo:
+Một vòng review/rewrite/verify bổ sung đã được thực hiện sau phiên rewrite ban đầu:
 
-- Một số chương (Ch12, Ch13, Ch14, Ch17) đã có intro chuyên nghiệp nhưng phần thân vẫn còn ngắn so với các chương lớn (Ch1, Ch15, Ch19, Ch20, Ch21). Có thể mở rộng thêm sections trong các phiên sau khi cần.
-- Các figure trong nội dung gốc vẫn đang dùng placeholder `<img src="fig-XX.png">`. Cần thay bằng diagram thật khi có thời gian.
-- Một số code listing có thể bổ sung thêm code thực thi được (notebooks) để bạn đọc chạy thử.
-- Vietnamese benchmark cho code-switching và emotion vẫn là gap thực sự của ngành, không thể giải quyết trong scope rewrite cuốn sách.
+- Ch17, Ch20 và các đoạn có claim động đã được chỉnh lại theo hướng thận trọng, có ngữ cảnh benchmark và không tuyệt đối hóa `SOTA`.
+- Các figure kiến trúc trọng tâm đã được chuyển sang Mermaid diagrams; public scanner không còn static placeholder `<img src="fig-...">`.
+- GitHub Actions đã được đồng bộ với `book.toml` bằng cách cài `mdbook-mermaid`.
+- `docs/STYLE_GUIDE.md` đã sửa quy tắc KaTeX underscore để khớp với thực tế browser rendering.
+- Final public scanner mục tiêu: `TBD = 0`, forbidden casual phrases = 0, static figure placeholders = 0.
+
+Các điểm còn có thể tiếp tục cải thiện trong tương lai:
+
+- Bổ sung thêm notebook hoặc runnable examples cho một số code listing dài.
+- Nếu cần mở rộng chương mới, cân nhắc một chương/phụ lục riêng cho Speech Enhancement (denoising, dereverberation, separation).
+- Vietnamese benchmark cho code-switching và emotion vẫn là khoảng trống thực sự của ngành, cần dữ liệu mới ngoài phạm vi rewrite nội dung.
 
 ## Stop conditions đã gặp
 
